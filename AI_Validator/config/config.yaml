@@ -9,7 +9,7 @@ server:
 # This is for downloading models from Hugging Face Hub
 huggingface:
   # Set this to your Hugging Face token if you need to access gated models
-  token: "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"
+  token: "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"
   
   # Model configuration
   model:

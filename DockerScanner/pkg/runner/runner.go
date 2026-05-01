@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"dockerhunter/pkg/client"
+	"github.com/noureldinSAF/AutoHunting/DockerScanner/pkg/client"
 )
 
 func Run(opts *Options) error {

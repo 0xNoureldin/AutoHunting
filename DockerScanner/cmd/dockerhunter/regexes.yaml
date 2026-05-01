@@ -1,4 +1,4 @@
-GithubScanner/ghscan/regexes.yaml# Secret Scanner Configuration File
+## GithubScanner/ghscan/regexes.yaml# Secret Scanner Configuration File
 signatures:
   - pattern:
       sensitive: true

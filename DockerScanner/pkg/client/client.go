@@ -11,7 +11,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/cyinnove/logify"
-	docker "github.com/fsouza/go-dockerclient"
+	"github.com/fsouza/go-dockerclient"
 )
 
 var (
@@ -232,15 +232,22 @@ func (s *DockerScan) scanContainerFiles(containerID string) error {
 
 // scanContent runs only the GeneralPattern regex on file content and appends matches.
 func (s *DockerScan) scanContent(filePath, content string) {
-	for _, match := range GeneralPattern.FindAllString(content, -1) {
-		match = strings.TrimSpace(match)
-		if match == "" || len(match) < 20 {
+	for _, pattern := range GeneralPatterns {
+		if pattern.Regex == nil {
 			continue
 		}
-		s.matches = append(s.matches, &SecretMatch{
-			Secret:   match,
-			FilePath: filePath,
-		})
+
+		for _, match := range pattern.Regex.FindAllString(content, -1) {
+			match = strings.TrimSpace(match)
+			if match == "" || len(match) < 20 {
+				continue
+			}
+
+			s.matches = append(s.matches, &SecretMatch{
+				Secret:   match,
+				FilePath: filePath,
+			})
+		}
 	}
 }
 

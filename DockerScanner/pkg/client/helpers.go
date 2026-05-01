@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	
 
 	"github.com/cyinnove/logify"
 	docker "github.com/fsouza/go-dockerclient"
 )
+
+
 
 // scanRoot returns the path to scan: workDir if set, else first existing root from defaultScanRoots.
 func (s *DockerScan) scanRoot(containerID string) string {

@@ -6,7 +6,7 @@ import (
 	"github.com/cyinnove/logify"
 	"github.com/spf13/cobra"
 
-	"dockerhunter/pkg/runner"
+	"github.com/noureldinSAF/AutoHunting/DockerScanner/pkg/runner"
 )
 
 var (
@@ -47,6 +47,8 @@ for sensitive information using customizable regex patterns.`,
 	flags.StringVarP(&opts.ImagesInputFile, "input-file", "f", "", "Path to file containing list of images to scan")
 	flags.BoolVar(&debug, "debug", false, "Enable debug logging")
 	flags.BoolVar(&verbose, "verbose", false, "Enable verbose/info logging")
+	flags.StringVarP(&opts.RegexesFile, "regexes", "r", "regexes.yaml", "Path to regexes YAML file")
+	
 
 	if err := rootCmd.Execute(); err != nil {
 		logify.Errorf("Error: %v", err)

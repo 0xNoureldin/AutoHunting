@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY main.py .
 COPY app ./app
-COPY README.md .
+## COPY README.md .
 
 # Create config directory
 RUN mkdir -p config

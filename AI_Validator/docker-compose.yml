@@ -8,7 +8,8 @@ services:
       - ./config:/app/config
     environment:
       - PYTHONUNBUFFERED=1
-      - HUGGINGFACEHUB_API_TOKEN=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
+      - HUGGINGFACEHUB_API_TOKEN=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
+      ##- HUGGINGFACEHUB_API_TOKEN=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
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

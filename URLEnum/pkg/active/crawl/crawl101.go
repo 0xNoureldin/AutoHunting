@@ -1,14 +1,13 @@
 package crawl
 
 import (
-	"context"
+	"context" 
 	"errors"
 	"fmt"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
-
 	"github.com/corpix/uarand"
 	"github.com/cyinnove/logify"
 	"github.com/gocolly/colly/v2"

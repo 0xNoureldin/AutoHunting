@@ -1,4 +1,5 @@
 import time
+import traceback
 from fastapi import APIRouter, HTTPException
 from app.models import ApiKeyResponse, ResponseDetails, TextRequest
 
@@ -17,7 +18,13 @@ def build_router(model_pipeline):
 
         start_time = time.time()
         try:
+            print("INPUT:", repr(request.text))
+            print("PIPELINE:", model_pipeline)
+
             result = model_pipeline(request.text)
+
+            print("RAW RESULT:", result)
+
             processing_time = time.time() - start_time
             api_keys = [item["word"] for item in result if "word" in item]
 
@@ -33,6 +40,8 @@ def build_router(model_pipeline):
                 details=details,
             )
         except Exception as e:
+            print("DETECTION ERROR:", repr(e))
+            traceback.print_exc()
             raise HTTPException(status_code=500, detail=f"Error processing text: {str(e)}")
 
     @router.get("/health")
