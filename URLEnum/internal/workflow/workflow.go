@@ -64,7 +64,7 @@ func Run(urls []string, opts Options) error {
 		if strings.TrimSpace(fo.OutDir) == "" {
 			fo.OutDir = filepath.Join(opts.OutDir, "fuzz-plan")
 		}
-		if err := fuzz.WritePlan(interestingURLs, fo); err != nil {
+		if err := fuzz.WritePlan(sorted, fo); err != nil {
 			return err
 		}
 	}
@@ -74,7 +74,7 @@ func Run(urls []string, opts Options) error {
 		if strings.TrimSpace(no.OutDir) == "" {
 			no.OutDir = filepath.Join(opts.OutDir, "nuclei-plan")
 		}
-		if err := nuclei.WritePlan(interestingURLs, no); err != nil {
+		if err := nuclei.WritePlan(sorted, no); err != nil {
 			return err
 		}
 	}
@@ -94,6 +94,7 @@ func writeSummary(path string, total int, interesting int, opts Options) error {
 		"Generated files:",
 		"- urls-prioritized.txt",
 		"- interesting.txt",
+		"- summary.md",
 	}
 	if opts.FuzzEnabled {
 		lines = append(lines, "- fuzz-plan/fuzz.txt", "- fuzz-plan/params.txt", "- fuzz-plan/ffuf_commands.sh")

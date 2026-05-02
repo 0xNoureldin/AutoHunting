@@ -2,6 +2,7 @@ package runner
 
 import (
 	"net/url"
+	"path"
 	"sort"
 	"strings"
 	"sync"
@@ -90,33 +91,109 @@ func parseDedupeMode(mode string) normalize.Mode {
 func activeSeeds(queries []string, urls []string, max int) []string {
 	seen := map[string]struct{}{}
 	out := make([]string, 0, len(queries)+len(urls))
-	add := func(raw string) {
-		raw = strings.TrimSpace(raw)
-		if raw == "" || strings.HasPrefix(raw, "#") {
+
+	addSeed := func(seed string) {
+		if max > 0 && len(out) >= max {
 			return
 		}
-		if !strings.Contains(raw, "://") {
-			raw = "https://" + raw
-		}
-		u, err := url.Parse(raw)
-		if err != nil || u.Host == "" {
-			return
-		}
-		seed := strings.ToLower(u.Scheme) + "://" + strings.ToLower(u.Host) + "/"
 		if _, ok := seen[seed]; ok {
 			return
 		}
 		seen[seed] = struct{}{}
 		out = append(out, seed)
 	}
+
+	parseCandidate := func(raw string) *url.URL {
+		raw = strings.TrimSpace(raw)
+		if raw == "" || strings.HasPrefix(raw, "#") {
+			return nil
+		}
+		if !strings.Contains(raw, "://") {
+			raw = "https://" + raw
+		}
+		u, err := url.Parse(raw)
+		if err != nil || u.Host == "" {
+			return nil
+		}
+		scheme := strings.ToLower(u.Scheme)
+		if scheme != "http" && scheme != "https" {
+			return nil
+		}
+		u.Scheme = scheme
+		u.Host = strings.ToLower(u.Host)
+		u.Fragment = ""
+		return u
+	}
+
+	addRoot := func(raw string) {
+		u := parseCandidate(raw)
+		if u == nil {
+			return
+		}
+		addSeed(u.Scheme + "://" + u.Host + "/")
+	}
+
+	addHighValuePath := func(raw string) {
+		u := parseCandidate(raw)
+		if u == nil || isStaticSeedAsset(u.Path) || !isHighValueSeedPath(u.Path) {
+			return
+		}
+		p := path.Clean(u.EscapedPath())
+		if p == "." || p == "" {
+			p = "/"
+		}
+		if !strings.HasPrefix(p, "/") {
+			p = "/" + p
+		}
+		if p == "/" {
+			return
+		}
+		addSeed(u.Scheme + "://" + u.Host + p)
+	}
+
 	for _, q := range queries {
-		add(q)
+		addRoot(q)
 	}
 	for _, u := range urls {
-		if max > 0 && len(out) >= max {
-			break
-		}
-		add(u)
+		addRoot(u)
+	}
+	for _, q := range queries {
+		addHighValuePath(q)
+	}
+	for _, u := range urls {
+		addHighValuePath(u)
 	}
 	return out
+}
+
+func isHighValueSeedPath(rawPath string) bool {
+	p := strings.ToLower(rawPath)
+	for _, term := range []string{
+		"/admin",
+		"/login",
+		"/dashboard",
+		"/api",
+		"/graphql",
+		"/swagger",
+		"/openapi",
+		"/console",
+		"/internal",
+		"/debug",
+		"/oauth",
+	} {
+		if strings.HasPrefix(p, term) || strings.Contains(p, term+"/") || strings.HasSuffix(p, term) {
+			return true
+		}
+	}
+	return false
+}
+
+func isStaticSeedAsset(rawPath string) bool {
+	ext := strings.ToLower(path.Ext(rawPath))
+	switch ext {
+	case ".css", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".woff", ".woff2", ".ttf", ".map", ".pdf", ".zip":
+		return true
+	default:
+		return false
+	}
 }

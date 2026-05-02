@@ -12,11 +12,12 @@ import (
 	"time"
 
 	"github.com/corpix/uarand"
+	"github.com/cyinnove/logify"
 )
 
 type Source struct{}
 
-func (s *Source) Name() string { return "webarchive" }
+func (s *Source) Name() string        { return "webarchive" }
 func (s *Source) RequireAPIKey() bool { return false }
 
 func (s *Source) Search(ctx context.Context, query string, client *http.Client) ([]string, error) {
@@ -37,9 +38,9 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 
 	// Retry policy (tune)
 	const (
-		maxRetries = 3
+		maxRetries = 1
 		baseDelay  = 500 * time.Millisecond
-		maxDelay   = 20 * time.Second
+		maxDelay   = 2 * time.Second
 	)
 
 	var lastErr error
@@ -48,7 +49,9 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 			return nil, ctx.Err()
 		}
 
-		time.Sleep(time.Duration(150+rand.Intn(350)) * time.Millisecond)
+		if err := sleepExact(ctx, time.Duration(150+rand.Intn(350))*time.Millisecond); err != nil {
+			return nil, err
+		}
 
 		req, err := http.NewRequestWithContext(ctx, "GET", cdx, nil)
 		if err != nil {
@@ -59,8 +62,14 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 		resp, err := client.Do(req)
 		if err != nil {
 			lastErr = err
+			if ctx.Err() != nil {
+				return nil, ctx.Err()
+			}
 			if attempt == maxRetries || !isRetryableNetErr(err) {
 				return nil, err
+			}
+			if isContextDeadlineErr(err) {
+				logify.Infof("webarchive: context deadline exceeded for %s; retrying attempt %d/%d", query, attempt+2, maxRetries+1)
 			}
 			if err := sleepBackoff(ctx, attempt, baseDelay, maxDelay); err != nil {
 				return nil, err
@@ -71,6 +80,7 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 		// Got HTTP response
 		out, retry, err := handleWebArchiveResponse(ctx, resp, attempt, maxRetries, baseDelay, maxDelay)
 		if err == nil && !retry {
+			logify.Infof("webarchive: request completed for %s with %d urls", query, len(out))
 			return out, nil
 		}
 		if err != nil {
@@ -143,7 +153,9 @@ func handleWebArchiveResponse(
 }
 
 func isRetryableNetErr(err error) bool {
-	if err == nil { return false }
+	if err == nil {
+		return false
+	}
 	s := strings.ToLower(err.Error())
 	return strings.Contains(s, "connection refused") ||
 		strings.Contains(s, "connection reset") ||
@@ -156,6 +168,9 @@ func isRetryableNetErr(err error) bool {
 		strings.Contains(s, "no such host")
 }
 
+func isContextDeadlineErr(err error) bool {
+	return err != nil && strings.Contains(strings.ToLower(err.Error()), "context deadline exceeded")
+}
 
 func sleepBackoff(ctx context.Context, attempt int, base, max time.Duration) error {
 	d := base * time.Duration(1<<attempt)
@@ -169,6 +184,9 @@ func sleepBackoff(ctx context.Context, attempt int, base, max time.Duration) err
 }
 
 func sleepExact(ctx context.Context, d time.Duration) error {
+	if d <= 0 {
+		return nil
+	}
 	t := time.NewTimer(d)
 	defer t.Stop()
 	select {

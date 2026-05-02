@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 )
 
 type PlanOptions struct {
-	Enabled   bool
-	OutDir    string
-	Marker    string
-	Wordlist  string
-	Rate      int
-	MinScore  int
+	Enabled  bool
+	OutDir   string
+	Marker   string
+	Wordlist string
+	Rate     int
+	MinScore int
 }
 
 func (o PlanOptions) withDefaults() PlanOptions {
@@ -65,13 +64,13 @@ func ffufCommands(results []Result, opts PlanOptions) []string {
 	cmds = append(cmds, "#!/usr/bin/env bash", "set -euo pipefail", "")
 	for i, r := range results {
 		name := fmt.Sprintf("ffuf-%04d.json", i+1)
-		cmds = append(cmds, fmt.Sprintf("ffuf -u %q -w %q -rate %d -timeout 10 -mc all -of json -o %q", r.URL, opts.Wordlist, opts.Rate, filepath.Join(opts.OutDir, name)))
+		outPath := filepath.ToSlash(filepath.Join(opts.OutDir, name))
+		cmds = append(cmds, fmt.Sprintf("ffuf -u %q -w %q -rate %d -timeout 10 -mc all -of json -o %q", r.URL, opts.Wordlist, opts.Rate, outPath))
 	}
 	return cmds
 }
 
 func writeLines(path string, lines []string) error {
-	sort.Strings(lines)
 	f, err := os.Create(path)
 	if err != nil {
 		return err

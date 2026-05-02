@@ -10,11 +10,13 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
-    "strconv"
+
 	"github.com/corpix/uarand"
+	"github.com/cyinnove/logify"
 )
 
 type Source struct {
@@ -42,6 +44,8 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 	if ctx == nil {
 		ctx = context.Background()
 	}
+
+	logify.Infof("commoncrawl: request started for %s", query)
 
 	api, err := latestCDXAPI(ctx, client)
 	if err != nil {
@@ -84,6 +88,7 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 		}
 	}
 
+	logify.Infof("commoncrawl: request completed for %s with %d urls", query, len(out))
 	return out, nil
 }
 
@@ -91,9 +96,9 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 
 func cdxQueryWithRetry(ctx context.Context, client *http.Client, apiBase string, urlPattern string) ([]string, error) {
 	const (
-		maxRetries = 6
+		maxRetries = 2
 		baseDelay  = 500 * time.Millisecond
-		maxDelay   = 20 * time.Second
+		maxDelay   = 5 * time.Second
 	)
 
 	var lastErr error
@@ -102,8 +107,9 @@ func cdxQueryWithRetry(ctx context.Context, client *http.Client, apiBase string,
 			return nil, ctx.Err()
 		}
 
-		// small jitter helps under concurrency
-		time.Sleep(time.Duration(100+rand.Intn(200)) * time.Millisecond)
+		if err := sleepExact(ctx, time.Duration(100+rand.Intn(200))*time.Millisecond); err != nil {
+			return nil, err
+		}
 
 		urls, retry, err := cdxQueryOnce(ctx, client, apiBase, urlPattern)
 		if err == nil && !retry {
@@ -119,6 +125,7 @@ func cdxQueryWithRetry(ctx context.Context, client *http.Client, apiBase string,
 			return nil, lastErr
 		}
 
+		logify.Infof("commoncrawl: %s failed: %v; retrying attempt %d/%d", urlPattern, lastErr, attempt+2, maxRetries+1)
 		if err := sleepBackoff(ctx, attempt, baseDelay, maxDelay); err != nil {
 			return nil, err
 		}
@@ -386,4 +393,4 @@ func parseRetryAfter(v string) (time.Duration, bool) {
 		return d, true
 	}
 	return 0, false
-} 
+}

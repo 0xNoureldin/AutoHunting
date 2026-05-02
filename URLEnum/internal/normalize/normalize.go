@@ -32,27 +32,38 @@ func Key(raw string, mode Mode) string {
 	if !strings.HasPrefix(p, "/") {
 		p = "/" + p
 	}
-	u.Path = p
+	base := u.Scheme + "://" + u.Host + p
 
 	switch mode {
 	case Exact:
-		return u.String()
+		if u.RawQuery == "" {
+			return base
+		}
+		return base + "?" + u.RawQuery
 
 	case ParamAware:
 		q := u.Query()
-		keys := make([]string, 0, len(q))
+		seen := map[string]struct{}{}
 		for k := range q {
-			keys = append(keys, strings.ToLower(k))
+			seen[strings.ToLower(k)] = struct{}{}
+		}
+		keys := make([]string, 0, len(seen))
+		for k := range seen {
+			keys = append(keys, k)
 		}
 		sort.Strings(keys)
-		u.RawQuery = strings.Join(keys, "&")
-		return u.Scheme + "://" + u.Host + u.Path + "?" + u.RawQuery
+		if len(keys) == 0 {
+			return base
+		}
+		return base + "?" + strings.Join(keys, "&")
 
 	case PathOnly:
-		u.RawQuery = ""
-		return u.Scheme + "://" + u.Host + u.Path
+		return base
 
 	default:
-		return u.String()
+		if u.RawQuery == "" {
+			return base
+		}
+		return base + "?" + u.RawQuery
 	}
 }

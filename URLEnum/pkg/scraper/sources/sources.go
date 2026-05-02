@@ -14,23 +14,24 @@ var AllSources = [...]scraper.Source{
 }
 
 func GetAllSources(apiKeys map[string][]string) []scraper.Source {
-
 	var sources []scraper.Source
 
 	for _, source := range AllSources {
-		//sourceName := source.Name()
-
 		if source.RequireAPIKey() {
-			// if keys, ok := apiKeys[sourceName]; ok && len(keys) > 0 {
-			// 	switch sourceName {
-			// 	case "urlscan":
-			// 		sources = append(sources, urlscan.New(keys))
-			//     }
-			continue;
-		} else { sources = append(sources, source) }
-	    }
-    
+			keys := apiKeys[source.Name()]
+			if len(keys) == 0 {
+				continue
+			}
+			switch source.Name() {
+			case "urlscan":
+				sources = append(sources, urlscan.New(keys))
+			default:
+				sources = append(sources, source)
+			}
+			continue
+		}
+		sources = append(sources, source)
+	}
 
 	return sources
 }
- 

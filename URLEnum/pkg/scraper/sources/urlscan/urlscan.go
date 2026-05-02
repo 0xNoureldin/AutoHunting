@@ -1,23 +1,20 @@
 package urlscan
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
-	//"log"
 	"math/rand"
 	"net/http"
 	"net/url"
-
-	"time"
-	"context"
 	"strings"
-	
+	"time"
 
-	//"github.com/cyinnove/logify"
+	"github.com/corpix/uarand"
 )
 
-type Source struct { apiKeys []string }
+type Source struct{ apiKeys []string }
 
 func (s *Source) Name() string {
 	return "urlscan"
@@ -26,7 +23,6 @@ func (s *Source) Name() string {
 func (s *Source) RequireAPIKey() bool {
 	return true
 }
-
 
 // type responseObj struct {
 // 	TotalResult int `json:"total_Result"`
@@ -41,40 +37,50 @@ func New(apiKeys []string) *Source {
 	return &Source{apiKeys: apiKeys}
 }
 
-
-
 func (s *Source) randomKey() string {
+	if len(s.apiKeys) == 0 {
+		return ""
+	}
 	return s.apiKeys[rand.Intn(len(s.apiKeys))]
 }
 
 func (s *Source) Search(ctx context.Context, query string, client *http.Client) ([]string, error) {
-
-	var urls []string
-
+	query = strings.TrimSpace(query)
 	if query == "" {
-		return urls, nil
+		return nil, nil
+	}
+	if client == nil {
+		return nil, fmt.Errorf("nil http client")
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if _, ok := ctx.Deadline(); !ok {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, 30*time.Second)
+		defer cancel()
 	}
 
 	qs := url.Values{}
 	qs.Set("q", fmt.Sprintf("domain:%s", query))
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://urlscan.io/api/v1/search/?q="+qs.Encode(), nil)
 	if err != nil {
-		return urls, err
+		return nil, err
 	}
-	req.Header.Set("User-Agent", "uarand.GetRandom()") 
+	req.Header.Set("User-Agent", uarand.GetRandom())
+	if key := s.randomKey(); key != "" {
+		req.Header.Set("API-Key", key)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return urls, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, fmt.Errorf("webarchive returned non-200 status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("urlscan returned non-2xx status code: %d", resp.StatusCode)
 	}
 
 	var parsed struct {
@@ -91,13 +97,11 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 
 	out := make([]string, 0, len(parsed.Results))
 	for _, r := range parsed.Results {
-		out = append(out, r.Page.URL)
-
 		u := strings.TrimSpace(r.Page.URL)
 		if u == "" {
 			continue
 		}
-		
+
 		out = append(out, u)
 	}
 

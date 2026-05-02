@@ -22,11 +22,16 @@ func selectHeadlessSeeds(urls []string, limit int) []string {
 		if err != nil || u.Scheme == "" || u.Host == "" {
 			continue
 		}
+		scheme := strings.ToLower(u.Scheme)
+		if scheme != "http" && scheme != "https" {
+			continue
+		}
 		if !isHeadlessCandidate(u) {
 			continue
 		}
-		seed := u.Scheme + "://" + strings.ToLower(u.Host) + u.Path
-		if seed == "" || seed == u.Scheme+"://"+strings.ToLower(u.Host) {
+		base := scheme + "://" + strings.ToLower(u.Host)
+		seed := base + u.Path
+		if seed == "" || seed == base {
 			seed += "/"
 		}
 		if _, ok := seen[seed]; ok {
@@ -37,6 +42,9 @@ func selectHeadlessSeeds(urls []string, limit int) []string {
 	}
 	sort.Slice(scored, func(i, j int) bool {
 		if scored[i].score == scored[j].score {
+			if len(scored[i].url) == len(scored[j].url) {
+				return scored[i].url < scored[j].url
+			}
 			return len(scored[i].url) < len(scored[j].url)
 		}
 		return scored[i].score > scored[j].score
@@ -68,7 +76,7 @@ func headlessScore(u *url.URL) int {
 	p := strings.ToLower(u.Path)
 	q := strings.ToLower(u.RawQuery)
 	score := 0
-	for _, hit := range []string{"/app", "/admin", "/login", "/signin", "/dashboard", "/portal", "/console", "/account", "/oauth", "/callback"} {
+	for _, hit := range []string{"/app", "/admin", "/administrator", "/login", "/signin", "/dashboard", "/portal", "/console", "/account", "/oauth", "/callback", "/api", "/graphql", "/swagger", "/openapi"} {
 		if strings.Contains(p, hit) {
 			score += 10
 		}

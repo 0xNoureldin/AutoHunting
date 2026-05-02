@@ -109,11 +109,13 @@ func recommendTags(urls []string, extra []string) []string {
 
 func commands(opts PlanOptions, tags []string) []string {
 	tagArg := strings.Join(tags, ",")
+	targetsPath := filepath.ToSlash(filepath.Join(opts.OutDir, "nuclei_targets.txt"))
+	resultsPath := filepath.ToSlash(filepath.Join(opts.OutDir, "nuclei-results.txt"))
 	return []string{
 		"#!/usr/bin/env bash",
 		"set -euo pipefail",
 		"",
-		fmt.Sprintf("nuclei -l %q -tags %q -rate-limit %d -o %q", filepath.Join(opts.OutDir, "nuclei_targets.txt"), tagArg, opts.Rate, filepath.Join(opts.OutDir, "nuclei-results.txt")),
+		fmt.Sprintf("nuclei -l %q -tags %q -rate-limit %d -o %q", targetsPath, tagArg, opts.Rate, resultsPath),
 	}
 }
 

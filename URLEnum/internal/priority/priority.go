@@ -63,17 +63,23 @@ func Rank(raw string) Ranked {
 		return r
 	}
 	p := strings.ToLower(u.Path)
-	q := strings.ToLower(u.RawQuery)
+	queryNames := make([]string, 0, len(u.Query()))
+	for name := range u.Query() {
+		queryNames = append(queryNames, strings.ToLower(name))
+	}
 	for _, w := range pathWeights {
-		if strings.HasPrefix(p, w.term) || strings.Contains(p, w.term+"/") {
+		if strings.HasPrefix(p, w.term) || strings.Contains(p, w.term+"/") || strings.HasSuffix(p, w.term) {
 			r.Score += w.weight
 			r.Reason = append(r.Reason, w.reason)
 		}
 	}
 	for _, w := range paramWeights {
-		if strings.Contains(q, w.term+"=") || strings.Contains(q, w.term+"%5b") {
-			r.Score += w.weight
-			r.Reason = append(r.Reason, w.reason)
+		for _, name := range queryNames {
+			if name == w.term || strings.Contains(name, w.term) {
+				r.Score += w.weight
+				r.Reason = append(r.Reason, w.reason)
+				break
+			}
 		}
 	}
 	if strings.HasSuffix(p, ".js") {
