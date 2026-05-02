@@ -2,6 +2,7 @@ package priority
 
 import (
 	"net/url"
+	"path"
 	"sort"
 	"strings"
 )
@@ -17,27 +18,34 @@ var pathWeights = []struct {
 	weight int
 	reason string
 }{
-	{"/admin", 100, "admin path"},
-	{"/administrator", 100, "admin path"},
-	{"/console", 90, "console path"},
-	{"/dashboard", 85, "dashboard path"},
-	{"/manage", 80, "management path"},
-	{"/internal", 80, "internal path"},
-	{"/private", 80, "private path"},
-	{"/debug", 75, "debug path"},
-	{"/api", 70, "api path"},
-	{"/graphql", 70, "graphql path"},
-	{"/login", 65, "auth path"},
-	{"/signin", 65, "auth path"},
-	{"/auth", 65, "auth path"},
-	{"/oauth", 65, "oauth path"},
-	{"/callback", 60, "callback path"},
-	{"/upload", 55, "upload path"},
-	{"/download", 55, "download path"},
-	{"/backup", 50, "backup path"},
-	{"/swagger", 50, "api docs"},
-	{"/openapi", 50, "api docs"},
-	{"/api-docs", 50, "api docs"},
+	{"admin", 140, "admin path"},
+	{"administrator", 140, "admin path"},
+	{"console", 110, "console path"},
+	{"dashboard", 105, "dashboard path"},
+	{"api", 100, "api path"},
+	{"auth", 95, "auth path"},
+	{"signup", 90, "signup path"},
+	{"register", 90, "signup path"},
+	{"manage", 95, "management path"},
+	{"management", 95, "management path"},
+	{"internal", 95, "internal path"},
+	{"private", 90, "private path"},
+	{"debug", 90, "debug path"},
+	{"graphql", 85, "graphql path"},
+	{"swagger", 85, "api docs"},
+	{"openapi", 85, "api docs"},
+	{"api-docs", 85, "api docs"},
+	{"login", 80, "auth path"},
+	{"signin", 80, "auth path"},
+	{"oauth", 75, "oauth path"},
+	{"dev", 75, "development path"},
+	{"devops", 75, "development path"},
+	{"callback", 70, "callback path"},
+	{"upload", 70, "upload path"},
+	{"download", 65, "download path"},
+	{"backup", 65, "backup path"},
+	{"config", 55, "configuration path"},
+	{"settings", 50, "settings path"},
 }
 
 var paramWeights = []struct {
@@ -45,15 +53,38 @@ var paramWeights = []struct {
 	weight int
 	reason string
 }{
-	{"redirect", 35, "redirect parameter"},
-	{"next", 30, "redirect parameter"},
-	{"url", 30, "url parameter"},
-	{"callback", 30, "callback parameter"},
-	{"file", 30, "file parameter"},
-	{"path", 30, "path parameter"},
-	{"token", 25, "token parameter"},
-	{"code", 20, "code parameter"},
-	{"id", 15, "id parameter"},
+	{"admin", 90, "admin parameter"},
+	{"redirect", 85, "redirect parameter"},
+	{"api", 80, "api parameter"},
+	{"return", 75, "redirect parameter"},
+	{"return_to", 75, "redirect parameter"},
+	{"next", 75, "redirect parameter"},
+	{"auth", 75, "auth parameter"},
+	{"signup", 75, "signup parameter"},
+	{"register", 75, "signup parameter"},
+	{"url", 75, "url parameter"},
+	{"callback", 70, "callback parameter"},
+	{"file", 70, "file parameter"},
+	{"path", 65, "path parameter"},
+	{"token", 65, "token parameter"},
+	{"access_token", 65, "token parameter"},
+	{"dev", 60, "development parameter"},
+	{"code", 55, "code parameter"},
+	{"id", 45, "id parameter"},
+}
+
+var hostWeights = []struct {
+	term   string
+	weight int
+	reason string
+}{
+	{"admin", 80, "admin host"},
+	{"api", 70, "api host"},
+	{"auth", 65, "auth host"},
+	{"signup", 60, "signup host"},
+	{"register", 60, "signup host"},
+	{"dev", 55, "development host"},
+	{"devops", 55, "development host"},
 }
 
 func Rank(raw string) Ranked {
@@ -68,25 +99,150 @@ func Rank(raw string) Ranked {
 		queryNames = append(queryNames, strings.ToLower(name))
 	}
 	for _, w := range pathWeights {
-		if strings.HasPrefix(p, w.term) || strings.Contains(p, w.term+"/") || strings.HasSuffix(p, w.term) {
+		if pathHasPriorityTerm(p, w.term) {
 			r.Score += w.weight
 			r.Reason = append(r.Reason, w.reason)
 		}
 	}
 	for _, w := range paramWeights {
 		for _, name := range queryNames {
-			if name == w.term || strings.Contains(name, w.term) {
+			if paramHasPriorityTerm(name, w.term) {
 				r.Score += w.weight
 				r.Reason = append(r.Reason, w.reason)
 				break
 			}
 		}
 	}
-	if strings.HasSuffix(p, ".js") {
-		r.Score += 20
+	for _, w := range hostWeights {
+		if hostHasPriorityTerm(u.Host, w.term) {
+			r.Score += w.weight
+			r.Reason = append(r.Reason, w.reason)
+		}
+	}
+	if isJavaScriptPath(p) {
+		r.Score += 5
 		r.Reason = append(r.Reason, "javascript asset")
 	}
 	return r
+}
+
+func pathHasPriorityTerm(rawPath string, term string) bool {
+	term = strings.Trim(strings.ToLower(term), "/")
+	if term == "" {
+		return false
+	}
+	for _, segment := range strings.Split(strings.ToLower(rawPath), "/") {
+		if segment == "" {
+			continue
+		}
+		if segmentMatchesPriorityTerm(segment, term) {
+			return true
+		}
+		base := strings.TrimSuffix(segment, path.Ext(segment))
+		if base != segment && segmentMatchesPriorityTerm(base, term) {
+			return true
+		}
+	}
+	return false
+}
+
+func segmentMatchesPriorityTerm(segment, term string) bool {
+	if segment == term {
+		return true
+	}
+	if len(segment) > len(term) && strings.HasPrefix(segment, term) {
+		next := segment[len(term)]
+		if next >= '0' && next <= '9' {
+			return true
+		}
+		if len(term) >= 4 {
+			return true
+		}
+	}
+	for _, sep := range []string{"-", "_", ".", "~"} {
+		if strings.HasPrefix(segment, term+sep) || strings.HasSuffix(segment, sep+term) || strings.Contains(segment, sep+term+sep) {
+			return true
+		}
+	}
+	return false
+}
+
+func paramHasPriorityTerm(name, term string) bool {
+	tokens := identifierTokens(name)
+	name = strings.ToLower(strings.TrimSpace(name))
+	term = strings.ToLower(term)
+	for _, token := range tokens {
+		if token == term {
+			return true
+		}
+	}
+	if len(term) >= 4 && strings.Contains(name, term) {
+		return true
+	}
+	compactName := strings.NewReplacer("-", "", "_", "", ".", "").Replace(name)
+	compactTerm := strings.NewReplacer("-", "", "_", "", ".", "").Replace(term)
+	if compactTerm == "" {
+		return false
+	}
+	if len(term) <= 3 {
+		if term != "api" {
+			return compactName == compactTerm
+		}
+		for _, allowed := range []string{"api", "apikey", "apitoken", "apiurl", "apiendpoint", "apiversion"} {
+			if strings.HasPrefix(compactName, allowed) {
+				return true
+			}
+		}
+		return false
+	}
+	return strings.Contains(compactName, compactTerm)
+}
+
+func hostHasPriorityTerm(host, term string) bool {
+	host = strings.ToLower(host)
+	for _, part := range strings.Split(host, ".") {
+		if segmentMatchesPriorityTerm(part, term) {
+			return true
+		}
+	}
+	return false
+}
+
+func identifierTokens(s string) []string {
+	var tokens []string
+	var b strings.Builder
+	var prev rune
+	flush := func() {
+		if b.Len() == 0 {
+			return
+		}
+		tokens = append(tokens, strings.ToLower(b.String()))
+		b.Reset()
+	}
+	for _, r := range s {
+		switch {
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9':
+			if b.Len() > 0 && prev >= 'a' && prev <= 'z' && r >= 'A' && r <= 'Z' {
+				flush()
+			}
+			b.WriteRune(r)
+			prev = r
+		default:
+			flush()
+			prev = 0
+		}
+	}
+	flush()
+	return tokens
+}
+
+func isJavaScriptPath(rawPath string) bool {
+	switch strings.ToLower(path.Ext(rawPath)) {
+	case ".js", ".mjs", ".cjs":
+		return true
+	default:
+		return false
+	}
 }
 
 func Sort(urls []string) []string {
