@@ -145,16 +145,27 @@ func runPassiveStage(
 	store *resultStore,
 ) {
 	passiveJobs := make(chan passiveJob)
+	breakers := sourceCircuitBreakers(srcs)
 	var wg sync.WaitGroup
 	for i := 0; i < opts.Concurrency; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			for job := range passiveJobs {
+				breaker := breakers[job.source.Name()]
+				if breaker != nil && breaker.Disabled() {
+					continue
+				}
 				urls, err := runPassiveSourceWithRetry(ctx, opts, job, limiters[job.source.Name()])
 				if err != nil {
 					logify.Errorf("source %s failed for %s after retries: %v", job.source.Name(), job.query, err)
+					if breaker != nil && breaker.RecordFailure() {
+						logify.Errorf("source %s disabled after %d consecutive failures; skipping remaining jobs for this run", job.source.Name(), breaker.Threshold())
+					}
 					continue
+				}
+				if breaker != nil {
+					breaker.RecordSuccess()
 				}
 				for _, u := range urls {
 					store.Add(u, job.source.Name())
@@ -216,8 +227,8 @@ func runPassiveSourceWithRetry(ctx context.Context, opts *Options, job passiveJo
 
 func passiveRetryAttempts(sourceName string) int {
 	switch strings.ToLower(strings.TrimSpace(sourceName)) {
-	case "webarchive":
-		return 2
+	case "commoncrawl", "webarchive":
+		return 1
 	default:
 		return 2
 	}
@@ -228,28 +239,15 @@ func passiveRequestTimeout(opts *Options, sourceName string) time.Duration {
 	if configured <= 0 {
 		configured = 30 * time.Second
 	}
-
-	var capTimeout time.Duration
-	switch strings.ToLower(strings.TrimSpace(sourceName)) {
-	case "webarchive":
-		capTimeout = 5 * time.Second
-	case "commoncrawl":
-		capTimeout = 10 * time.Second
-	default:
-		capTimeout = 10 * time.Second
-	}
-	if configured < capTimeout {
-		return configured
-	}
-	return capTimeout
+	return configured
 }
 
 func passiveAttemptBudget(opts *Options, sourceName string, requestTimeout time.Duration) time.Duration {
 	switch strings.ToLower(strings.TrimSpace(sourceName)) {
 	case "webarchive":
-		return requestTimeout + 3*time.Second
+		return requestTimeout*2 + 5*time.Second
 	case "commoncrawl":
-		return requestTimeout * 2
+		return requestTimeout*3 + 10*time.Second
 	default:
 		return requestTimeout + 2*time.Second
 	}
