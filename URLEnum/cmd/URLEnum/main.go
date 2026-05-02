@@ -51,7 +51,7 @@ func main() {
 	flag.IntVar(&options.JSRetries, "js-retries", 3, "jsAnalyzer retries per JS URL")
 	flag.Int64Var(&options.JSMaxSize, "js-max-size", 5*1024*1024, "Maximum JS response size in bytes")
 	flag.BoolVar(&options.JSStrict, "js-strict", false, "Require JavaScript content type while fetching JS URLs")
-	flag.BoolVar(&options.JSRawSecrets, "js-raw-secrets", false, "Write raw secret values in JS secret outputs")
+	flag.BoolVar(&options.JSRawSecrets, "js-raw-secrets", true, "Write complete raw secret values in JS secret outputs; set false to mask")
 
 	flag.Parse()
 

@@ -32,7 +32,7 @@ func main() {
 	retries := flag.Int("retries", 3, "Number of retries for transient fetch failures")
 	maxSize := flag.Int64("max-size", 5*1024*1024, "Maximum JS response size in bytes")
 	strictJS := flag.Bool("strict-js", false, "Reject responses without a JavaScript content type")
-	rawSecrets := flag.Bool("raw-secrets", false, "Include raw secret values in JSON outputs")
+	rawSecrets := flag.Bool("raw-secrets", true, "Include complete raw secret values in JSON outputs; set false to mask")
 	deobfuscate := flag.Bool("deobfuscate", true, "Enable safe static deobfuscation/unpacking")
 	maxFindings := flag.Int("max-findings", 5000, "Maximum endpoints and secrets retained per JS file")
 

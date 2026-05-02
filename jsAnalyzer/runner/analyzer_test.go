@@ -103,6 +103,28 @@ func TestMaskedSecretOutputRedactsContext(t *testing.T) {
 	}
 }
 
+func TestRawSecretOutputKeepsCompleteValue(t *testing.T) {
+	raw := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature"
+	res, err := AnalyzeJSContentForURL("https://example.com/app.js", []byte(`const token = "`+raw+`";`), AnalyzeOptions{
+		Secrets:     true,
+		RawSecrets:  true,
+		Deobfuscate: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res.SecretFindings) != 1 {
+		t.Fatalf("expected one finding, got %#v", res.SecretFindings)
+	}
+	finding := res.SecretFindings[0]
+	if finding.Value != raw {
+		t.Fatalf("expected complete secret value %q, got %#v", raw, finding)
+	}
+	if !strings.Contains(finding.Context, raw) {
+		t.Fatalf("expected raw context when raw secrets are enabled, got %#v", finding)
+	}
+}
+
 func TestAnalyzeJavaScriptDeobfuscatesStaticStrings(t *testing.T) {
 	body := []byte(
 		"const escaped = \"\\x2f\\x61\\x70\\x69\\x2f\\x65\\x73\\x63\";\n" +

@@ -77,6 +77,37 @@ func TestRunJSSecretStageWritesMaskedSecretArtifacts(t *testing.T) {
 	}
 }
 
+func TestRunJSSecretStageCanWriteRawSecretArtifacts(t *testing.T) {
+	raw := "ghp_abcdefghijklmnopqrstuvwxyz123456"
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/javascript")
+		_, _ = w.Write([]byte(`const token = "` + raw + `";`))
+	}))
+	defer srv.Close()
+
+	outDir := t.TempDir()
+	opts := &Options{
+		JSOutDir:      outDir,
+		JSConcurrency: 1,
+		JSTimeout:     2,
+		JSRetries:     0,
+		JSMaxSize:     1024 * 1024,
+		JSRawSecrets:  true,
+	}
+
+	if err := runJSSecretStage([]string{srv.URL + "/static/app.js"}, opts); err != nil {
+		t.Fatal(err)
+	}
+
+	secrets, err := os.ReadFile(filepath.Join(outDir, jsSecretsFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(secrets), `"value":"`+raw+`"`) {
+		t.Fatalf("expected raw secret value in output, got: %s", secrets)
+	}
+}
+
 func TestRunJSSecretStageHandlesNoJSURLs(t *testing.T) {
 	outDir := t.TempDir()
 	opts := &Options{JSOutDir: outDir, JSConcurrency: 1, JSTimeout: 1, JSMaxSize: 1024}
