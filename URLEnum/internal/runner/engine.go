@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math/rand"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -68,6 +69,12 @@ func RunPipeline(opts *Options) error {
 		}
 	}
 
+	if opts.JSSecrets {
+		if err := runJSSecretStage(urls, opts); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -107,6 +114,25 @@ func setDefaults(opts *Options) {
 	}
 	if opts.NucleiRate <= 0 {
 		opts.NucleiRate = 20
+	}
+	if opts.JSConcurrency <= 0 {
+		opts.JSConcurrency = 3
+	}
+	if opts.JSTimeout <= 0 {
+		opts.JSTimeout = 30
+	}
+	if opts.JSRetries < 0 {
+		opts.JSRetries = 0
+	}
+	if opts.JSMaxSize <= 0 {
+		opts.JSMaxSize = 5 * 1024 * 1024
+	}
+	if strings.TrimSpace(opts.JSOutDir) == "" {
+		if opts.Workflow {
+			opts.JSOutDir = filepath.Join(opts.WorkflowOut, "js-secrets")
+		} else {
+			opts.JSOutDir = "urlenum-js-secrets"
+		}
 	}
 }
 

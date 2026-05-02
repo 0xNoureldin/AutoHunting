@@ -32,5 +32,14 @@ type Options struct {
 	NucleiRate   int
 	NucleiTags   string
 
+	JSSecrets     bool
+	JSOutDir      string
+	JSConcurrency int
+	JSTimeout     int
+	JSRetries     int
+	JSMaxSize     int64
+	JSStrict      bool
+	JSRawSecrets  bool
+
 	queries []string
 }

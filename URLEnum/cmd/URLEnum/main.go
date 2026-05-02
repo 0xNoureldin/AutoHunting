@@ -44,6 +44,15 @@ func main() {
 	flag.IntVar(&options.NucleiRate, "nuclei-rate", 20, "Rate limit used in generated nuclei commands")
 	flag.StringVar(&options.NucleiTags, "nuclei-tags", "", "Comma-separated extra nuclei tags")
 
+	flag.BoolVar(&options.JSSecrets, "js-secrets", false, "Extract discovered JS URLs and scan them with jsAnalyzer for secrets")
+	flag.StringVar(&options.JSOutDir, "js-out", "", "JS secret scan output directory")
+	flag.IntVar(&options.JSConcurrency, "js-c", 3, "jsAnalyzer worker concurrency")
+	flag.IntVar(&options.JSTimeout, "js-timeout", 30, "jsAnalyzer fetch timeout per JS URL in seconds")
+	flag.IntVar(&options.JSRetries, "js-retries", 3, "jsAnalyzer retries per JS URL")
+	flag.Int64Var(&options.JSMaxSize, "js-max-size", 5*1024*1024, "Maximum JS response size in bytes")
+	flag.BoolVar(&options.JSStrict, "js-strict", false, "Require JavaScript content type while fetching JS URLs")
+	flag.BoolVar(&options.JSRawSecrets, "js-raw-secrets", false, "Write raw secret values in JS secret outputs")
+
 	flag.Parse()
 
 	if err := runner.Run(options); err != nil {
