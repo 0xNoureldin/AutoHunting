@@ -12,11 +12,12 @@ import (
 	"time"
 
 	"github.com/corpix/uarand"
+	"github.com/cyinnove/logify"
 )
 
 type Source struct{}
 
-func (s *Source) Name() string { return "webarchive" }
+func (s *Source) Name() string        { return "webarchive" }
 func (s *Source) RequireAPIKey() bool { return false }
 
 func (s *Source) Search(ctx context.Context, query string, client *http.Client) ([]string, error) {
@@ -30,58 +31,103 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 		ctx = context.Background()
 	}
 
-	cdx := fmt.Sprintf(
-		"https://web.archive.org/cdx/search/cdx?url=*.%s/*&output=json&fl=original&collapse=urlkey",
-		url.QueryEscape(query),
-	)
+	logify.Infof("webarchive: request started for %s", query)
 
 	// Retry policy (tune)
 	const (
-		maxRetries = 3
+		maxRetries = 1
 		baseDelay  = 500 * time.Millisecond
-		maxDelay   = 20 * time.Second
+		maxDelay   = 2 * time.Second
 	)
 
+	patterns := []string{
+		"*." + query + "/*",
+		query + "/*",
+	}
+	seen := make(map[string]struct{})
+	out := make([]string, 0, 512)
 	var lastErr error
-	for attempt := 0; attempt <= maxRetries; attempt++ {
-		if ctx.Err() != nil {
-			return nil, ctx.Err()
-		}
+	success := false
 
-		time.Sleep(time.Duration(150+rand.Intn(350)) * time.Millisecond)
+	for _, pattern := range patterns {
+		cdx := fmt.Sprintf(
+			"https://web.archive.org/cdx/search/cdx?url=%s&output=json&fl=original&collapse=urlkey",
+			url.QueryEscape(pattern),
+		)
 
-		req, err := http.NewRequestWithContext(ctx, "GET", cdx, nil)
-		if err != nil {
-			return nil, err
-		}
-		req.Header.Set("User-Agent", uarand.GetRandom())
+		for attempt := 0; attempt <= maxRetries; attempt++ {
+			if ctx.Err() != nil {
+				if len(out) > 0 || success {
+					logify.Infof("webarchive: request completed for %s with %d urls before context deadline", query, len(out))
+					return out, nil
+				}
+				return nil, ctx.Err()
+			}
 
-		resp, err := client.Do(req)
-		if err != nil {
-			lastErr = err
-			if attempt == maxRetries || !isRetryableNetErr(err) {
+			if err := sleepExact(ctx, time.Duration(150+rand.Intn(350))*time.Millisecond); err != nil {
+				if len(out) > 0 || success {
+					return out, nil
+				}
 				return nil, err
 			}
-			if err := sleepBackoff(ctx, attempt, baseDelay, maxDelay); err != nil {
+
+			req, err := http.NewRequestWithContext(ctx, "GET", cdx, nil)
+			if err != nil {
 				return nil, err
 			}
-			continue
-		}
+			req.Header.Set("User-Agent", uarand.GetRandom())
 
-		// Got HTTP response
-		out, retry, err := handleWebArchiveResponse(ctx, resp, attempt, maxRetries, baseDelay, maxDelay)
-		if err == nil && !retry {
-			return out, nil
+			resp, err := client.Do(req)
+			if err != nil {
+				lastErr = err
+				if ctx.Err() != nil {
+					if len(out) > 0 || success {
+						logify.Infof("webarchive: request completed for %s with %d urls before context deadline", query, len(out))
+						return out, nil
+					}
+					return nil, ctx.Err()
+				}
+				if attempt == maxRetries || !isRetryableNetErr(err) {
+					logify.Infof("webarchive: %s failed: %v; trying next pattern", pattern, err)
+					break
+				}
+				if isContextDeadlineErr(err) {
+					logify.Infof("webarchive: context deadline exceeded for %s; retrying attempt %d/%d", query, attempt+2, maxRetries+1)
+				} else {
+					logify.Infof("webarchive: %s failed: %v; retrying attempt %d/%d", pattern, err, attempt+2, maxRetries+1)
+				}
+				if err := sleepBackoff(ctx, attempt, baseDelay, maxDelay); err != nil {
+					return nil, err
+				}
+				continue
+			}
+
+			urls, retry, err := handleWebArchiveResponse(ctx, resp, attempt, maxRetries, baseDelay, maxDelay)
+			if err == nil && !retry {
+				success = true
+				for _, u := range urls {
+					if _, ok := seen[u]; ok {
+						continue
+					}
+					seen[u] = struct{}{}
+					out = append(out, u)
+				}
+				break
+			}
+			if err != nil {
+				lastErr = err
+			}
+			if !retry {
+				logify.Infof("webarchive: %s failed: %v; trying next pattern", pattern, lastErr)
+				break
+			}
 		}
-		if err != nil {
-			lastErr = err
-		}
-		if !retry {
-			return nil, lastErr
-		}
-		// else retry
 	}
 
+	if len(out) > 0 || success {
+		logify.Infof("webarchive: request completed for %s with %d urls", query, len(out))
+		return out, nil
+	}
 	if lastErr == nil {
 		lastErr = fmt.Errorf("webarchive: failed without explicit error")
 	}
@@ -143,7 +189,9 @@ func handleWebArchiveResponse(
 }
 
 func isRetryableNetErr(err error) bool {
-	if err == nil { return false }
+	if err == nil {
+		return false
+	}
 	s := strings.ToLower(err.Error())
 	return strings.Contains(s, "connection refused") ||
 		strings.Contains(s, "connection reset") ||
@@ -153,9 +201,13 @@ func isRetryableNetErr(err error) bool {
 		strings.Contains(s, "temporary") ||
 		strings.Contains(s, "dial tcp") ||
 		strings.Contains(s, "context deadline exceeded") ||
-		strings.Contains(s, "no such host")
+		strings.Contains(s, "no such host") ||
+		strings.Contains(s, "eof")
 }
 
+func isContextDeadlineErr(err error) bool {
+	return err != nil && strings.Contains(strings.ToLower(err.Error()), "context deadline exceeded")
+}
 
 func sleepBackoff(ctx context.Context, attempt int, base, max time.Duration) error {
 	d := base * time.Duration(1<<attempt)
@@ -169,6 +221,9 @@ func sleepBackoff(ctx context.Context, attempt int, base, max time.Duration) err
 }
 
 func sleepExact(ctx context.Context, d time.Duration) error {
+	if d <= 0 {
+		return nil
+	}
 	t := time.NewTimer(d)
 	defer t.Stop()
 	select {

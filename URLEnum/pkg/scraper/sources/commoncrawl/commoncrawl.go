@@ -10,11 +10,13 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
-    "strconv"
+
 	"github.com/corpix/uarand"
+	"github.com/cyinnove/logify"
 )
 
 type Source struct {
@@ -43,9 +45,16 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 		ctx = context.Background()
 	}
 
+	logify.Infof("commoncrawl: request started for %s", query)
+
 	api, err := latestCDXAPI(ctx, client)
 	if err != nil {
-		return nil, err
+		api = fallbackCDXAPI()
+		logify.Infof("commoncrawl: collinfo discovery failed for %s: %v; falling back to %s", query, err, api)
+	}
+	apis := []string{api}
+	if fallback := fallbackCDXAPI(); fallback != api {
+		apis = append(apis, fallback)
 	}
 
 	// Try both patterns:
@@ -59,31 +68,53 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 
 	seen := make(map[string]struct{})
 	out := make([]string, 0, 512)
+	var lastSoftErr error
+	success := false
 
-	for _, pat := range patterns {
-		urls, err := cdxQueryWithRetry(ctx, client, api, pat)
-		if err != nil {
-			// If it's a hard error, bubble it up.
-			// But allow partial results from the other pattern if we already got some.
-			if len(out) > 0 && isSoftErr(err) {
-				continue
+	for _, api := range apis {
+		apiSuccess := false
+		for _, pat := range patterns {
+			urls, err := cdxQueryWithRetry(ctx, client, api, pat)
+			if err != nil {
+				if isSoftErr(err) {
+					lastSoftErr = err
+					logify.Infof("commoncrawl: %s failed softly on %s: %v; trying next pattern", pat, api, err)
+					continue
+				}
+				if len(out) > 0 {
+					logify.Infof("commoncrawl: %s failed after partial results: %v", pat, err)
+					break
+				}
+				return nil, err
 			}
-			return out, err
+			success = true
+			apiSuccess = true
+
+			for _, u := range urls {
+				u = strings.TrimSpace(u)
+				if u == "" {
+					continue
+				}
+				if _, ok := seen[u]; ok {
+					continue
+				}
+				seen[u] = struct{}{}
+				out = append(out, u)
+			}
 		}
-
-		for _, u := range urls {
-			u = strings.TrimSpace(u)
-			if u == "" {
-				continue
-			}
-			if _, ok := seen[u]; ok {
-				continue
-			}
-			seen[u] = struct{}{}
-			out = append(out, u)
+		if len(out) > 0 {
+			break
+		}
+		if !apiSuccess {
+			logify.Infof("commoncrawl: no successful CDX response from %s; trying next index if available", api)
 		}
 	}
 
+	if !success && lastSoftErr != nil {
+		return nil, lastSoftErr
+	}
+
+	logify.Infof("commoncrawl: request completed for %s with %d urls", query, len(out))
 	return out, nil
 }
 
@@ -91,9 +122,9 @@ func (s *Source) Search(ctx context.Context, query string, client *http.Client) 
 
 func cdxQueryWithRetry(ctx context.Context, client *http.Client, apiBase string, urlPattern string) ([]string, error) {
 	const (
-		maxRetries = 6
+		maxRetries = 1
 		baseDelay  = 500 * time.Millisecond
-		maxDelay   = 20 * time.Second
+		maxDelay   = 5 * time.Second
 	)
 
 	var lastErr error
@@ -102,8 +133,9 @@ func cdxQueryWithRetry(ctx context.Context, client *http.Client, apiBase string,
 			return nil, ctx.Err()
 		}
 
-		// small jitter helps under concurrency
-		time.Sleep(time.Duration(100+rand.Intn(200)) * time.Millisecond)
+		if err := sleepExact(ctx, time.Duration(100+rand.Intn(200))*time.Millisecond); err != nil {
+			return nil, err
+		}
 
 		urls, retry, err := cdxQueryOnce(ctx, client, apiBase, urlPattern)
 		if err == nil && !retry {
@@ -119,6 +151,7 @@ func cdxQueryWithRetry(ctx context.Context, client *http.Client, apiBase string,
 			return nil, lastErr
 		}
 
+		logify.Infof("commoncrawl: %s failed: %v; retrying attempt %d/%d", urlPattern, lastErr, attempt+2, maxRetries+1)
 		if err := sleepBackoff(ctx, attempt, baseDelay, maxDelay); err != nil {
 			return nil, err
 		}
@@ -250,6 +283,10 @@ type ccCollection struct {
 	CDXAPI string `json:"cdx-api"`
 }
 
+func fallbackCDXAPI() string {
+	return "https://index.commoncrawl.org/CC-MAIN-2026-04-index"
+}
+
 var (
 	ccMu     sync.Mutex
 	ccCached string
@@ -283,32 +320,79 @@ func fetchLatestCDXAPI(ctx context.Context, client *http.Client) (string, error)
 		return "", fmt.Errorf("nil http client")
 	}
 
+	const (
+		maxRetries = 1
+		baseDelay  = 500 * time.Millisecond
+		maxDelay   = 3 * time.Second
+	)
+
+	var lastErr error
+	for attempt := 0; attempt <= maxRetries; attempt++ {
+		api, retry, err := fetchLatestCDXAPIOnce(ctx, client)
+		if err == nil && !retry {
+			return api, nil
+		}
+		if err != nil {
+			lastErr = err
+		}
+		if !retry || attempt == maxRetries {
+			if lastErr == nil {
+				lastErr = fmt.Errorf("commoncrawl collinfo failed without explicit error")
+			}
+			return "", lastErr
+		}
+
+		logify.Infof("commoncrawl: collinfo failed: %v; retrying attempt %d/%d", lastErr, attempt+2, maxRetries+1)
+		if err := sleepBackoff(ctx, attempt, baseDelay, maxDelay); err != nil {
+			return "", err
+		}
+	}
+
+	if lastErr == nil {
+		lastErr = fmt.Errorf("commoncrawl collinfo failed without explicit error")
+	}
+	return "", lastErr
+}
+
+func fetchLatestCDXAPIOnce(ctx context.Context, client *http.Client) (string, bool, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://index.commoncrawl.org/collinfo.json", nil)
 	if err != nil {
-		return "", err
+		return "", false, err
 	}
 	req.Header.Set("User-Agent", uarand.GetRandom())
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		if isRetryableNetErr(err) {
+			return "", true, err
+		}
+		return "", false, err
 	}
 	defer resp.Body.Close()
 
-	// Retryable statuses should be handled by caller; here keep it simple.
+	if resp.StatusCode == http.StatusTooManyRequests || (resp.StatusCode >= 500 && resp.StatusCode <= 599) {
+		if ra := resp.Header.Get("Retry-After"); ra != "" {
+			if d, ok := parseRetryAfter(ra); ok {
+				if err := sleepExact(ctx, d); err != nil {
+					return "", false, err
+				}
+			}
+		}
+		return "", true, fmt.Errorf("commoncrawl collinfo status %d", resp.StatusCode)
+	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return "", fmt.Errorf("commoncrawl collinfo status %d", resp.StatusCode)
+		return "", false, fmt.Errorf("commoncrawl collinfo status %d", resp.StatusCode)
 	}
 
 	var collections []ccCollection
 	if err := json.NewDecoder(resp.Body).Decode(&collections); err != nil {
-		return "", fmt.Errorf("parse collinfo: %w", err)
+		return "", true, fmt.Errorf("parse collinfo: %w", err)
 	}
 	if len(collections) == 0 || strings.TrimSpace(collections[0].CDXAPI) == "" {
-		return "", fmt.Errorf("no collections returned")
+		return "", false, fmt.Errorf("no collections returned")
 	}
 
-	return collections[0].CDXAPI, nil
+	return collections[0].CDXAPI, false, nil
 }
 
 // -------------------- helpers --------------------
@@ -326,7 +410,8 @@ func isRetryableNetErr(err error) bool {
 		strings.Contains(s, "temporary") ||
 		strings.Contains(s, "dial tcp") ||
 		strings.Contains(s, "context deadline exceeded") ||
-		strings.Contains(s, "no such host")
+		strings.Contains(s, "no such host") ||
+		strings.Contains(s, "eof")
 }
 
 // isSoftErr is used to allow partial results when one pattern fails
@@ -339,6 +424,7 @@ func isSoftErr(err error) bool {
 		strings.Contains(s, "timeout") ||
 		strings.Contains(s, "dial tcp") ||
 		strings.Contains(s, "connection refused") ||
+		strings.Contains(s, "eof") ||
 		strings.Contains(s, "503") ||
 		strings.Contains(s, "429")
 }
@@ -386,4 +472,4 @@ func parseRetryAfter(v string) (time.Duration, bool) {
 		return d, true
 	}
 	return 0, false
-} 
+}
