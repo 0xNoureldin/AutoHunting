@@ -1,0 +1,2 @@
+https://haas-manager.mydata.cdr.originenergy.com.au/api/auth/signin/biza_id
+https://reneweclipse.originenergy.com.au/p/login

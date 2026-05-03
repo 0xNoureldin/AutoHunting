@@ -1,5 +1,1578 @@
 [
   {
+    "url": "http://flagyard.com/ext/jquery/bxGallery/jquery.bxGallery.1.1.min.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/jquery/bxGallery/jquery.bxGallery.1.1.min.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/jquery/fancybox/jquery.fancybox-1.3.4.pack.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/jquery/fancybox/jquery.fancybox-1.3.4.pack.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/jquery/jquery-1.4.2.min.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/jquery/jquery-1.4.2.min.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/jquery/jquery-1.8.0.min.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/jquery/jquery-1.8.0.min.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/jquery/jquery.corner.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/jquery/jquery.corner.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/jquery/jquery.equalheights.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/jquery/jquery.equalheights.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/jquery/ui/jquery-ui-1.8.22.min.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/jquery/ui/jquery-ui-1.8.22.min.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/jquery/ui/jquery-ui-1.8.6.min.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/jquery/ui/jquery-ui-1.8.6.min.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/js/Kozuka_Gothic_Pro_OpenType_700.font.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/js/Kozuka_Gothic_Pro_OpenType_700.font.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/js/cufon-replace.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/js/cufon-replace.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/js/cufon-yui.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/js/cufon-yui.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/js/imagepreloader.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/js/imagepreloader.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/js/jcarousellite.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/js/jcarousellite.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ext/js/js.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ext/js/js.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://flagyard.com/ppntv-gg/images/webgg.js",
+    "secret_findings": [
+      {
+        "source": "http://flagyard.com/ppntv-gg/images/webgg.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "http://www.flagyard.com/includes/general.js",
+    "secret_findings": [
+      {
+        "source": "http://www.flagyard.com/includes/general.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://bm.stc.com.sa/js/messages.js?lang=en_GB\u0026lastMod=1776351680940"
+  },
+  {
+    "url": "https://bugbounty.sa/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
+  },
+  {
+    "url": "https://coe.stc.com.sa/main.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://coe.stc.com.sa/polyfills-es5.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://coe.stc.com.sa/polyfills.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://coe.stc.com.sa/runtime.js"
+  },
+  {
+    "url": "https://coe.stc.com.sa/scripts.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://datausage.stc.com.sa/js/jquery-2.1.4.min.js"
+  },
+  {
+    "url": "https://datausage.stc.com.sa/js/wow.min.js"
+  },
+  {
+    "url": "https://extbom01.stc.com.sa/api/start_session.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://extbom01.stc.com.sa/content/access_key_input.js"
+  },
+  {
+    "url": "https://extbom01.stc.com.sa/content/portal.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/AnimateOnScroll-Dwb7dOyl.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Card-DOuMEqSH.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/CardContent-3l5srOMo.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/CheckCircleOutline-BWLBUcWR.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/ChoosePlan-D3Bnlsqk.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/FlagContainer-3PRHR3dY.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Footer-ByDRscGn.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/FormTextField-R2RHRm4Y.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Global-yWUWxf02.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Hero-CMTbyMtp.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/Join-D2mYtu4E.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Landing-DAB3KGps.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/LoadingButton-CrGiJs3n.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Login-DHKPeqAp.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/MainLayout-BLBKvXNl.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/NoMatch-I11qu40v.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Page-BZwXBNiP.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/PrivateLayout-CCukecl1.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/PublicLayout-qBLGOczQ.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/RecaptchaNotice-CDV7meD-.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/SubscriptionPlans-BB5xPo0c.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/What-D7R3ec6n.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Who-B5Wsvt2i.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/Why-CfGVfMyp.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/getPlanFeatures-B4ZIMxFu.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/index-BeIfxPXd.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/assets/index-BeIfxPXd.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/index-C7OejvAL.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/assets/index-C7OejvAL.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/index-CDy1nhmU.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/assets/index-CDy1nhmU.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/index-CMR5SLt2.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/assets/index-CMR5SLt2.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/index-CWmvAxp2.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/index-CqJXaAU5.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/assets/index-CqJXaAU5.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/index-Dm9K5SZ2.js",
+    "signals": [
+      "base64_string",
+      "eval_string_extracted",
+      "string_array",
+      "string_concat",
+      "template_literal"
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/index-dn_Uzzrf.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/assets/index-dn_Uzzrf.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/index-roRooa7g.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/assets/index-roRooa7g.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/modalKeys-CbV-dvKd.js",
+    "signals": [
+      "base64_string"
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/polyfill-force-Ccj07gXN.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/polyfill-force-DotJlDeL.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/assets/polyfill-force-DotJlDeL.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/assets/sendVerificationEmail-Bor5UTfw.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/socketEvents-C4PXYrnS.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/tslib.es6-NPRqQeXK.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/useChallengeCategories-CkWmsSvO.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/useDate-DJ7cYMH5.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/useFastForm-DqBx-pLU.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/usePlanFeatures-B-FVfHR_.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/usePlans-BEXFEymw.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/useRecaptcha-DhSUQM7X.js"
+  },
+  {
+    "url": "https://flagyard.com/assets/useSnackbar-DIUzUkIw.js"
+  },
+  {
+    "url": "https://flagyard.com/static/js/1274.38db5505.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/1274.38db5505.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/1356.38852e12.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/1356.38852e12.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/1442.4af6a24f.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/1442.4af6a24f.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/2103.26a5863d.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/2103.26a5863d.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/2103.e879f6d1.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/2103.e879f6d1.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/3204.1af71d77.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/3204.1af71d77.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/3786.15210b96.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/3786.15210b96.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/3825.f83edd10.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/3825.f83edd10.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/4250.7a23b1b1.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/4250.7a23b1b1.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/4341.8eda102d.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/4341.8eda102d.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/5162.0dd22020.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/5162.0dd22020.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/5162.46e64dbb.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/5162.46e64dbb.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/5983.06056546.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/5983.06056546.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/5983.239f0967.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/5983.239f0967.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/5983.2ab87834.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/5983.2ab87834.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/6039.0679d915.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/6039.0679d915.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/6326.e42d8a4e.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/6326.e42d8a4e.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/6601.273c934d.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/6601.273c934d.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/6601.ebe4c7eb.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/6601.ebe4c7eb.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/7780.07c4e99a.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/7780.07c4e99a.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/807.840634a2.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/807.840634a2.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/8071.6a35d4ca.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/8071.6a35d4ca.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/856.57a98b53.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/856.57a98b53.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/8749.158f830d.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/8749.158f830d.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/8801.86633afa.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/8801.86633afa.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/8828.0e6a0fea.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/8828.0e6a0fea.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/8828.ccd0975d.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/8828.ccd0975d.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/9057.49ba393f.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/9057.49ba393f.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/933.ec16453a.chunk.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/933.ec16453a.chunk.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.0171dad0.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.0171dad0.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.0387d2db.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.0387d2db.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.366bc22c.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.366bc22c.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.3c2144a7.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.3c2144a7.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.45110fda.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.45110fda.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.4d571a06.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.4d571a06.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.5d22f812.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.5d22f812.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.642e99c5.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.642e99c5.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://flagyard.com/static/js/main.d1dd8799.js",
+    "secret_findings": [
+      {
+        "source": "https://flagyard.com/static/js/main.d1dd8799.js",
+        "type": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU",
+        "masked": "eyJh********cqxU",
+        "confidence": "high",
+        "context": "-branch=\"main\" data-netlify-deploy-context=\"production\" data-netlify-cwv-token=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU\"\u003e\u003c/script\u003e\u003c/body\u003e"
+      }
+    ],
+    "secrets": {
+      "jwt::eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "jwt",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaXRlX2lkIjoiMmI5ZTZlYTktOTJlOS00MmQ0LTg0NDMtZWIwOTRiZDZhMWI4IiwiYWNjb3VudF9pZCI6IjVkZjc3N2RiYzNlZGU5OTU2MzY1YmRmMyIsImRlcGxveV9pZCI6IjY5MjQ1YjcwYTczYjVmMDAwODIyNWFhNSIsImlzc3VlciI6Im5mc2VydmVyIn0.drKkggJ-k2doHnd7zhB057QxzERRKAJAaR56RS0cqxU"
+      }
+    ]
+  },
+  {
+    "url": "https://gct.stc.com.sa/aes.js"
+  },
+  {
+    "url": "https://gct.stc.com.sa/main.js",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
     "url": "https://help.flynas.com/_next/static/chunks/02b763e81740e9bc.js"
   },
   {
@@ -88,9 +1661,6 @@
     ]
   },
   {
-    "url": "https://help.flynas.com/_next/static/chunks/d84a225161d3c975.js"
-  },
-  {
     "url": "https://help.flynas.com/_next/static/chunks/dab90962b56bf806.js",
     "signals": [
       "string_concat"
@@ -116,5 +1686,1370 @@
     "signals": [
       "string_array"
     ]
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/0174xh3wfsjm1.js"
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/01xlw8hd842-c.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/039m2-x.ddvge.js",
+    "signals": [
+      "string_array",
+      "template_literal"
+    ]
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/03~yq9q893hmn.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/0cdflzhs6f4x_.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/0d3shmwh5_nmn.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/0kn0q~yo___05.js"
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/0pqt~8bl3ukh4.js"
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/0v9c2uadhpd-i.js"
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/0zaia6i55l01..js"
+  },
+  {
+    "url": "https://ipsar.chi.gov.sa/_next/static/chunks/turbopack-07tg82hkmcdnm.js"
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/jsLibs/Common12_2_7_0_0.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/FNDWFWorklistService.js"
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/OAFSlideoutMenu.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/lookAheadLOV.js"
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/multiTab.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/oaGestureHandler.js",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/oaGestureLib.js"
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/oafb.js"
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/oafcoreR122.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://isupapp02.kafd.sa/OA_HTML/cabo/oajsLibs/popup.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/AdapterDayjs-DmGawYJi.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Button-BS2JGr4Q.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Button-CA38Z_K7.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ButtonBase-lYGbZ0EQ.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/CircularProgress-DSJCVHV5.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ClickAwayListener-Bt6ofl-C.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ClientStyleContext-CEGo4sRH.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ConfirmDialog-DMNnARro.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/DefaultPropsProvider-Bh5DvZOA.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Dialog-_6LtjC6y.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/DialogActions-Dg6vLkZX.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/DialogTitle-CkyQcOE3.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Divider-DhGUXx95.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Error-aAdY0baE.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ErrorPage-Bq4zcqvK.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Fade-FpkSmA0i.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/FormControl-DhSK0AqO.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/FormControlLabel-DW8P7sZw.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Grow-COf6iruo.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/IconButton-DU7-aWTL.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Input-CHIgv-yq.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/InputAdornment-QsWGwjlo.js",
+    "signals": [
+      "base64_string",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/LanguageChanger-BVYQDM5B.js",
+    "signals": [
+      "template_literal"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/List-DmGM69Wh.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ListContext-DHu0X7ab.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ListItem-DnKXS30g.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ListItemButton-BEygqeR5.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ListItemIcon-i-7yrvje.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ListItemText-bghsxo0H.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Loader-D3817FkC.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/LocalizationProvider-5N8wIS6d.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Login.api-KpotZlCg.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Menu-rBg3Du2F.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/MenuItem-CTz0g4mx.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Modal-CHiKcI_5.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Paper-D35_9CZ2.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Portal-CNFSLWx6.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/QueryClientProvider-5tFdRwf-.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Select-fds86Tlj.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Skeleton-CWpMufu-.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Snackbar-CAIbamcg.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/SwiperSlider-Di-Ref9s.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Switch-CBKE5Xf7.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/SwitchBase-CBzjo7_e.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/TextField-DpnpveOB.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/Typography-JpStkeOx.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/_auth-C_FGEPt-.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/_login-layout-DPkNrn50.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/api.types-BjOyEQtz.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/autoplay-D9wjRTyr.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/bundle-mjs-CSqCgoPn.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/colorManipulator-BM-GVVe7.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/components-D0c_T_-3.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/context-XTgWaqWL.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/createChainedFunction-BO_9K8Jh.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/createClass-DcaXeGtT.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/createSvgIcon-cg6Ah2jR.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/dayjs.min-CSm285Ut.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/debounce-Be36O1Ab.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/defaultTheme-DcQA8_Qn.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/dividerClasses-BNM2TPOx.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/entry.client-G54pDf83.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/formControlState-Dq1zat_P.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/getThemeProps-C1wHEK6l.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/hooks-C-pLszN8.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/i18next-BGmvVs3U.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/index-BNKgBsTZ.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/index-BWUsHA0T.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/index-C4CVpGKm.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/index-CbKIZFDx.js",
+    "secret_findings": [
+      {
+        "source": "https://mystc.stc.com.sa/assets/index-CbKIZFDx.js",
+        "type": "google_api_key",
+        "value": "AIzaSyB18hiBRg0fetHf8vevQA36TGMHYEQFwnw",
+        "masked": "AIza********Fwnw",
+        "confidence": "high",
+        "context": "0,SSR:!1,VITE_API_URL:\"https://mystc.stc.com.sa/api/\",VITE_GOOGLE_MAPS_API_KEY:\"AIzaSyB18hiBRg0fetHf8vevQA36TGMHYEQFwnw\",VITE_LOGGING:\"false\",VITE_SHOW_STORE:\"true\"},S=e=\u003e{let t;const o=new Set,r=(s,"
+      }
+    ],
+    "secrets": {
+      "google_api_key::AIzaSyB18hiBRg0fetHf8vevQA36TGMHYEQFwnw": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "google_api_key",
+        "value": "AIzaSyB18hiBRg0fetHf8vevQA36TGMHYEQFwnw"
+      }
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/index-DE0RulfE.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/index-DKnBOxLq.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/index-RWM3lFuy.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/index-kI9wnMhN.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/isHostComponent-DVu5iVWx.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/isMuiElement-C3DUilPv.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/jsx-runtime-Dt5Dsy05.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/listItemButtonClasses-fOTeMJx5.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/listItemIconClasses-PlGKoEPd.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/listItemTextClasses-BYkMMfjT.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/login-rF4uptkL.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/login_.signup-BM6M59r1.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/logo-CFaJCspC.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/manifest-569c6f48.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/misc-B049Cxsf.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/navigation-BVC1Qt_A.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/notifyManager-BYUTpA4Q.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/ownerWindow-BkLOrp6C.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/pagination-CYMdQU0S.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/parse-BbBXsCNB.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/preload-helper-CLcXU_4U.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/resolveComponentProps-BtlmCeva.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/root-B7TlFlZH.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/swiper-react-CjAtss5M.js",
+    "signals": [
+      "base64_string",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useApiRequest-By0UAXo9.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useContentApi-C0m6PZrR.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useControlled-C7R5n_oT.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useFormControl-VaKvgaQk.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useId-DcmfC6Nt.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useLoggerApi-BuZKnOeU.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useMediaQuery-C33sT0Ke.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useQuery-tzggX9pN.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useResponsive-BAYcCQ1h.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useSlot-DJe8qFdj.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useSlotProps-CYLL10y5.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useTheme-jCGa0ILU.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useThemeProps-D0P0l3iK.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useThemeProps-Fo6VZbSf.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useThemeWithoutDefault-Cf6HPTCK.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/useTranslation-WENw2UF8.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/userStore-_UMgB0zF.js",
+    "secret_findings": [
+      {
+        "source": "https://mystc.stc.com.sa/assets/userStore-_UMgB0zF.js",
+        "type": "google_api_key",
+        "value": "AIzaSyB18hiBRg0fetHf8vevQA36TGMHYEQFwnw",
+        "masked": "AIza********Fwnw",
+        "confidence": "high",
+        "context": "0,SSR:!1,VITE_API_URL:\"https://mystc.stc.com.sa/api/\",VITE_GOOGLE_MAPS_API_KEY:\"AIzaSyB18hiBRg0fetHf8vevQA36TGMHYEQFwnw\",VITE_LOGGING:\"false\",VITE_SHOW_STORE:\"true\"};function H(i,c){let t;try{t=i()}c"
+      }
+    ],
+    "secrets": {
+      "google_api_key::AIzaSyB18hiBRg0fetHf8vevQA36TGMHYEQFwnw": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "google_api_key",
+        "value": "AIzaSyB18hiBRg0fetHf8vevQA36TGMHYEQFwnw"
+      }
+    ]
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/utils-DQ0W8A3M.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/utils-DoM3o7-Q.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/warning-BfdRMKB_.js"
+  },
+  {
+    "url": "https://mystc.stc.com.sa/assets/zod-fHgrctRo.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/1733-148d60117266f36e.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/1785-d84222daae929d05.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/1858-602b96532048b66d.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/2117-3c26dd83e4954579.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/2117-9265e3c48da56fa7.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/2586-be2c99fe1f51d601.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/2912-f9f6a3d300eac232.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/3000-9a0f1df63715554d.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/3145-2d3ed8fb5c18dd66.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/3173-70078033e431ea44.js",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/3181-a2d6897de81fd483.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/3217-b76fb4b0942e1e21.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/3447-e9f997417c60dbb0.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/3458-fb74057deb0a3d6c.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/3487-86d2661064a0a099.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/4184-c2f9dfa3be050fb7.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/4438-3d30af4952a1e157.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/4438-84f5bde2c54f1a7c.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/4719-b05af6745cd20cf6.js",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/6137-041c6b7c802ee6fe.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/6137-eaf7b6db0f76248f.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/6225-43b04980e16f7077.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/6873-9f261111c9ffd31d.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/7493-35be3b8369dead32.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/7619-680646b00f744db6.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/8728-bdbc0bbfe863a489.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/9079-980e37bbedfbe641.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/9324-ed9acf3e48670fd9.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/9418-8ae1409a12b14b74.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/9763-f2cc401fde03d148.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/9915-f04242ac9e3b6849.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/%5Blocale%5D/(auth)/layout-ac69776e25ed1a49.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/%5Blocale%5D/(auth)/layout-eeb2faa36e6d4a38.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/%5Blocale%5D/(auth)/login/page-144c21f661568785.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/%5Blocale%5D/(auth)/login/page-9d7167900ec28624.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/%5Blocale%5D/layout-02edd4cd6f758c15.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/[locale]/(auth)/layout-ac69776e25ed1a49.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/[locale]/(auth)/login/page-144c21f661568785.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/[locale]/(auth)/login/page-9d7167900ec28624.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/layout-182fbcba19e7daf2.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/app/layout-2efa3bc08a71f388.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/fd9d1056-29a9d49593613712.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/main-app-64588dc5211e12b1.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/main-app-efb05939bd6c61e7.js"
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/polyfills-42372ed130431b0a.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/webpack-632245643389f9d9.js",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://portal.kafd.sa/_next/static/chunks/webpack-bcc5b1ad90dc33ee.js",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js-lib/jquery-migrate-util.min.fe1ea0ef2dd248c0085bdc2074ffc0c5.js?v=fe1ea0ef2dd248c0085bdc2074ffc0c5"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js-lib/jquery-migrate.min.b17acf619ad30d5015f146451ed89cce.js?v=b17acf619ad30d5015f146451ed89cce"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js-lib/jquery-ui.min.842e3946fa938e62f185abb29ab00dc7.js?v=842e3946fa938e62f185abb29ab00dc7"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js-lib/jquery.min.8fb8fee4fcc3cc86ff6c724154c49c42.js?v=8fb8fee4fcc3cc86ff6c724154c49c42",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js-lib/jquery.tmpl.min.d503f2c8ee572dad324531524c552242.js?v=d503f2c8ee572dad324531524c552242",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/jquery-json.min.e721d17bcd5553c19cfcb3cdf5cc9075.js?v=e721d17bcd5553c19cfcb3cdf5cc9075",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/jquery.localize.921e0540c58c02b917464074b48eb23a.js?v=921e0540c58c02b917464074b48eb23a"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/page.optionalvidm.ca9822e5917de9776529aa48fe9288ec.js?v=ca9822e5917de9776529aa48fe9288ec"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/page.password-forgot-localuser.ff7f28836b9e05a1b84474a57ec8133d.js?v=ff7f28836b9e05a1b84474a57ec8133d"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/page.password-reset.2ee085c570983e2d8b1008a4d522b89a.js?v=2ee085c570983e2d8b1008a4d522b89a"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/plugins/requirejs/require.1565af44b896bc4c641f238fd800fc83.js?v=1565af44b896bc4c641f238fd800fc83"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/util.autofocus.97b2f2aa2244bde7495522a6eb8cf176.js?v=97b2f2aa2244bde7495522a6eb8cf176"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/util.catalog.dd6bf8a9e453831db68587984f791518.js?v=dd6bf8a9e453831db68587984f791518"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/util.csrf.05ce6dee0f684a5d5538a448944c84bd.js?v=05ce6dee0f684a5d5538a448944c84bd"
+  },
+  {
+    "url": "https://vidm.stc.com.sa/SAAS/horizon/js/util.message-strip.3dbb47e87bbb777f873b40cde6bde92c.js?v=3dbb47e87bbb777f873b40cde6bde92c"
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/SdwxHL-oFXMG2mAS5iUaM/_buildManifest.js"
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/SdwxHL-oFXMG2mAS5iUaM/_ssgManifest.js"
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/chunks/framework-45714ceb67b9f27a.js"
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/chunks/main-5eae6ac538dc3cde.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/chunks/pages/%5B...slug%5D-a24b5b496e302386.js"
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/chunks/pages/404-4677601b48a46810.js"
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/chunks/pages/[...slug]-a24b5b496e302386.js"
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/chunks/pages/_app-0cc786566acd9a0c.js",
+    "secret_findings": [
+      {
+        "source": "https://www.kafd.sa/_next/static/chunks/pages/_app-0cc786566acd9a0c.js",
+        "type": "google_api_key",
+        "value": "AIzaSyBeKH7gO6VDHwLhP3VRsYuwq-NNkETvpOg",
+        "masked": "AIza********vpOg",
+        "confidence": "high",
+        "context": "AIzaSyBeKH7gO6VDHwLhP3VRsYuwq-NNkETvpOg"
+      }
+    ],
+    "signals": [
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ],
+    "secrets": {
+      "google_api_key::AIzaSyBeKH7gO6VDHwLhP3VRsYuwq-NNkETvpOg": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "google_api_key",
+        "value": "AIzaSyBeKH7gO6VDHwLhP3VRsYuwq-NNkETvpOg"
+      }
+    ]
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/chunks/polyfills-42372ed130431b0a.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://www.kafd.sa/_next/static/chunks/webpack-7a6a85f1bca2e2bb.js",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/1009-2e9f2be163cae02c.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/1508-8055cfb7a504fd76.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/163-93fa91959ee841e3.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/1637-f893b7a8a52031f4.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/16accd03-e779b91a7458b17f.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/1792-e42866dd00fdca45.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/1dd3208c-6e1d4e8af9022959.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2161-3f1be886890bf5e0.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2161-5559c6eeead6aacf.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2161-8268177389cd0b9b.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2161-fc6870f2b8feeaa1.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2207-343963be3daaf808.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2207-8b8ec1c575e5842f.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2855-6311bcb214b56a33.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/286-c88ccc0fc4b5b74c.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2ed43723-3cfdecec8a2a8e05.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/2ed43723-f380ca95ae4e3adb.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/301-09a0445021484a1b.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/3242-25fc1bfd96ad49fe.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/3415-d852e3ed696c6e59.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/3506-a3f2e9031c460b35.js",
+    "signals": [
+      "base64_string",
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/3542-813df011ed35aa19.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/3745-28f12c71bf962124.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/3745-ae928fe20e7e6056.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/3902-f3f2136bcde50e82.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/402-0a4a7376dec396ea.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/4440-31437bdb73fe4f33.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/4453-f955840bd9719100.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/459-b7d0ce85ad3809cd.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/494-df3a84df29b8ccce.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5250-12875f9c1a346fd1.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5327-a516dd161c959edd.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5335-4633c8db73b2962a.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5357-89e0e58c9af2adb0.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5367-3ddcc4d9af0b3fb2.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5417-3fb7ffee4420cd74.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5614-613fd7e3d2c60137.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5711-d4e9cc7e5adffe02.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5770-7ee58480e2dd50b3.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/5943-2366fa328f424021.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/6109-2474465ae9a41981.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/6126-15f4f05ebec104b1.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/6126-93f2e91dcf8b860a.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/6126-ca97ec5a1a0e9ad0.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/6126-d200929c3a8984b1.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/6137-8e7dd193e8323cda.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/6586-f7bc58ace2469623.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/7261-887b7fdd924c15ab.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/7261-ee8ffe349ac076cb.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/7336-8d3e6085e99d64ec.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/7451-b2b6d1c3f53e58f4.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/7451-c5120bbc54f4c8d2.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/7774-c9e0d5f388a64477.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/7774-e96737ff5a5135d6.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8004-72494cb49f1ca4dc.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8004-a4ecf72394726e47.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8315-8492d340ca863873.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8315-9481ac6702713704.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8315-aba3baac38b697ca.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8476-ff1173909efd8823.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8627-cf52496a410e32ef.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8720-5ad36c3c09aa6717.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/87c73c54-4ba92762561c244b.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/87c73c54-cf0fd0a21d65deac.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/87c73c54-ee047da61bde381f.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8811-3d8f85c4be4a53ca.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8811-dfdab82535055da4.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8828-6de23fc4749e187f.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/8828-c3eee135bb96baf2.js",
+    "signals": [
+      "base64_string"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/898-1a23580f2e0633c6.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/898-28b358b192f421bb.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/9140-e490f1620f13e5e9.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/9140-f6820e69fab29740.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/9287-0250caea0e5d78ef.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/9423-b086bee47a5fe1f4.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/9550-6d9baf697ddc5ca9.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/9550-a41b9c5cf3a37bf0.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/9550-cccc82d23dc5a9dc.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/990a3170-677d69c440caac91.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/990a3170-ae0e32b9f887130c.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/9974-5125fc507430f240.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/%5B...path%5D/layout-3fb4781c219b4114.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/%5B...path%5D/page-1c635e04eb275278.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/%5B...path%5D/page-4255ef1b5bc02573.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/%5B...path%5D/page-8001ca0bba04b581.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/%5B...path%5D/page-af54b5eaf6387d07.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/%5B...path%5D/page-c53a94ca207dbdc2.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/%5B...path%5D/page-f86bb79291cf41b5.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/%5B...path%5D/page-ff83ddb3985a2959.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/error-00c7f41814036698.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/error-59c4f04800a73068.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/error-6b87bc0810325a04.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/error-771b148c05dcaa9a.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/error-a93f08322da0cf4e.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/error-b2f61b826be6157c.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/error-d08d00625bdf9b7a.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/global-error-0530cfd9590b121f.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/global-error-0fc8d246571bb68b.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/global-error-124a215f30d64e72.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/global-error-33078c183241719b.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/global-error-40949c0ae2694750.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/global-error-6bef4c6065086f3e.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/global-error-889b56fee9ae36dd.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/layout-221bf172515804e8.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/layout-38a1983aafe7aa19.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/layout-3d0948c8f67dfae9.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/layout-66332e54b9c3a879.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/layout-69231b04b3a3db58.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/layout-8cdce7a83a32691a.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/layout-dfdbed00f2bd4715.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/not-found-0c460bfba7af4819.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/not-found-68a89be0ed3fc3be.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/not-found-7f1d3bd468400e67.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/not-found-8edaed77cf5a119a.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/not-found-c76da319384bca73.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/not-found-cf5803aaca285007.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/app/not-found-e7382c2cf6bd4dda.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/e6838795-5a814cb12bd25f1d.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/main-app-5ed7e6dc372ec924.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/main-app-9b40544807cf230b.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/main-app-c4e38a4bd1b99c01.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/polyfills-42372ed130431b0a.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/polyfills-78c92fac7aa8fdd8.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/webpack-4407916f47870b19.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/webpack-4be187b7c5d6b15e.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/webpack-98911ff95d70c94b.js",
+    "signals": [
+      "eval_string_extracted"
+    ]
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/webpack-9c7635bf71535456.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/webpack-a33a3642066a9e3c.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/webpack-ada88885d27eacaa.js"
+  },
+  {
+    "url": "https://www.stctv.com/_next/static/chunks/webpack-cf6072c9e1fa21d5.js"
+  },
+  {
+    "url": "https://www.stctv.com/en/privacy/js/html5shiv.min.js"
+  },
+  {
+    "url": "https://www.stctv.com/en/privacy/js/respond.min.js"
   }
 ]
