@@ -26,7 +26,7 @@ type Source struct {
 func (s *Source) Name() string { return "commoncrawl" }
 
 // Common Crawl does not require an API key for CDX.
-func (s *Source) RequireAPIKey() bool { return true }
+func (s *Source) RequireAPIKey() bool { return false }
 
 // Optional constructor (keep if your sources registry expects it)
 func New(apiKeys []string) *Source {
