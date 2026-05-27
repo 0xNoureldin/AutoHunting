@@ -1,0 +1,385 @@
+[
+  {
+    "url": "http://chat.helium.com/assets/client.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/client.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/component-emitter/index.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/component-emitter/index.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/component-reduce/index.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/component-reduce/index.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/emitter/index.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/emitter/index.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/reduce/index.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/reduce/index.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/superagent.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/superagent.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/superagent/deps/emitter/index.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/superagent/deps/emitter/index.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/superagent/deps/reduce/index.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/superagent/deps/reduce/index.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/superagent/index.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/superagent/index.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/assets/superagent/lib/client.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/assets/superagent/lib/client.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "http://chat.helium.com/index.js",
+    "secret_findings": [
+      {
+        "source": "http://chat.helium.com/index.js",
+        "type": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi",
+        "masked": "pk_live_********vcdi",
+        "confidence": "high",
+        "context": "cordapp.com\",\"MIGRATION_DESTINATION_ORIGIN\":\"https://discord.com\",\"STRIPE_KEY\":\"pk_live_CUQtlpQUF0vufWpnpUmQvcdi\",\"ADYEN_KEY\":\"live_E3OQ33V6GVGTXOVQZEAFQJ6DJIDVG6SY\",\"BRAINTREE_KEY\":\"productio"
+      }
+    ],
+    "secrets": {
+      "stripe_key::pk_live_CUQtlpQUF0vufWpnpUmQvcdi": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_CUQtlpQUF0vufWpnpUmQvcdi"
+      }
+    ]
+  },
+  {
+    "url": "https://bpmweb.htc.com/assets/js/detect-element-resize.js",
+    "signals": [
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://bpmweb.htc.com/main.6c8f8c5cbcbde903216e.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://bpmweb.htc.com/polyfills-es5.34dd2daeee3b472caadb.js",
+    "signals": [
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://bpmweb.htc.com/polyfills.0ac8381477fc256ab071.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://bpmweb.htc.com/runtime.7d9d4678f9511567f211.js"
+  },
+  {
+    "url": "https://certified.hootsuite.com/assets/js/google-api-config.js"
+  },
+  {
+    "url": "https://certified.hootsuite.com/assets/js/prerender-flags.js"
+  },
+  {
+    "url": "https://certified.hootsuite.com/assets/js/unsupported-browser.js"
+  },
+  {
+    "url": "https://certified.hootsuite.com/main.c8133cb68d773780.js",
+    "secret_findings": [
+      {
+        "source": "https://certified.hootsuite.com/main.c8133cb68d773780.js",
+        "type": "google_api_key",
+        "value": "AIzaSyCgKPyvoy_y1MMvTtTqIex7OIBlVjbYkYE",
+        "masked": "AIza********YkYE",
+        "confidence": "high",
+        "context": "AIzaSyCgKPyvoy_y1MMvTtTqIex7OIBlVjbYkYE"
+      },
+      {
+        "source": "https://certified.hootsuite.com/main.c8133cb68d773780.js",
+        "type": "stripe_key",
+        "value": "pk_live_augT0u3YJe9jCxuMPK67aUpa",
+        "masked": "pk_live_********aUpa",
+        "confidence": "high",
+        "context": "pk_live_augT0u3YJe9jCxuMPK67aUpa"
+      }
+    ],
+    "signals": [
+      "eval_string_extracted",
+      "string_array",
+      "string_concat",
+      "template_literal"
+    ],
+    "secrets": {
+      "google_api_key::AIzaSyCgKPyvoy_y1MMvTtTqIex7OIBlVjbYkYE": {},
+      "stripe_key::pk_live_augT0u3YJe9jCxuMPK67aUpa": {}
+    },
+    "secret_matches": [
+      {
+        "pattern": "google_api_key",
+        "value": "AIzaSyCgKPyvoy_y1MMvTtTqIex7OIBlVjbYkYE"
+      },
+      {
+        "pattern": "stripe_key",
+        "value": "pk_live_augT0u3YJe9jCxuMPK67aUpa"
+      }
+    ]
+  },
+  {
+    "url": "https://certified.hootsuite.com/polyfills.9c23ed3020d0fe58.js",
+    "signals": [
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://certified.hootsuite.com/runtime.d415c57d28f54317.js"
+  },
+  {
+    "url": "https://certified.hootsuite.com/scripts.e8614ac818c6a7c3.js"
+  },
+  {
+    "url": "https://corporatedealsnb.marriott.com/wp-content/plugins/sitepress-multilingual-cms/res/js/jquery.cookie.js"
+  },
+  {
+    "url": "https://corporatedealsnb.marriott.com/wp-includes/js/jquery/jquery-migrate.min.js"
+  },
+  {
+    "url": "https://corporatedealsnb.marriott.com/wp-includes/js/jquery/jquery.js",
+    "signals": [
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://credit-cards.marriott.com/card-member-site/js/app.js",
+    "signals": [
+      "base64_string",
+      "eval_string_extracted",
+      "string_array"
+    ]
+  },
+  {
+    "url": "https://credit-cards.marriott.com/global-card-member-site/js/header.min.js"
+  },
+  {
+    "url": "https://credit-cards.marriott.com/global-its-in-the-cards/js/header.min.js"
+  },
+  {
+    "url": "https://credit-cards.marriott.com/global/js/header.min.js"
+  },
+  {
+    "url": "https://credit-cards.marriott.com/its-in-the-cards/js/app.js",
+    "signals": [
+      "base64_string",
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  },
+  {
+    "url": "https://credit-cards.marriott.com/js/app.js",
+    "signals": [
+      "base64_string",
+      "eval_string_extracted",
+      "string_array",
+      "string_concat"
+    ]
+  }
+]
