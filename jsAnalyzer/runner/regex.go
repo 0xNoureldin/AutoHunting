@@ -85,6 +85,25 @@ func AnalyzeJSContent(content string, opts AnalyzeOptions) (ScanResult, error) {
 
 
 
+// secretKeywords are case-insensitive: real-world JS uses every casing
+// convention for identifiers (apiKey, ApiKey, API_KEY, api_key, ...), and a
+// case-sensitive check silently skips whole classes of PascalCase/CONST_CASE
+// code.
+var secretKeywords = []string{
+	"key", "token", "secret", "pass", "auth", "bearer", "api",
+	"credential", "private",
+}
+
+// secretMarkers are fixed-case vendor prefixes where casing is part of the
+// spec (a real AWS key is always "AKIA", never "akia"), so keeping them
+// case-sensitive avoids diluting the pre-filter with unrelated matches.
+var secretMarkers = []string{
+	"x-", "AKIA", "ASIA", "-----BEGIN", "sk_", "rk_", "AIza", "ya29.",
+	"ghp_", "gho_", "ghu_", "ghs_", "ghr_", "github_pat_", "glpat-",
+	"npm_", "xoxb-", "xoxp-", "dop_v1_", "sq0atp-", "sq0csp-", "SG.",
+	"key-", "EAACEdEose0cBA", "eyJ",
+}
+
 // extractSecretCandidateWindows pulls smaller chunks where secrets usually appear.
 // This reduces false positives in massive/minified code and speeds up scanning.
 func extractSecretCandidateWindows(s string) []string {
@@ -97,23 +116,25 @@ func extractSecretCandidateWindows(s string) []string {
 		if l == "" {
 			continue
 		}
-		if strings.Contains(l, "key") ||
-			strings.Contains(l, "token") ||
-			strings.Contains(l, "secret") ||
-			strings.Contains(l, "pass") ||
-			strings.Contains(l, "auth") ||
-			strings.Contains(l, "bearer") ||
-			strings.Contains(l, "api") ||
-			strings.Contains(l, "x-") ||
-			strings.Contains(l, "AKIA") ||
-			strings.Contains(l, "ASIA") ||
-			strings.Contains(l, "-----BEGIN") ||
-			strings.Contains(l, "sk_") ||
-			strings.Contains(l, "AIza") ||
-			strings.Contains(l, "ghp_") ||
-			strings.Contains(l, "npm_") ||
-			strings.Contains(l, "xoxb-") ||
-			strings.Contains(l, "xoxp-") {
+
+		matched := false
+		lower := strings.ToLower(l)
+		for _, kw := range secretKeywords {
+			if strings.Contains(lower, kw) {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			for _, m := range secretMarkers {
+				if strings.Contains(l, m) {
+					matched = true
+					break
+				}
+			}
+		}
+
+		if matched {
 			if len(l) > maxWin {
 				l = l[:maxWin]
 			}
@@ -272,7 +293,9 @@ func passesEntropyHeuristic(v string) bool {
 	if strings.Contains(v, "-----BEGIN ") {
 		return true
 	}
-	prefixes := []string{"sk_", "rk_", "pk_", "akia", strings.ToLower("ASIA"), strings.ToLower("AIza"), "ghp_", "github_pat_", "npm_", "xoxb-", "xoxp-"}
+	// Note: intentionally excludes "pk_" (Stripe publishable keys) and other
+	// vendor prefixes that identify public/non-secret values by design.
+	prefixes := []string{"sk_", "rk_", "akia", "asia", "aiza", "ghp_", "gho_", "ghu_", "ghs_", "ghr_", "github_pat_", "npm_", "xoxb-", "xoxp-", "glpat-", "dop_v1_", "sq0atp-", "sq0csp-", "ya29.", "sg."}
 	for _, p := range prefixes {
 		if strings.HasPrefix(lv, p) {
 			return true

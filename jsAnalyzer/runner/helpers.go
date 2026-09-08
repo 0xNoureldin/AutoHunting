@@ -115,16 +115,52 @@ func setToSlice(set map[string]struct{}) []string {
 }
 
 
+// secretPatterns is compiled exactly once at package init, mirroring the other
+// regexes in vars.go. LoadSecretPatterns used to call regexp.MustCompile for
+// every pattern on every single JS file scan (ScanJSURL -> AnalyzeJSContent ->
+// FindSecrets -> LoadSecretPatterns), which is wasted CPU work repeated once
+// per file for the lifetime of a scan instead of once for the whole process.
+var secretPatterns = []SecretPattern{
+	// --- Cloud providers ---
+	{Name: "AWS Access Key ID", Re: regexp.MustCompile(`AKIA[0-9A-Z]{16}`)},
+	{Name: "AWS Temporary Access Key ID", Re: regexp.MustCompile(`ASIA[0-9A-Z]{16}`)},
+	{Name: "AWS Secret Key", Re: regexp.MustCompile(`(?i)aws(?:.{0,20})?(?:secret)?(?:.{0,20})?['"]([0-9a-zA-Z/+]{40})['"]`)},
+	{Name: "Google API Key", Re: regexp.MustCompile(`AIza[0-9A-Za-z-_]{35}`)},
+	{Name: "Google OAuth Access Token", Re: regexp.MustCompile(`ya29\.[0-9A-Za-z\-_]+`)},
+	{Name: "Azure Storage Account Key", Re: regexp.MustCompile(`AccountKey=[A-Za-z0-9+/]{86}==`)},
+	{Name: "DigitalOcean Personal Access Token", Re: regexp.MustCompile(`dop_v1_[a-f0-9]{64}`)},
+
+	// --- Source control / package registries ---
+	{Name: "GitHub Personal Access Token", Re: regexp.MustCompile(`ghp_[0-9A-Za-z]{36}`)},
+	{Name: "GitHub Fine-Grained PAT", Re: regexp.MustCompile(`github_pat_[0-9A-Za-z_]{20,}`)},
+	{Name: "GitHub OAuth/App Token", Re: regexp.MustCompile(`gh[ours]_[0-9A-Za-z]{36}`)},
+	{Name: "GitLab Personal Access Token", Re: regexp.MustCompile(`glpat-[0-9A-Za-z\-_]{20}`)},
+	{Name: "npm Access Token", Re: regexp.MustCompile(`npm_[0-9A-Za-z]{36}`)},
+
+	// --- Payments ---
+	{Name: "Stripe Secret Key", Re: regexp.MustCompile(`sk_(?:live|test)_[0-9A-Za-z]{16,64}`)},
+	{Name: "Stripe Restricted Key", Re: regexp.MustCompile(`rk_(?:live|test)_[0-9A-Za-z]{16,64}`)},
+	{Name: "Square Access Token", Re: regexp.MustCompile(`sq0atp-[0-9A-Za-z\-_]{22}`)},
+	{Name: "Square OAuth Secret", Re: regexp.MustCompile(`sq0csp-[0-9A-Za-z\-_]{43}`)},
+	{Name: "PayPal Braintree Access Token", Re: regexp.MustCompile(`access_token\$production\$[0-9a-z]{16}\$[0-9a-f]{32}`)},
+
+	// --- Messaging / comms ---
+	{Name: "Slack Token", Re: regexp.MustCompile(`xox[baprs]-[0-9]{10,}-[0-9]{10,}-[a-zA-Z0-9]{24,}`)},
+	{Name: "Slack Webhook URL", Re: regexp.MustCompile(`https://hooks\.slack\.com/services/T[0-9A-Za-z]{6,12}/B[0-9A-Za-z]{6,12}/[0-9A-Za-z]{16,32}`)},
+	{Name: "SendGrid API Key", Re: regexp.MustCompile(`SG\.[0-9A-Za-z\-_]{20,24}\.[0-9A-Za-z\-_]{38,45}`)},
+	{Name: "Mailgun API Key", Re: regexp.MustCompile(`key-[0-9a-f]{32}`)},
+	{Name: "Facebook Access Token", Re: regexp.MustCompile(`EAACEdEose0cBA[0-9A-Za-z]+`)},
+	{Name: "Discord Bot Token", Re: regexp.MustCompile(`[MN][a-zA-Z0-9_-]{23,25}\.[a-zA-Z0-9_-]{6}\.[a-zA-Z0-9_-]{27,40}`)},
+
+	// --- Generic / structural ---
+	{Name: "JWT", Re: regexp.MustCompile(`eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}`)},
+	{Name: "Private Key Block", Re: regexp.MustCompile(`-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----`)},
+	{Name: "Credentials in URL", Re: regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9+.-]{1,15}://[A-Za-z0-9._%+-]{1,64}:[^\s"'@/]{3,64}@[A-Za-z0-9.-]+`)},
+	{Name: "Generic API Key/Secret", Re: regexp.MustCompile(`(?i)(api[_-]?key|apikey|secret[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|private[_-]?key|password|passwd)\s*[:=]\s*['"]([A-Za-z0-9_\-.+/=]{12,100})['"]`)},
+}
+
 func LoadSecretPatterns() ([]SecretPattern, error) {
-	// For simplicity, we hardcode some common patterns here.
-	// In a real implementation, you might load these from a file or database.
-	patterns := []SecretPattern{
-		{Name: "AWS Access Key", Re: regexp.MustCompile(`AKIA[0-9A-Z]{16}`)},
-		{Name: "AWS Secret Key", Re: regexp.MustCompile(`(?i)aws(.{0,20})?(secret)?(.{0,20})?['"][0-9a-zA-Z/+]{40}['"]`)},
-		{Name: "Google API Key", Re: regexp.MustCompile(`AIza[0-9A-Za-z-_]{35}`)},
-		{Name: "Slack Token", Re: regexp.MustCompile(`xox[baprs]-[0-9]{10,}-[0-9]{10,}-[a-zA-Z0-9]{24,}`)},
-	}
-	return patterns, nil
+	return secretPatterns, nil
 }
 
 type MultiError struct{ Errs []error }
