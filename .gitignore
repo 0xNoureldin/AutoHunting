@@ -1,0 +1,3 @@
+# Compiled binary that `go build ./...` can drop at the repo root from the
+# oneClick/cmd/oneclick package.
+/oneclick
