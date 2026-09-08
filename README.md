@@ -138,9 +138,11 @@ Scans for exposed AWS S3 buckets and misconfigurations:
 ---
 
 ### 🌍 vhosts
-Discovers virtual hosts associated with a target:
-- Hidden domains
-- Internal services
+Discovers virtual hosts associated with a target, two ways:
+- Given a list of hosts, groups them by the IP(s) they resolve to
+- Given a list of candidate hosts **and** a target IP/host, fuzzes the HTTP `Host` header
+  against that one target to find vhosts with no DNS record of their own -- hidden domains
+  and internal services a server routes to but that DNS never reveals
 
 ---
 
@@ -229,10 +231,21 @@ from a known `api`), and `-w <wordlist>` (DNS brute-force: each candidate is
 techniques — each off by default, combine any of them freely.
 
 ### vhost (virtual host enumeration)
-Determines which subdomains resolve to which IP addresses:
+In `vhosts/cmd/vhoster`, two modes depending on whether `-ips` is given:
 ```bash
+# Mode 1: group known hosts by the IP(s) they resolve to
 go run . -hosts subs.txt -output vhostedSubs
+
+# Mode 2: vhost fuzzing -- find hosts with NO DNS record at all, by sending each
+# candidate as the Host header to a fixed target and diffing the response against
+# a baseline (the same effect as pinning the domain to an IP in /etc/hosts and
+# fuzzing the Host header, e.g. `gobuster vhost`, without touching system DNS config)
+go run . -hosts candidates.txt -ips targets.txt -output vhostResults -concurrency 10
 ```
+`-ips` accepts a domain name as well as a literal IP -- either way, every candidate in
+`-hosts` is requested against that same connection target with only the `Host` header
+changed. `candidates.txt` needs full hostnames (e.g. `admin.example.com`), not bare words;
+oneClick's `-vhost` (below) builds this file for you from a subdomain wordlist.
 
 ### portScanner
 Performs TCP port scanning:
@@ -279,6 +292,7 @@ go run . -d example.com -active            # deeper: zone transfer, crawling, he
 go run . -d example.com -fuzz-subs         # wordlist-based subdomain DNS brute-force
 go run . -d example.com -fuzz-urls         # wordlist-based URL path/content fuzzing
 go run . -d example.com -mutations         # alterx permutation-based subdomain guessing
+go run . -d example.com -vhost             # Host-header vhost discovery (no DNS record needed)
 go run . -d example.com -live              # stream each stage's live output to the terminal
 go run . -d example.com -o results/acme -c 20 -t 120
 go run . -h                                # full option list
@@ -300,6 +314,17 @@ also bumps the default timeout to 300s unless `-t` is set explicitly.
 `-mutations` enables alterx permutation-based subdomain guessing (e.g. trying `dev-api` and
 `api-dev` once `api` is known). It's off by default and independent of `-active`, `-fuzz-subs`,
 and `-fuzz-urls` — combine it with any of them.
+
+`-vhost` finds virtual hosts that don't exist in DNS at all — only in the target server's own
+routing config — which every DNS-based technique above (passive sources, `-fuzz-subs`,
+`-mutations`) is blind to by nature. It probes each target directly over HTTP(S) with the
+`Host` header swapped to `word.domain` for every entry in the subdomain wordlist (the same one
+`-fuzz-subs` downloads/uses, or `-sw`), keeping the connection target fixed, and reports the
+ones whose response genuinely differs from a baseline. This is the `vhosts` tool's fuzzing mode
+(see above) wired in automatically; discovered vhosts are merged into the subdomain list before
+URL enumeration runs, so they get the same downstream treatment as anything DNS found. Off by
+default, independent of `-active`/`-mutations`/`-fuzz-subs`/`-fuzz-urls`, and combinable with
+any of them; also bumps the default timeout to 300s unless `-t` is set explicitly.
 
 By default, each stage's own output only goes into `oneclick.log`, keeping the terminal to
 oneClick's own progress lines. Pass `-live` to also stream it to the terminal as it happens.

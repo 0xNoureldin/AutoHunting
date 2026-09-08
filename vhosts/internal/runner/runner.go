@@ -1,9 +1,10 @@
 package runner
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"math/rand"
 	"os"
 	"strings"
 	"sync"
@@ -93,10 +94,8 @@ func Run(opts *Options) error {
 					return
 				}
 
-				invalidHost := fmt.Sprintf("%d-invalid.invalid", rand.Intn(1000000))
-
-				baselineFingerprint, err := http.GetResponse(opts.Timeout, invalidHost, validURL)
-				if err != nil || baselineFingerprint == nil {
+				baseline, err := captureBaselineRange(opts.Timeout, validURL)
+				if err != nil {
 					return
 				}
 
@@ -121,7 +120,7 @@ func Run(opts *Options) error {
 						}
 
 						// Detect vhost: compare response to baseline
-						if isVhost(baselineFingerprint, vhostResp) {
+						if !baseline.inRange(vhostResp) {
 							mu.Lock()
 							resultMap[ipAddr] = append(resultMap[ipAddr], h)
 							mu.Unlock()
@@ -144,18 +143,83 @@ func Run(opts *Options) error {
 	return nil
 }
 
-// isVhost returns true if status code or content length differ significantly
-func isVhost(baseline, vhostResp *http.Response) bool {
+// baselineRange is the range of "not actually a distinct vhost" responses
+// observed across several baseline samples. A single sample is fragile: any
+// natural variance between requests (a server that echoes the Host header
+// into an error page, cache/CDN timing, etc.) would make every candidate
+// look like a hit. Ranging over several samples absorbs that noise.
+type baselineRange struct {
+	statusMin, statusMax int
+	lengthMin, lengthMax int64
+}
 
-	if baseline.StatusCode != vhostResp.StatusCode {
-		return true
+// lengthTolerance absorbs modest, non-vhost-related content-length variance
+// -- notably a server that echoes the (varying-length) Host header into an
+// otherwise-static error page, which would otherwise make every candidate
+// look distinct purely because its hostname is a different length than the
+// baseline probe's. A genuinely different vhost is expected to differ by
+// far more than this (a different page entirely), so this is deliberately
+// small relative to that.
+const lengthTolerance = 64
+
+func (r baselineRange) inRange(resp *http.Response) bool {
+	if resp.StatusCode < r.statusMin || resp.StatusCode > r.statusMax {
+		return false
+	}
+	if resp.ContentLength < r.lengthMin-lengthTolerance || resp.ContentLength > r.lengthMax+lengthTolerance {
+		return false
+	}
+	return true
+}
+
+// captureBaselineRange requests validURL 3 times with a random, practically
+// guaranteed-absent Host header and returns the range of responses seen.
+// Each invalid host is the same fixed length (a 16-char hex token) so that a
+// server echoing the Host header into its response body doesn't itself
+// introduce content-length variance unrelated to real vhost differences.
+func captureBaselineRange(timeout int, validURL string) (baselineRange, error) {
+	const samples = 3
+	var resps []*http.Response
+
+	for i := 0; i < samples; i++ {
+		token, err := randomToken()
+		if err != nil {
+			return baselineRange{}, err
+		}
+		resp, err := http.GetResponse(timeout, token+"-invalid.invalid", validURL)
+		if err != nil || resp == nil {
+			return baselineRange{}, fmt.Errorf("baseline request failed: %w", err)
+		}
+		resps = append(resps, resp)
 	}
 
-	if baseline.ContentLength != vhostResp.ContentLength {
-		return true
+	r := baselineRange{
+		statusMin: resps[0].StatusCode, statusMax: resps[0].StatusCode,
+		lengthMin: resps[0].ContentLength, lengthMax: resps[0].ContentLength,
 	}
+	for _, resp := range resps[1:] {
+		if resp.StatusCode < r.statusMin {
+			r.statusMin = resp.StatusCode
+		}
+		if resp.StatusCode > r.statusMax {
+			r.statusMax = resp.StatusCode
+		}
+		if resp.ContentLength < r.lengthMin {
+			r.lengthMin = resp.ContentLength
+		}
+		if resp.ContentLength > r.lengthMax {
+			r.lengthMax = resp.ContentLength
+		}
+	}
+	return r, nil
+}
 
-	return false
+func randomToken() (string, error) {
+	b := make([]byte, 8)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
 }
 
 // outputResults handles outputting results in JSON format to file and CLI format to console
@@ -192,7 +256,7 @@ func printCLIResults(resultMap map[string][]string) {
 
 	for ip, hosts := range resultMap {
 		if len(hosts) > 0 {
-			logify.Infof(ip)
+			logify.Infof("%s", ip)
 			for _, host := range hosts {
 				fmt.Printf("  - %s\n", host)
 			}

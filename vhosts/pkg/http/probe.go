@@ -54,12 +54,3 @@ func isAlive(client *http.Client, url string) bool {
 
 	return false
 }
-
-func main() {
-	result := ProbeHTTP("216.150.1.1", 5)
-	if result != "" {
-		fmt.Println("Found:", result)
-	} else {
-		fmt.Println("No HTTP/HTTPS service found")
-	}
-}

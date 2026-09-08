@@ -13,6 +13,7 @@
 //	go run . -d example.com -fuzz-subs             // wordlist-based subdomain fuzzing
 //	go run . -d example.com -fuzz-urls             // wordlist-based URL fuzzing
 //	go run . -d example.com -fuzz-subs -fuzz-urls  // both
+//	go run . -d example.com -vhost                 // Host-header vhost discovery
 package main
 
 import (
@@ -84,13 +85,22 @@ Options:
                               first use (oneClick/wordlists/), unless -uw is given. Off by
                               default; independent of -active, -mutations, and -fuzz-subs, and
                               can be combined with any of them.
-  -sw, -subs-wordlist <path> Use this wordlist for subdomain fuzzing instead of downloading one
-                              (implies -fuzz-subs)
+  -vh, -vhost                 Enable virtual host discovery: probes each target directly over
+                              HTTP(S) with the Host header swapped to "word.domain" for every
+                              entry in the subdomain wordlist (same one -fuzz-subs uses/
+                              downloads, or -sw), reporting hosts whose response genuinely
+                              differs. Finds vhosts that exist only in the server's own routing
+                              config, with no DNS record at all -- invisible to every other
+                              technique here. Off by default; independent of -active,
+                              -mutations, -fuzz-subs, and -fuzz-urls, and can be combined with
+                              any of them.
+  -sw, -subs-wordlist <path> Use this wordlist for subdomain fuzzing/vhost discovery instead of
+                              downloading one (implies -fuzz-subs)
   -uw, -urls-wordlist <path> Use this wordlist for URL fuzzing instead of downloading one
                               (implies -fuzz-urls)
   -c, -concurrency <n>       Concurrency used across stages (default: 10)
   -t, -timeout <seconds>     Per-request timeout used across stages (default: 60, 300 with
-                              -active, -fuzz-subs, or -fuzz-urls)
+                              -active, -fuzz-subs, -fuzz-urls, or -vhost)
   -lv, -live                  Stream each stage's live output to the terminal as it runs, not
                               just to the log file. Off by default (quiet, log-file-only).
   -h, -help                  Show this help
@@ -102,7 +112,8 @@ Examples:
   go run . -d example.com -fuzz-subs
   go run . -d example.com -fuzz-urls
   go run . -d example.com -fuzz-subs -sw my-subs.txt -fuzz-urls -uw my-paths.txt
-  go run . -d example.com -active -mutations -live
+  go run . -d example.com -vhost
+  go run . -d example.com -active -mutations -vhost -live
 `, bold, reset)
 }
 
@@ -119,6 +130,7 @@ func run() int {
 	var fuzzSubs, fuzzUrls bool
 	var live bool
 	var mutations bool
+	var vhost bool
 	var subsWordlistOverride, urlsWordlistOverride string
 	timeoutSet := false
 
@@ -146,6 +158,8 @@ func run() int {
 	fs.StringVar(&urlsWordlistOverride, "urls-wordlist", "", "")
 	fs.BoolVar(&mutations, "mu", false, "")
 	fs.BoolVar(&mutations, "mutations", false, "")
+	fs.BoolVar(&vhost, "vh", false, "")
+	fs.BoolVar(&vhost, "vhost", false, "")
 	fs.BoolVar(&live, "live", false, "")
 	fs.BoolVar(&live, "lv", false, "")
 	fs.BoolVar(&help, "h", false, "")
@@ -194,12 +208,12 @@ func run() int {
 		fuzzUrls = true
 	}
 
-	if (active || fuzzSubs || fuzzUrls) && !timeoutSet {
+	if (active || fuzzSubs || fuzzUrls || vhost) && !timeoutSet {
 		// All are deep/slow techniques: -active budgets a full crawl or
-		// headless page load per seed, and each fuzz stage budgets working
-		// through a wordlist of thousands of candidates per seed (subdomain
-		// DNS brute-force has its own short, fixed per-query timeout
-		// regardless of this).
+		// headless page load per seed, and each fuzz/vhost stage budgets
+		// working through a wordlist of thousands of candidates per seed
+		// (subdomain DNS brute-force has its own short, fixed per-query
+		// timeout regardless of this).
 		timeout = 300
 	}
 
@@ -210,16 +224,16 @@ func run() int {
 	}
 
 	var subsWordlist, urlsWordlist string
-	if fuzzSubs || fuzzUrls {
+	if fuzzSubs || fuzzUrls || vhost {
 		step("Preparing fuzzing wordlists")
 		cacheDir := filepath.Join(repoRoot, "oneClick", "wordlists")
 
-		if fuzzSubs {
+		if fuzzSubs || vhost {
 			if subsWordlistOverride != "" {
 				subsWordlist = subsWordlistOverride
 				ok("Using subdomain wordlist -> %s", subsWordlist)
 			} else if p, err := ensureWordlist(cacheDir, "subdomains.txt", defaultSubdomainWordlistURL); err != nil {
-				warn("Could not prepare subdomain wordlist, subdomain fuzzing disabled: %v", err)
+				warn("Could not prepare subdomain wordlist, subdomain fuzzing/vhost discovery disabled: %v", err)
 			} else {
 				subsWordlist = p
 				ok("Subdomain wordlist ready -> %s", p)
@@ -305,6 +319,7 @@ func run() int {
 	fmt.Printf("  mutations:   %s\n", onOff(mutations))
 	fmt.Printf("  fuzz subs:   %s\n", wordlistStatus(fuzzSubs, subsWordlist))
 	fmt.Printf("  fuzz urls:   %s\n", wordlistStatus(fuzzUrls, urlsWordlist))
+	fmt.Printf("  vhost:       %s\n", wordlistStatus(vhost, subsWordlist))
 	fmt.Printf("  live logs:   %s\n", onOff(live))
 	fmt.Printf("  concurrency: %d\n", concurrency)
 	fmt.Printf("  timeout:     %ds\n", timeout)
@@ -329,7 +344,7 @@ func run() int {
 	// round trips), so a wordlist of thousands of candidates needs more
 	// concurrency than the default to finish in reasonable time.
 	subEnumConcurrency := concurrency
-	if subsWordlist != "" && subEnumConcurrency < 50 {
+	if fuzzSubs && subsWordlist != "" && subEnumConcurrency < 50 {
 		subEnumConcurrency = 50
 	}
 	subEnumArgs := append([]string{
@@ -338,7 +353,10 @@ func run() int {
 		"-c", strconv.Itoa(subEnumConcurrency),
 		"-timeout", strconv.Itoa(timeout),
 	}, activeFlag...)
-	if subsWordlist != "" {
+	// subsWordlist is also prepared for -vhost alone, which must NOT imply
+	// SubEnum's own DNS brute-force -- only pass -w through when the user
+	// actually asked for -fuzz-subs (or -sw, which implies it above).
+	if fuzzSubs && subsWordlist != "" {
 		subEnumArgs = append(subEnumArgs, "-w", subsWordlist)
 	}
 	if mutations {
@@ -358,6 +376,25 @@ func run() int {
 		warn("SubEnum exited with an error (see %s), continuing with %d known host(s)", logPath, subsCount)
 	} else {
 		ok("Found %d unique subdomain(s) -> %s", subsCount, subsPath)
+	}
+
+	// Virtual host discovery: subdomains found via DNS (passive sources,
+	// brute-force, permutation) all require a DNS record to exist. A vhost
+	// that's only routed by the server's own config (nginx/Apache/an LB)
+	// has no such record and is invisible to every technique above. This
+	// probes the target(s) directly over HTTP(S) with the Host header
+	// swapped to each wordlist candidate, keeping the same connection
+	// target throughout -- the same effect as pinning the domain to an IP
+	// in /etc/hosts and fuzzing the Host header, without touching system
+	// DNS config.
+	if vhost {
+		vhostRC := runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, concurrency, timeout, logFile, live)
+		subsCount = countNonEmptyLines(subsPath)
+		if vhostRC != 0 {
+			warn("vhost discovery exited with an error (see %s)", logPath)
+		} else {
+			ok("Subdomains after vhost discovery: %d -> %s", subsCount, subsPath)
+		}
 	}
 
 	// -------------------------------------------------------------------
@@ -428,6 +465,7 @@ func run() int {
 			"mutations:         %s\n"+
 			"fuzz subs:         %s\n"+
 			"fuzz urls:         %s\n"+
+			"vhost:             %s\n"+
 			"generated:         %s\n"+
 			"subdomains found:  %d   (%s)\n"+
 			"urls found:        %d   (%s)\n"+
@@ -439,6 +477,7 @@ func run() int {
 		onOff(mutations),
 		wordlistStatus(fuzzSubs, subsWordlist),
 		wordlistStatus(fuzzUrls, urlsWordlist),
+		wordlistStatus(vhost, subsWordlist),
 		time.Now().UTC().Format(time.RFC3339),
 		subsCount, subsPath,
 		urlsCount, urlsPath,
@@ -502,7 +541,7 @@ func findRepoRoot() (string, error) {
 			return root, nil
 		}
 	}
-	return "", fmt.Errorf("could not locate the AutoHunting repo root (expected SubEnum, URLEnum and jsAnalyzer as siblings)")
+	return "", fmt.Errorf("could not locate the AutoHunting repo root (expected SubEnum, URLEnum, jsAnalyzer and vhosts as siblings)")
 }
 
 func searchUpwardForRepoRoot(start string) (string, bool) {
@@ -520,7 +559,7 @@ func searchUpwardForRepoRoot(start string) (string, bool) {
 }
 
 func isRepoRoot(dir string) bool {
-	for _, sub := range []string{"SubEnum", "URLEnum", "jsAnalyzer"} {
+	for _, sub := range []string{"SubEnum", "URLEnum", "jsAnalyzer", "vhosts"} {
 		info, err := os.Stat(filepath.Join(dir, sub))
 		if err != nil || !info.IsDir() {
 			return false
