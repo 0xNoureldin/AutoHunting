@@ -5,25 +5,23 @@ import (
 	"testing"
 )
 
-func TestFuzzStatus(t *testing.T) {
+func TestWordlistStatus(t *testing.T) {
 	cases := []struct {
-		name                       string
-		fuzz                       bool
-		subsWordlist, urlsWordlist string
-		want                       string
+		name     string
+		enabled  bool
+		wordlist string
+		want     string
 	}{
-		{"disabled", false, "", "", "off"},
-		{"disabled even with wordlists set", false, "a", "b", "off"},
-		{"both ready", true, "subs.txt", "paths.txt", "on (subdomains + URLs)"},
-		{"only subs ready", true, "subs.txt", "", "on (subdomains only, URL wordlist unavailable)"},
-		{"only urls ready", true, "", "paths.txt", "on (URLs only, subdomain wordlist unavailable)"},
-		{"requested but both unavailable", true, "", "", "requested, but unavailable (see warnings above)"},
+		{"disabled", false, "", "off"},
+		{"disabled even with a wordlist set", false, "subs.txt", "off"},
+		{"enabled and ready", true, "subs.txt", "on"},
+		{"enabled but unavailable", true, "", "requested, but unavailable (see warnings above)"},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			got := fuzzStatus(c.fuzz, c.subsWordlist, c.urlsWordlist)
+			got := wordlistStatus(c.enabled, c.wordlist)
 			if got != c.want {
-				t.Errorf("fuzzStatus(%v, %q, %q) = %q, want %q", c.fuzz, c.subsWordlist, c.urlsWordlist, got, c.want)
+				t.Errorf("wordlistStatus(%v, %q) = %q, want %q", c.enabled, c.wordlist, got, c.want)
 			}
 		})
 	}

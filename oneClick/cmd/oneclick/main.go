@@ -10,7 +10,9 @@
 //	go run . -d example.com
 //	go run . -f domains.txt
 //	go run . -d example.com -active -o /tmp/out
-//	go run . -d example.com -fuzz  // wordlist-based subdomain + URL fuzzing
+//	go run . -d example.com -fuzz-subs             // wordlist-based subdomain fuzzing
+//	go run . -d example.com -fuzz-urls             // wordlist-based URL fuzzing
+//	go run . -d example.com -fuzz-subs -fuzz-urls  // both
 package main
 
 import (
@@ -71,19 +73,24 @@ Options:
                               headless browsing). Off by default for a fast passive-only run.
   -mu, -mutations             Enable alterx permutation-based subdomain guessing (e.g. dev-api,
                               api-dev from a known subdomain). Off by default; independent of
-                              -active and -fuzz, and can be combined with either.
-  -fz, -fuzz                 Enable wordlist-based fuzzing for subdomain enumeration (DNS
-                              brute-force) and URL enumeration (path/content discovery).
-                              Downloads and caches a well-known SecLists wordlist for each on
-                              first use (oneClick/wordlists/), unless overridden below. Works
-                              independently of -active and can be combined with it. Thorough but
-                              slow (thousands of candidates per target) -- like -active, it bumps
-                              the default timeout to 300s unless -t is set explicitly.
+                              -active, -fuzz-subs, and -fuzz-urls, and can be combined with any.
+  -fs, -fuzz-subs             Enable wordlist-based DNS brute-force fuzzing for subdomain
+                              enumeration. Downloads and caches a well-known SecLists subdomain
+                              wordlist on first use (oneClick/wordlists/), unless -sw is given.
+                              Off by default; independent of -active, -mutations, and -fuzz-urls,
+                              and can be combined with any of them.
+  -fu, -fuzz-urls             Enable wordlist-based path/content fuzzing for URL enumeration.
+                              Downloads and caches a well-known SecLists content wordlist on
+                              first use (oneClick/wordlists/), unless -uw is given. Off by
+                              default; independent of -active, -mutations, and -fuzz-subs, and
+                              can be combined with any of them.
   -sw, -subs-wordlist <path> Use this wordlist for subdomain fuzzing instead of downloading one
+                              (implies -fuzz-subs)
   -uw, -urls-wordlist <path> Use this wordlist for URL fuzzing instead of downloading one
+                              (implies -fuzz-urls)
   -c, -concurrency <n>       Concurrency used across stages (default: 10)
-  -t, -timeout <seconds>     Per-request timeout used across stages (default: 60, 300 with -active
-                              or -fuzz)
+  -t, -timeout <seconds>     Per-request timeout used across stages (default: 60, 300 with
+                              -active, -fuzz-subs, or -fuzz-urls)
   -lv, -live                  Stream each stage's live output to the terminal as it runs, not
                               just to the log file. Off by default (quiet, log-file-only).
   -h, -help                  Show this help
@@ -92,8 +99,9 @@ Examples:
   go run . -d example.com
   go run . -f domains.txt -o results/acme
   go run . -d example.com -active -c 20
-  go run . -d example.com -fuzz
-  go run . -d example.com -fuzz -sw my-subs.txt -uw my-paths.txt
+  go run . -d example.com -fuzz-subs
+  go run . -d example.com -fuzz-urls
+  go run . -d example.com -fuzz-subs -sw my-subs.txt -fuzz-urls -uw my-paths.txt
   go run . -d example.com -active -mutations -live
 `, bold, reset)
 }
@@ -108,7 +116,7 @@ func run() int {
 	var concurrency int
 	var timeout int
 	var help bool
-	var fuzz bool
+	var fuzzSubs, fuzzUrls bool
 	var live bool
 	var mutations bool
 	var subsWordlistOverride, urlsWordlistOverride string
@@ -128,8 +136,10 @@ func run() int {
 	fs.IntVar(&concurrency, "concurrency", 10, "")
 	fs.IntVar(&timeout, "t", 60, "")
 	fs.IntVar(&timeout, "timeout", 60, "")
-	fs.BoolVar(&fuzz, "fz", false, "")
-	fs.BoolVar(&fuzz, "fuzz", false, "")
+	fs.BoolVar(&fuzzSubs, "fs", false, "")
+	fs.BoolVar(&fuzzSubs, "fuzz-subs", false, "")
+	fs.BoolVar(&fuzzUrls, "fu", false, "")
+	fs.BoolVar(&fuzzUrls, "fuzz-urls", false, "")
 	fs.StringVar(&subsWordlistOverride, "sw", "", "")
 	fs.StringVar(&subsWordlistOverride, "subs-wordlist", "", "")
 	fs.StringVar(&urlsWordlistOverride, "uw", "", "")
@@ -174,11 +184,22 @@ func run() int {
 		fail("Go is required but was not found in PATH")
 		return 1
 	}
-	if (active || fuzz) && !timeoutSet {
-		// Both are deep/slow techniques: -active budgets a full crawl or
-		// headless page load per seed, and -fuzz budgets working through a
-		// wordlist of thousands of paths per seed (subdomain DNS brute-force
-		// has its own short, fixed per-query timeout regardless of this).
+	// Passing a custom wordlist is a clear signal of intent, so it enables
+	// the corresponding fuzzing stage even without the -fuzz-subs/-fuzz-urls
+	// flag.
+	if subsWordlistOverride != "" {
+		fuzzSubs = true
+	}
+	if urlsWordlistOverride != "" {
+		fuzzUrls = true
+	}
+
+	if (active || fuzzSubs || fuzzUrls) && !timeoutSet {
+		// All are deep/slow techniques: -active budgets a full crawl or
+		// headless page load per seed, and each fuzz stage budgets working
+		// through a wordlist of thousands of candidates per seed (subdomain
+		// DNS brute-force has its own short, fixed per-query timeout
+		// regardless of this).
 		timeout = 300
 	}
 
@@ -189,28 +210,32 @@ func run() int {
 	}
 
 	var subsWordlist, urlsWordlist string
-	if fuzz {
+	if fuzzSubs || fuzzUrls {
 		step("Preparing fuzzing wordlists")
 		cacheDir := filepath.Join(repoRoot, "oneClick", "wordlists")
 
-		if subsWordlistOverride != "" {
-			subsWordlist = subsWordlistOverride
-			ok("Using subdomain wordlist -> %s", subsWordlist)
-		} else if p, err := ensureWordlist(cacheDir, "subdomains.txt", defaultSubdomainWordlistURL); err != nil {
-			warn("Could not prepare subdomain wordlist, subdomain fuzzing disabled: %v", err)
-		} else {
-			subsWordlist = p
-			ok("Subdomain wordlist ready -> %s", p)
+		if fuzzSubs {
+			if subsWordlistOverride != "" {
+				subsWordlist = subsWordlistOverride
+				ok("Using subdomain wordlist -> %s", subsWordlist)
+			} else if p, err := ensureWordlist(cacheDir, "subdomains.txt", defaultSubdomainWordlistURL); err != nil {
+				warn("Could not prepare subdomain wordlist, subdomain fuzzing disabled: %v", err)
+			} else {
+				subsWordlist = p
+				ok("Subdomain wordlist ready -> %s", p)
+			}
 		}
 
-		if urlsWordlistOverride != "" {
-			urlsWordlist = urlsWordlistOverride
-			ok("Using URL wordlist -> %s", urlsWordlist)
-		} else if p, err := ensureWordlist(cacheDir, "paths.txt", defaultPathWordlistURL); err != nil {
-			warn("Could not prepare URL wordlist, URL fuzzing disabled: %v", err)
-		} else {
-			urlsWordlist = p
-			ok("URL wordlist ready -> %s", p)
+		if fuzzUrls {
+			if urlsWordlistOverride != "" {
+				urlsWordlist = urlsWordlistOverride
+				ok("Using URL wordlist -> %s", urlsWordlist)
+			} else if p, err := ensureWordlist(cacheDir, "paths.txt", defaultPathWordlistURL); err != nil {
+				warn("Could not prepare URL wordlist, URL fuzzing disabled: %v", err)
+			} else {
+				urlsWordlist = p
+				ok("URL wordlist ready -> %s", p)
+			}
 		}
 	}
 
@@ -278,7 +303,8 @@ func run() int {
 	fmt.Printf("  targets:     %d domain(s)\n", len(rawDomains))
 	fmt.Printf("  mode:        %s\n", mode)
 	fmt.Printf("  mutations:   %s\n", onOff(mutations))
-	fmt.Printf("  fuzzing:     %s\n", fuzzStatus(fuzz, subsWordlist, urlsWordlist))
+	fmt.Printf("  fuzz subs:   %s\n", wordlistStatus(fuzzSubs, subsWordlist))
+	fmt.Printf("  fuzz urls:   %s\n", wordlistStatus(fuzzUrls, urlsWordlist))
 	fmt.Printf("  live logs:   %s\n", onOff(live))
 	fmt.Printf("  concurrency: %d\n", concurrency)
 	fmt.Printf("  timeout:     %ds\n", timeout)
@@ -400,7 +426,8 @@ func run() int {
 			"target(s):        %s\n"+
 			"mode:              %s\n"+
 			"mutations:         %s\n"+
-			"fuzzing:           %s\n"+
+			"fuzz subs:         %s\n"+
+			"fuzz urls:         %s\n"+
 			"generated:         %s\n"+
 			"subdomains found:  %d   (%s)\n"+
 			"urls found:        %d   (%s)\n"+
@@ -410,7 +437,8 @@ func run() int {
 		strings.Join(rawDomains, ","),
 		modeShort,
 		onOff(mutations),
-		fuzzStatus(fuzz, subsWordlist, urlsWordlist),
+		wordlistStatus(fuzzSubs, subsWordlist),
+		wordlistStatus(fuzzUrls, urlsWordlist),
 		time.Now().UTC().Format(time.RFC3339),
 		subsCount, subsPath,
 		urlsCount, urlsPath,
@@ -572,17 +600,16 @@ func filterJSURLs(urlsPath, jsPath string) error {
 	return writeLines(jsPath, jsURLs)
 }
 
-func fuzzStatus(fuzz bool, subsWordlist, urlsWordlist string) string {
-	if !fuzz {
-		return "off"
-	}
+// wordlistStatus reports the state of one independent fuzzing stage: off
+// (not requested), on (a wordlist is ready to use), or unavailable (the
+// user asked for it but no wordlist could be prepared -- see warnings
+// printed during wordlist preparation).
+func wordlistStatus(enabled bool, wordlist string) string {
 	switch {
-	case subsWordlist != "" && urlsWordlist != "":
-		return "on (subdomains + URLs)"
-	case subsWordlist != "":
-		return "on (subdomains only, URL wordlist unavailable)"
-	case urlsWordlist != "":
-		return "on (URLs only, subdomain wordlist unavailable)"
+	case !enabled:
+		return "off"
+	case wordlist != "":
+		return "on"
 	default:
 		return "requested, but unavailable (see warnings above)"
 	}

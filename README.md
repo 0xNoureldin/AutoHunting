@@ -267,31 +267,33 @@ Runs subdomain enumeration, URL enumeration, and JS secret scanning back to back
 single command — no need to juggle each tool's flags or pipe files between them by hand.
 From `oneClick/cmd/oneclick`:
 ```bash
-go run . -d example.com                # passive, fast (default)
-go run . -f domains.txt                # same, for a list of domains
-go run . -d example.com -active        # deeper: zone transfer, crawling, headless browsing
-go run . -d example.com -fuzz          # wordlist-based subdomain + URL fuzzing
-go run . -d example.com -mutations     # alterx permutation-based subdomain guessing
-go run . -d example.com -live          # stream each stage's live output to the terminal
+go run . -d example.com                    # passive, fast (default)
+go run . -f domains.txt                    # same, for a list of domains
+go run . -d example.com -active            # deeper: zone transfer, crawling, headless browsing
+go run . -d example.com -fuzz-subs         # wordlist-based subdomain DNS brute-force
+go run . -d example.com -fuzz-urls         # wordlist-based URL path/content fuzzing
+go run . -d example.com -mutations         # alterx permutation-based subdomain guessing
+go run . -d example.com -live              # stream each stage's live output to the terminal
 go run . -d example.com -o results/acme -c 20 -t 120
-go run . -h                            # full option list
+go run . -h                                # full option list
 ```
 Results (subdomains, URLs, the filtered list of JS files, `secrets.json`, a `SUMMARY.txt`,
 and a combined log) are written to `oneClick/results/<target>_<timestamp>/` unless `-o` is
 given. Active mode is off by default since it can take from several minutes up to an hour
 (see the URLEnum notes above); pass `-active` when you want deeper coverage.
 
-`-fuzz` enables wordlist-based fuzzing, independently of `-active` (and combinable with it):
-DNS brute-force for subdomain enumeration, and path/content discovery (baseline-diffing) for
-URL enumeration. On first use it downloads and caches SecLists' standard wordlists —
-`subdomains-top1million-5000.txt` and `common.txt` — into `oneClick/wordlists/`; pass
-`-sw <path>`/`-uw <path>` to use your own instead. Like `-active`, it's thorough but slow
-(thousands of candidates per target), so it also bumps the default timeout to 300s unless
-`-t` is set explicitly.
+`-fuzz-subs` and `-fuzz-urls` each enable wordlist-based fuzzing independently — DNS
+brute-force for subdomain enumeration, and path/content discovery (baseline-diffing) for URL
+enumeration — and independently of `-active`/`-mutations`, so any combination works. On first
+use each downloads and caches its own SecLists wordlist (`subdomains-top1million-5000.txt`,
+`common.txt`) into `oneClick/wordlists/`; pass `-sw <path>`/`-uw <path>` to use your own
+instead (which also implies the matching `-fuzz-subs`/`-fuzz-urls`, so you don't need both).
+Like `-active`, they're thorough but slow (thousands of candidates per target), so either one
+also bumps the default timeout to 300s unless `-t` is set explicitly.
 
 `-mutations` enables alterx permutation-based subdomain guessing (e.g. trying `dev-api` and
-`api-dev` once `api` is known). It's off by default and independent of both `-active` and
-`-fuzz` — combine it with either.
+`api-dev` once `api` is known). It's off by default and independent of `-active`, `-fuzz-subs`,
+and `-fuzz-urls` — combine it with any of them.
 
 By default, each stage's own output only goes into `oneclick.log`, keeping the terminal to
 oneClick's own progress lines. Pass `-live` to also stream it to the terminal as it happens.
