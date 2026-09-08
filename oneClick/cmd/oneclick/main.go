@@ -14,6 +14,7 @@
 //	go run . -d example.com -fuzz-urls             // wordlist-based URL fuzzing
 //	go run . -d example.com -fuzz-subs -fuzz-urls  // both
 //	go run . -d example.com -vhost                 // Host-header vhost discovery
+//	go run . -d example.com -port-scan             // TCP-connect port scan of discovered subdomains
 package main
 
 import (
@@ -98,6 +99,17 @@ Options:
                               downloading one (implies -fuzz-subs)
   -uw, -urls-wordlist <path> Use this wordlist for URL fuzzing instead of downloading one
                               (implies -fuzz-urls)
+  -ps, -port-scan             Enable TCP-connect port scanning across every discovered
+                              subdomain. Scans the top 100 most common ports by default;
+                              see -all-ports and -ports to scan differently. Any open port
+                              other than 80/443 is also written to portScanning.txt. Off by
+                              default; independent of every other stage, and can be
+                              combined with any of them.
+  -ap, -all-ports             Scan all 65535 ports instead of the default top 100 (implies
+                              -port-scan; ignored if -ports is also set).
+  -ports <spec>               Scan this specific comma-separated list of ports and/or port
+                              ranges instead of the default top 100 (e.g. 80,443,8000-8100).
+                              Implies -port-scan and overrides -all-ports.
   -c, -concurrency <n>       Concurrency used across stages (default: 10)
   -t, -timeout <seconds>     Per-request timeout used across stages (default: 60, 300 with
                               -active, -fuzz-subs, -fuzz-urls, or -vhost)
@@ -114,6 +126,9 @@ Examples:
   go run . -d example.com -fuzz-subs -sw my-subs.txt -fuzz-urls -uw my-paths.txt
   go run . -d example.com -vhost
   go run . -d example.com -active -mutations -vhost -live
+  go run . -d example.com -port-scan
+  go run . -d example.com -port-scan -all-ports
+  go run . -d example.com -port-scan -ports 1-1000,8080,8443
 `, bold, reset)
 }
 
@@ -131,6 +146,8 @@ func run() int {
 	var live bool
 	var mutations bool
 	var vhost bool
+	var portScan, allPorts bool
+	var portsSpec string
 	var subsWordlistOverride, urlsWordlistOverride string
 	timeoutSet := false
 
@@ -160,6 +177,11 @@ func run() int {
 	fs.BoolVar(&mutations, "mutations", false, "")
 	fs.BoolVar(&vhost, "vh", false, "")
 	fs.BoolVar(&vhost, "vhost", false, "")
+	fs.BoolVar(&portScan, "ps", false, "")
+	fs.BoolVar(&portScan, "port-scan", false, "")
+	fs.BoolVar(&allPorts, "ap", false, "")
+	fs.BoolVar(&allPorts, "all-ports", false, "")
+	fs.StringVar(&portsSpec, "ports", "", "")
 	fs.BoolVar(&live, "live", false, "")
 	fs.BoolVar(&live, "lv", false, "")
 	fs.BoolVar(&help, "h", false, "")
@@ -206,6 +228,11 @@ func run() int {
 	}
 	if urlsWordlistOverride != "" {
 		fuzzUrls = true
+	}
+	// Asking for all ports or a specific port spec is a clear signal of
+	// intent, so it enables the port-scanning stage even without -port-scan.
+	if allPorts || portsSpec != "" {
+		portScan = true
 	}
 
 	if (active || fuzzSubs || fuzzUrls || vhost) && !timeoutSet {
@@ -320,6 +347,7 @@ func run() int {
 	fmt.Printf("  fuzz subs:   %s\n", wordlistStatus(fuzzSubs, subsWordlist))
 	fmt.Printf("  fuzz urls:   %s\n", wordlistStatus(fuzzUrls, urlsWordlist))
 	fmt.Printf("  vhost:       %s\n", wordlistStatus(vhost, subsWordlist))
+	fmt.Printf("  port scan:   %s\n", portScanStatus(portScan, allPorts, portsSpec))
 	fmt.Printf("  live logs:   %s\n", onOff(live))
 	fmt.Printf("  concurrency: %d\n", concurrency)
 	fmt.Printf("  timeout:     %ds\n", timeout)
@@ -330,6 +358,8 @@ func run() int {
 	urlsPath := filepath.Join(outputDir, "urls.txt")
 	jsPath := filepath.Join(outputDir, "js_urls.txt")
 	secretsPath := filepath.Join(outputDir, "secrets.json")
+	portsPath := filepath.Join(outputDir, "ports.txt")
+	portScanningPath := filepath.Join(outputDir, "portScanning.txt")
 
 	var activeFlag []string
 	if active {
@@ -406,6 +436,30 @@ func run() int {
 	// rather than sometimes missing.
 	touchFile(vhostSubsPath)
 
+	// Port scanning (optional, off by default): a TCP-connect scan across
+	// every discovered subdomain (including any found via vhost
+	// discovery). Catches non-web services and non-standard ports that
+	// URL enumeration, which only ever looks at http(s) endpoints, would
+	// never see.
+	portsCount, notablePortsCount := 0, 0
+	portScanRC := 0
+	if portScan {
+		step("Port scanning")
+		portScanRC, portsCount, notablePortsCount = runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec, allPorts, concurrency, timeout, logFile, live)
+		if portScanRC != 0 {
+			warn("portScanner exited with an error (see %s)", logPath)
+		} else if portsCount == 0 {
+			ok("No open ports found")
+		} else {
+			ok("Found %d open port(s) -> %s (%d not on 80/443 -> %s)", portsCount, portsPath, notablePortsCount, portScanningPath)
+		}
+	}
+	// Always leave ports.txt/portScanning.txt in place (empty if
+	// -port-scan wasn't used or nothing was found), so they're reliable
+	// paths to reference rather than sometimes missing.
+	touchFile(portsPath)
+	touchFile(portScanningPath)
+
 	// -------------------------------------------------------------------
 	// Stage 2: URL enumeration (URLEnum)
 	// -------------------------------------------------------------------
@@ -475,12 +529,15 @@ func run() int {
 			"fuzz subs:         %s\n"+
 			"fuzz urls:         %s\n"+
 			"vhost:             %s\n"+
+			"port scan:         %s\n"+
 			"generated:         %s\n"+
 			"subdomains found:  %d   (%s)\n"+
 			"  ...via vhost:    %d   (%s)\n"+
 			"urls found:        %d   (%s)\n"+
 			"js files found:    %d   (%s)\n"+
 			"secrets output:    %s\n"+
+			"open ports found:  %d   (%s)\n"+
+			"  ...not 80/443:   %d   (%s)\n"+
 			"full log:          %s\n",
 		strings.Join(rawDomains, ","),
 		modeShort,
@@ -488,12 +545,15 @@ func run() int {
 		wordlistStatus(fuzzSubs, subsWordlist),
 		wordlistStatus(fuzzUrls, urlsWordlist),
 		wordlistStatus(vhost, subsWordlist),
+		portScanStatus(portScan, allPorts, portsSpec),
 		time.Now().UTC().Format(time.RFC3339),
 		subsCount, subsPath,
 		vhostCount, vhostSubsPath,
 		urlsCount, urlsPath,
 		jsCount, jsPath,
 		secretsPath,
+		portsCount, portsPath,
+		notablePortsCount, portScanningPath,
 		logPath,
 	)
 	if err := os.WriteFile(summaryPath, []byte(summary), 0o644); err != nil {
@@ -505,7 +565,7 @@ func run() int {
 	step("Done")
 	fmt.Printf("Results saved in: %s%s%s\n", bold, outputDir, reset)
 
-	if subEnumRC != 0 || urlEnumRC != 0 || jsAnalyzerRC != 0 {
+	if subEnumRC != 0 || urlEnumRC != 0 || jsAnalyzerRC != 0 || portScanRC != 0 {
 		warn("One or more stages reported errors, check %s for details", logPath)
 		return 2
 	}
@@ -552,7 +612,7 @@ func findRepoRoot() (string, error) {
 			return root, nil
 		}
 	}
-	return "", fmt.Errorf("could not locate the AutoHunting repo root (expected SubEnum, URLEnum, jsAnalyzer and vhosts as siblings)")
+	return "", fmt.Errorf("could not locate the AutoHunting repo root (expected SubEnum, URLEnum, jsAnalyzer, vhosts and portScanner as siblings)")
 }
 
 func searchUpwardForRepoRoot(start string) (string, bool) {
@@ -570,7 +630,7 @@ func searchUpwardForRepoRoot(start string) (string, bool) {
 }
 
 func isRepoRoot(dir string) bool {
-	for _, sub := range []string{"SubEnum", "URLEnum", "jsAnalyzer", "vhosts"} {
+	for _, sub := range []string{"SubEnum", "URLEnum", "jsAnalyzer", "vhosts", "portScanner"} {
 		info, err := os.Stat(filepath.Join(dir, sub))
 		if err != nil || !info.IsDir() {
 			return false

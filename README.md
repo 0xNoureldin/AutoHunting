@@ -119,7 +119,8 @@ Integration or wrapper for **Nuclei** to automate vulnerability scanning using t
 Performs port scanning to identify:
 - Open ports
 - Running services  
-Useful for network-level recon.
+Scans the top 100 most common ports by default; `-all-ports` scans all 65535, or `-ports` scans
+a specific comma-separated list/range. Useful for network-level recon.
 
 ---
 
@@ -157,8 +158,9 @@ Performs WHOIS lookups to gather:
 ### ⚡ oneClick
 One command recon pipeline. Give it a domain (or a file of domains) and it chains together
 **SubEnum → URLEnum → jsAnalyzer**: subdomain enumeration, then URL enumeration on the
-discovered hosts, then secret scanning on the discovered `.js` files. See
-[Module Usage Details](#-module-usage-details) below for usage.
+discovered hosts, then secret scanning on the discovered `.js` files. Optional add-on stages
+(off by default): virtual-host discovery (`-vhost`) and port scanning (`-port-scan`) across
+every discovered subdomain. See [Module Usage Details](#-module-usage-details) below for usage.
 
 ---
 
@@ -248,10 +250,15 @@ changed. `candidates.txt` needs full hostnames (e.g. `admin.example.com`), not b
 oneClick's `-vhost` (below) builds this file for you from a subdomain wordlist.
 
 ### portScanner
-Performs TCP port scanning:
+Performs TCP (or UDP) port scanning:
 ```bash
-go run . -host-file subs.txt -host-threads 52 -threads 86 -output-file ports.txt -timeout 3
+go run . -host-file subs.txt -host-threads 52 -threads 86 -output-file ports.txt -timeout 3       # top 100 ports (default)
+go run . -host example.com -all-ports -output-file ports.txt                                       # all 65535 ports
+go run . -host example.com -ports 80,443,8000-8100 -output-file ports.txt                           # specific ports/ranges
 ```
+`-ports` (comma-separated ports and/or ranges, e.g. `80,443,1000-2000`) takes precedence over
+`-all-ports` if both are given; with neither, it scans `Top100Ports`, the built-in list of the
+100 most commonly open ports.
 
 ### URLEnum (passive and active)
 Enumerates URLs from subdomains:
@@ -293,13 +300,17 @@ go run . -d example.com -fuzz-subs         # wordlist-based subdomain DNS brute-
 go run . -d example.com -fuzz-urls         # wordlist-based URL path/content fuzzing
 go run . -d example.com -mutations         # alterx permutation-based subdomain guessing
 go run . -d example.com -vhost             # Host-header vhost discovery (no DNS record needed)
+go run . -d example.com -port-scan         # TCP port scan every discovered subdomain (top 100 ports)
+go run . -d example.com -port-scan -all-ports        # scan all 65535 ports instead
+go run . -d example.com -port-scan -ports 1-1000,8080,8443  # scan specific ports/ranges instead
 go run . -d example.com -live              # stream each stage's live output to the terminal
 go run . -d example.com -o results/acme -c 20 -t 120
 go run . -h                                # full option list
 ```
 Results (subdomains, vhost-discovered subdomains on their own when `-vhost` is used, URLs,
-the filtered list of JS files, `secrets.json`, a `SUMMARY.txt`, and a combined log) are written
-to `oneClick/results/<target>_<timestamp>/` unless `-o` is given. Active mode is off by default
+the filtered list of JS files, `secrets.json`, open ports (`ports.txt` and, filtered down to
+non-80/443 ports, `portScanning.txt`) when `-port-scan` is used, a `SUMMARY.txt`, and a combined
+log) are written to `oneClick/results/<target>_<timestamp>/` unless `-o` is given. Active mode is off by default
 since it can take from several minutes up to an hour (see the URLEnum notes above); pass
 `-active` when you want deeper coverage.
 
@@ -328,6 +339,16 @@ are also written on their own to `vhost_subdomains.txt`, so you can tell which e
 `subdomains.txt` came from DNS versus from vhost fuzzing alone. Off by default, independent of
 `-active`/`-mutations`/`-fuzz-subs`/`-fuzz-urls`, and combinable with any of them; also bumps
 the default timeout to 300s unless `-t` is set explicitly.
+
+`-port-scan` TCP-connect scans every discovered subdomain (including any found via `-vhost`)
+with `portScanner`, the top 100 most commonly open ports by default. Pass `-all-ports` to scan
+all 65535 instead, or `-ports <spec>` (e.g. `80,443,8000-8100`, same comma/range syntax as
+`portScanner`'s own `-ports`) for a specific list -- either flag implies `-port-scan`, and
+`-ports` wins if both are given. Every open port is written to `ports.txt`; any open port other
+than 80 or 443 -- the two expected open on any web target -- is written again, on its own, to
+`portScanning.txt`, so non-standard/non-web services stand out without having to grep them out
+of the full list. Off by default, independent of every other stage, and combinable with any of
+them.
 
 By default, each stage's own output only goes into `oneclick.log`, keeping the terminal to
 oneClick's own progress lines. Pass `-live` to also stream it to the terminal as it happens.

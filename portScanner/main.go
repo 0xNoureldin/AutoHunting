@@ -28,7 +28,7 @@ var Top100Ports = []int{
 }
 
 func scanPort(connType, host string, port int, timeout time.Duration) bool {
-	addr := fmt.Sprintf("%s:%d", host, port)
+	addr := net.JoinHostPort(host, strconv.Itoa(port))
 	conn, err := net.DialTimeout(connType, addr, timeout)
 	if err != nil {
 		return false
@@ -122,6 +122,7 @@ func main() {
 
 	host := flag.String("host", "", "Target host to scan")
 	portsFlag := flag.String("ports", "", "Comma-separated list of ports or port ranges to scan (e.g., 80,443,1000-2000)")
+	allPorts := flag.Bool("all-ports", false, "Scan all 65535 ports instead of the default top 100 (ignored if -ports is set)")
 	timeout := flag.Int("timeout", 10, "Timeout in seconds for each port scan")
 	portThreads := flag.Int("threads", 10, "Number of concurrent threads to use for port scanning")
 	hostThreads := flag.Int("host-threads", 10, "Number of concurrent threads to use for host scanning")
@@ -164,7 +165,8 @@ func main() {
 		log.Fatal("no hosts to scan")
 	}
 
-	// Decide which ports to scan
+	// Decide which ports to scan: -ports takes precedence, then -all-ports,
+	// falling back to the default top-100 list.
 	portsToScan := Top100Ports
 	if strings.TrimSpace(*portsFlag) != "" {
 		parsed, err := parsePorts(*portsFlag)
@@ -172,6 +174,11 @@ func main() {
 			log.Fatalf("invalid -ports value: %v", err)
 		}
 		portsToScan = parsed
+	} else if *allPorts {
+		portsToScan = make([]int, 65535)
+		for i := range portsToScan {
+			portsToScan[i] = i + 1
+		}
 	}
 
 	fmt.Printf("Scanning %d host(s) | %d port(s) | conn=%s | timeout=%ds | hostThreads=%d | portThreads=%d\n",
