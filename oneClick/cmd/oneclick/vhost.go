@@ -29,21 +29,25 @@ const vhostConcurrencyCap = 10
 // record: it builds "word.domain" candidates from wordlist for every
 // domain in domains, runs the vhosts/cmd/vhoster tool (Host-header fuzzing
 // against each domain's own resolved connection target, baseline-diffed
-// so only genuinely distinct responses are reported), and merges whatever
-// it finds into subsPath alongside the existing subdomain list.
+// so only genuinely distinct responses are reported), writes whatever it
+// finds to vhostSubsPath (sanitized, deduped, sorted -- a standalone
+// deliverable in its own right, not just an intermediate file), and also
+// merges those same hosts into subsPath alongside the existing subdomain
+// list, so later stages see them too.
 //
 // Returns the vhoster subprocess exit code (0 on success and when there's
-// nothing to do, e.g. no wordlist available).
-func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath string, concurrency, timeout int, logFile io.Writer, live bool) int {
+// nothing to do, e.g. no wordlist available) and the number of distinct
+// vhosts discovered.
+func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSubsPath string, concurrency, timeout int, logFile io.Writer, live bool) (int, int) {
 	if wordlist == "" {
 		warn("No subdomain wordlist available, skipping vhost discovery")
-		return 0
+		return 0, 0
 	}
 
 	words, err := readLines(wordlist)
 	if err != nil {
 		warn("Could not read wordlist for vhost discovery: %v", err)
-		return 0
+		return 0, 0
 	}
 
 	outDir := filepath.Dir(subsPath)
@@ -68,15 +72,15 @@ func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath string, 
 	}
 	if len(candidates) == 0 {
 		warn("No vhost candidates to try, skipping vhost discovery")
-		return 0
+		return 0, 0
 	}
 	if err := writeLines(hostsPath, candidates); err != nil {
 		warn("Could not write vhost candidate file: %v", err)
-		return 0
+		return 0, 0
 	}
 	if err := writeLines(ipsPath, domains); err != nil {
 		warn("Could not write vhost target file: %v", err)
-		return 0
+		return 0, 0
 	}
 
 	vhostConcurrency := concurrency
@@ -101,23 +105,22 @@ func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath string, 
 	found, err := readVhosterResults(outJSON)
 	if err != nil {
 		warn("Could not read vhost discovery results: %v", err)
-		return rc
-	}
-	if len(found) == 0 {
-		return rc
+		return rc, 0
 	}
 
-	foundPath := filepath.Join(outDir, "vhost_found.txt")
-	if err := writeLines(foundPath, found); err != nil {
-		warn("Could not write discovered vhosts: %v", err)
-		return rc
+	sanitized := sanitizeHostLines(found)
+	if err := writeLines(vhostSubsPath, sanitized); err != nil {
+		warn("Could not write discovered vhosts to %s: %v", vhostSubsPath, err)
+		return rc, 0
 	}
-	if err := mergeSanitizedHosts(foundPath, subsPath); err != nil {
+	if len(sanitized) == 0 {
+		return rc, 0
+	}
+	if err := mergeSanitizedHosts(vhostSubsPath, subsPath); err != nil {
 		warn("Could not merge discovered vhosts into subdomains: %v", err)
-		return rc
+		return rc, 0
 	}
-	ok("Discovered %d vhost(s) via Host-header fuzzing", len(found))
-	return rc
+	return rc, len(sanitized)
 }
 
 // readVhosterResults reads vhoster's {"target": ["vhost1", "vhost2", ...]}

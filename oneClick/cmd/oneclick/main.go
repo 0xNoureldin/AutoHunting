@@ -326,6 +326,7 @@ func run() int {
 	fmt.Printf("  output:      %s\n", outputDir)
 
 	subsPath := filepath.Join(outputDir, "subdomains.txt")
+	vhostSubsPath := filepath.Join(outputDir, "vhost_subdomains.txt")
 	urlsPath := filepath.Join(outputDir, "urls.txt")
 	jsPath := filepath.Join(outputDir, "js_urls.txt")
 	secretsPath := filepath.Join(outputDir, "secrets.json")
@@ -387,15 +388,23 @@ func run() int {
 	// target throughout -- the same effect as pinning the domain to an IP
 	// in /etc/hosts and fuzzing the Host header, without touching system
 	// DNS config.
+	vhostCount := 0
 	if vhost {
-		vhostRC := runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, concurrency, timeout, logFile, live)
+		var vhostRC int
+		vhostRC, vhostCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, concurrency, timeout, logFile, live)
 		subsCount = countNonEmptyLines(subsPath)
 		if vhostRC != 0 {
 			warn("vhost discovery exited with an error (see %s)", logPath)
+		} else if vhostCount == 0 {
+			ok("No vhosts discovered")
 		} else {
-			ok("Subdomains after vhost discovery: %d -> %s", subsCount, subsPath)
+			ok("Discovered %d vhost(s) -> %s (merged into %s, now %d total)", vhostCount, vhostSubsPath, subsPath, subsCount)
 		}
 	}
+	// Always leave vhost_subdomains.txt in place (empty if -vhost wasn't
+	// used or nothing was found), so it's a reliable path to reference
+	// rather than sometimes missing.
+	touchFile(vhostSubsPath)
 
 	// -------------------------------------------------------------------
 	// Stage 2: URL enumeration (URLEnum)
@@ -468,6 +477,7 @@ func run() int {
 			"vhost:             %s\n"+
 			"generated:         %s\n"+
 			"subdomains found:  %d   (%s)\n"+
+			"  ...via vhost:    %d   (%s)\n"+
 			"urls found:        %d   (%s)\n"+
 			"js files found:    %d   (%s)\n"+
 			"secrets output:    %s\n"+
@@ -480,6 +490,7 @@ func run() int {
 		wordlistStatus(vhost, subsWordlist),
 		time.Now().UTC().Format(time.RFC3339),
 		subsCount, subsPath,
+		vhostCount, vhostSubsPath,
 		urlsCount, urlsPath,
 		jsCount, jsPath,
 		secretsPath,
@@ -572,24 +583,13 @@ var hostnameRe = regexp.MustCompile(
 	`^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$`,
 )
 
-// mergeSanitizedHosts merges inputPath and subsPath, keeps only lines that
-// look like a valid hostname (dropping garbage a flaky/blocked source may
-// have injected, such as error messages), dedupes, sorts, and writes the
-// result back to subsPath.
-func mergeSanitizedHosts(inputPath, subsPath string) error {
-	touchFile(subsPath)
-	inputLines, err := readLines(inputPath)
-	if err != nil {
-		return err
-	}
-	subLines, err := readLines(subsPath)
-	if err != nil {
-		return err
-	}
-
+// sanitizeHostLines keeps only lines that look like a valid hostname
+// (dropping garbage a flaky/blocked source may have injected, such as
+// error messages), dedupes, and sorts.
+func sanitizeHostLines(lines []string) []string {
 	seen := make(map[string]struct{})
 	var hosts []string
-	for _, l := range append(inputLines, subLines...) {
+	for _, l := range lines {
 		l = strings.TrimSpace(l)
 		if l == "" || !hostnameRe.MatchString(l) {
 			continue
@@ -601,6 +601,23 @@ func mergeSanitizedHosts(inputPath, subsPath string) error {
 		hosts = append(hosts, l)
 	}
 	sort.Strings(hosts)
+	return hosts
+}
+
+// mergeSanitizedHosts merges inputPath and subsPath, sanitizes the union
+// (see sanitizeHostLines), and writes the result back to subsPath.
+func mergeSanitizedHosts(inputPath, subsPath string) error {
+	touchFile(subsPath)
+	inputLines, err := readLines(inputPath)
+	if err != nil {
+		return err
+	}
+	subLines, err := readLines(subsPath)
+	if err != nil {
+		return err
+	}
+
+	hosts := sanitizeHostLines(append(inputLines, subLines...))
 	return writeLines(subsPath, hosts)
 }
 

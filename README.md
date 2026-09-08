@@ -297,10 +297,11 @@ go run . -d example.com -live              # stream each stage's live output to 
 go run . -d example.com -o results/acme -c 20 -t 120
 go run . -h                                # full option list
 ```
-Results (subdomains, URLs, the filtered list of JS files, `secrets.json`, a `SUMMARY.txt`,
-and a combined log) are written to `oneClick/results/<target>_<timestamp>/` unless `-o` is
-given. Active mode is off by default since it can take from several minutes up to an hour
-(see the URLEnum notes above); pass `-active` when you want deeper coverage.
+Results (subdomains, vhost-discovered subdomains on their own when `-vhost` is used, URLs,
+the filtered list of JS files, `secrets.json`, a `SUMMARY.txt`, and a combined log) are written
+to `oneClick/results/<target>_<timestamp>/` unless `-o` is given. Active mode is off by default
+since it can take from several minutes up to an hour (see the URLEnum notes above); pass
+`-active` when you want deeper coverage.
 
 `-fuzz-subs` and `-fuzz-urls` each enable wordlist-based fuzzing independently — DNS
 brute-force for subdomain enumeration, and path/content discovery (baseline-diffing) for URL
@@ -322,9 +323,11 @@ routing config — which every DNS-based technique above (passive sources, `-fuz
 `-fuzz-subs` downloads/uses, or `-sw`), keeping the connection target fixed, and reports the
 ones whose response genuinely differs from a baseline. This is the `vhosts` tool's fuzzing mode
 (see above) wired in automatically; discovered vhosts are merged into the subdomain list before
-URL enumeration runs, so they get the same downstream treatment as anything DNS found. Off by
-default, independent of `-active`/`-mutations`/`-fuzz-subs`/`-fuzz-urls`, and combinable with
-any of them; also bumps the default timeout to 300s unless `-t` is set explicitly.
+URL enumeration runs, so they get the same downstream treatment as anything DNS found -- and
+are also written on their own to `vhost_subdomains.txt`, so you can tell which entries in
+`subdomains.txt` came from DNS versus from vhost fuzzing alone. Off by default, independent of
+`-active`/`-mutations`/`-fuzz-subs`/`-fuzz-urls`, and combinable with any of them; also bumps
+the default timeout to 300s unless `-t` is set explicitly.
 
 By default, each stage's own output only goes into `oneclick.log`, keeping the terminal to
 oneClick's own progress lines. Pass `-live` to also stream it to the terminal as it happens.
