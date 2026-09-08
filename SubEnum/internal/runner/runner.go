@@ -51,13 +51,13 @@ func Run(opts *Options) error {
 	uniqueSubdomains := set.Slice()
 	logify.Infof("Passive enumeration completed: Found %d unique subdomain(s)", len(uniqueSubdomains))
 
-	if opts.ActiveEnabled {
+	if opts.Mutations {
 		newActiveCount, err := runActive(uniqueSubdomains, opts, set)
 		if err != nil {
 			return err
 		}
 		uniqueSubdomains = set.Slice()
-		logify.Infof("Active enumeration completed: Found %d new subdomain(s) (Total: %d)", newActiveCount, set.Len())
+		logify.Infof("Mutation-based enumeration completed: Found %d new subdomain(s) (Total: %d)", newActiveCount, set.Len())
 	}
 
 	if opts.OutputFile != "" {

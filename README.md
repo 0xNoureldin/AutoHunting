@@ -219,14 +219,14 @@ go run ./main.go -h
 Enumerates subdomains. In `SubEnum/cmd/subenum`:
 ```bash
 go run . -h
-go run . -active -c 10 -i domains.txt -o subs.txt                      # active enumeration
-go run . -active -c 20 -i domains.txt -o subs.txt -e -max-mutations-size 50 # limit mutation size
-go run . -w wordlist.txt -i domains.txt -o subs.txt                    # DNS brute-force fuzzing
+go run . -active -c 10 -i domains.txt -o subs.txt                        # zone transfer
+go run . -mutations -c 20 -i domains.txt -o subs.txt -e -max-mutations-size 50 # permutation guessing
+go run . -w wordlist.txt -i domains.txt -o subs.txt                      # DNS brute-force fuzzing
 ```
-Active enumeration (`-active`, zone transfer + permutation mutation) does not perform
-wordlist-based brute forcing; use `-w <wordlist>` for that instead, independently of
-`-active` — each candidate is `word + "." + domain`, concurrently DNS-probed for a live
-record.
+`-active` (zone transfer), `-mutations` (alterx permutation-based guessing, e.g. `dev-api`
+from a known `api`), and `-w <wordlist>` (DNS brute-force: each candidate is
+`word + "." + domain`, concurrently DNS-probed for a live record) are three independent
+techniques — each off by default, combine any of them freely.
 
 ### vhost (virtual host enumeration)
 Determines which subdomains resolve to which IP addresses:
@@ -269,8 +269,10 @@ From `oneClick/cmd/oneclick`:
 ```bash
 go run . -d example.com                # passive, fast (default)
 go run . -f domains.txt                # same, for a list of domains
-go run . -d example.com -active        # deeper: brute forcing, crawling, headless browsing
+go run . -d example.com -active        # deeper: zone transfer, crawling, headless browsing
 go run . -d example.com -fuzz          # wordlist-based subdomain + URL fuzzing
+go run . -d example.com -mutations     # alterx permutation-based subdomain guessing
+go run . -d example.com -live          # stream each stage's live output to the terminal
 go run . -d example.com -o results/acme -c 20 -t 120
 go run . -h                            # full option list
 ```
@@ -286,6 +288,13 @@ URL enumeration. On first use it downloads and caches SecLists' standard wordlis
 `-sw <path>`/`-uw <path>` to use your own instead. Like `-active`, it's thorough but slow
 (thousands of candidates per target), so it also bumps the default timeout to 300s unless
 `-t` is set explicitly.
+
+`-mutations` enables alterx permutation-based subdomain guessing (e.g. trying `dev-api` and
+`api-dev` once `api` is known). It's off by default and independent of both `-active` and
+`-fuzz` — combine it with either.
+
+By default, each stage's own output only goes into `oneclick.log`, keeping the terminal to
+oneClick's own progress lines. Pass `-live` to also stream it to the terminal as it happens.
 
 ## 🤝 Contributing
 

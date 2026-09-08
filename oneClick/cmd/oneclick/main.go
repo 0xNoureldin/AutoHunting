@@ -67,8 +67,11 @@ Options:
   -d, -domain <domain>      Target domain, or comma separated domains
   -f, -file <path>          File with a list of domains, one per line
   -o, -output <dir>         Output directory (default: oneClick/results/<target>_<timestamp>)
-  -a, -active                Enable active enumeration (slower, deeper: brute forcing, crawling,
+  -a, -active                Enable active enumeration (slower, deeper: zone transfer, crawling,
                               headless browsing). Off by default for a fast passive-only run.
+  -mu, -mutations             Enable alterx permutation-based subdomain guessing (e.g. dev-api,
+                              api-dev from a known subdomain). Off by default; independent of
+                              -active and -fuzz, and can be combined with either.
   -fz, -fuzz                 Enable wordlist-based fuzzing for subdomain enumeration (DNS
                               brute-force) and URL enumeration (path/content discovery).
                               Downloads and caches a well-known SecLists wordlist for each on
@@ -81,6 +84,8 @@ Options:
   -c, -concurrency <n>       Concurrency used across stages (default: 10)
   -t, -timeout <seconds>     Per-request timeout used across stages (default: 60, 300 with -active
                               or -fuzz)
+  -lv, -live                  Stream each stage's live output to the terminal as it runs, not
+                              just to the log file. Off by default (quiet, log-file-only).
   -h, -help                  Show this help
 
 Examples:
@@ -89,6 +94,7 @@ Examples:
   go run . -d example.com -active -c 20
   go run . -d example.com -fuzz
   go run . -d example.com -fuzz -sw my-subs.txt -uw my-paths.txt
+  go run . -d example.com -active -mutations -live
 `, bold, reset)
 }
 
@@ -103,6 +109,8 @@ func run() int {
 	var timeout int
 	var help bool
 	var fuzz bool
+	var live bool
+	var mutations bool
 	var subsWordlistOverride, urlsWordlistOverride string
 	timeoutSet := false
 
@@ -126,6 +134,10 @@ func run() int {
 	fs.StringVar(&subsWordlistOverride, "subs-wordlist", "", "")
 	fs.StringVar(&urlsWordlistOverride, "uw", "", "")
 	fs.StringVar(&urlsWordlistOverride, "urls-wordlist", "", "")
+	fs.BoolVar(&mutations, "mu", false, "")
+	fs.BoolVar(&mutations, "mutations", false, "")
+	fs.BoolVar(&live, "live", false, "")
+	fs.BoolVar(&live, "lv", false, "")
 	fs.BoolVar(&help, "h", false, "")
 	fs.BoolVar(&help, "help", false, "")
 
@@ -265,7 +277,9 @@ func run() int {
 	fmt.Printf("%soneClick recon pipeline%s\n", bold, reset)
 	fmt.Printf("  targets:     %d domain(s)\n", len(rawDomains))
 	fmt.Printf("  mode:        %s\n", mode)
+	fmt.Printf("  mutations:   %s\n", onOff(mutations))
 	fmt.Printf("  fuzzing:     %s\n", fuzzStatus(fuzz, subsWordlist, urlsWordlist))
+	fmt.Printf("  live logs:   %s\n", onOff(live))
 	fmt.Printf("  concurrency: %d\n", concurrency)
 	fmt.Printf("  timeout:     %ds\n", timeout)
 	fmt.Printf("  output:      %s\n", outputDir)
@@ -301,7 +315,10 @@ func run() int {
 	if subsWordlist != "" {
 		subEnumArgs = append(subEnumArgs, "-w", subsWordlist)
 	}
-	subEnumRC := runGoTool(filepath.Join(repoRoot, "SubEnum", "cmd", "subenum"), subEnumArgs, logFile)
+	if mutations {
+		subEnumArgs = append(subEnumArgs, "-mutations")
+	}
+	subEnumRC := runGoTool(filepath.Join(repoRoot, "SubEnum", "cmd", "subenum"), subEnumArgs, logFile, live)
 
 	// Always seed the discovered subdomains with the original target(s) so
 	// later stages still have something to work with even if enumeration
@@ -331,7 +348,7 @@ func run() int {
 	if urlsWordlist != "" {
 		urlEnumArgs = append(urlEnumArgs, "-w", urlsWordlist)
 	}
-	urlEnumRC := runGoTool(filepath.Join(repoRoot, "URLEnum", "cmd", "URLEnum"), urlEnumArgs, logFile)
+	urlEnumRC := runGoTool(filepath.Join(repoRoot, "URLEnum", "cmd", "URLEnum"), urlEnumArgs, logFile, live)
 
 	touchFile(urlsPath)
 	urlsCount := countNonEmptyLines(urlsPath)
@@ -366,7 +383,7 @@ func run() int {
 			"-c", strconv.Itoa(concurrency),
 			"-timeout", strconv.Itoa(timeout),
 		}
-		jsAnalyzerRC = runGoTool(filepath.Join(repoRoot, "jsAnalyzer", "cmd"), jsAnalyzerArgs, logFile)
+		jsAnalyzerRC = runGoTool(filepath.Join(repoRoot, "jsAnalyzer", "cmd"), jsAnalyzerArgs, logFile, live)
 		if jsAnalyzerRC != 0 {
 			warn("jsAnalyzer exited with an error (see %s)", logPath)
 		} else {
@@ -382,6 +399,7 @@ func run() int {
 		"oneClick recon summary\n"+
 			"target(s):        %s\n"+
 			"mode:              %s\n"+
+			"mutations:         %s\n"+
 			"fuzzing:           %s\n"+
 			"generated:         %s\n"+
 			"subdomains found:  %d   (%s)\n"+
@@ -391,6 +409,7 @@ func run() int {
 			"full log:          %s\n",
 		strings.Join(rawDomains, ","),
 		modeShort,
+		onOff(mutations),
 		fuzzStatus(fuzz, subsWordlist, urlsWordlist),
 		time.Now().UTC().Format(time.RFC3339),
 		subsCount, subsPath,
@@ -416,14 +435,20 @@ func run() int {
 }
 
 // runGoTool runs `go run .` in dir with the given args, sending combined
-// stdout/stderr to logFile, and returns the process exit code (0 on
-// success, non-zero on failure, 1 if the process could not even start).
-func runGoTool(dir string, args []string, logFile io.Writer) int {
+// stdout/stderr to logFile (and, when live is true, also streaming it to
+// the terminal as it's produced instead of only being visible in the log
+// file afterward), and returns the process exit code (0 on success,
+// non-zero on failure, 1 if the process could not even start).
+func runGoTool(dir string, args []string, logFile io.Writer, live bool) int {
 	fmt.Fprintf(logFile, "\n--- go run . %s (in %s) ---\n", strings.Join(args, " "), dir)
 	cmd := exec.Command("go", append([]string{"run", "."}, args...)...)
 	cmd.Dir = dir
-	cmd.Stdout = logFile
-	cmd.Stderr = logFile
+	out := logFile
+	if live {
+		out = io.MultiWriter(logFile, os.Stdout)
+	}
+	cmd.Stdout = out
+	cmd.Stderr = out
 	if err := cmd.Run(); err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			return exitErr.ExitCode()
@@ -561,6 +586,13 @@ func fuzzStatus(fuzz bool, subsWordlist, urlsWordlist string) string {
 	default:
 		return "requested, but unavailable (see warnings above)"
 	}
+}
+
+func onOff(b bool) string {
+	if b {
+		return "on"
+	}
+	return "off"
 }
 
 func sanitizeName(s string) string {

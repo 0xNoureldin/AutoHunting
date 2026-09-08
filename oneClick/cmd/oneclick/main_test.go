@@ -29,6 +29,15 @@ func TestFuzzStatus(t *testing.T) {
 	}
 }
 
+func TestOnOff(t *testing.T) {
+	if got := onOff(true); got != "on" {
+		t.Errorf("onOff(true) = %q, want \"on\"", got)
+	}
+	if got := onOff(false); got != "off" {
+		t.Errorf("onOff(false) = %q, want \"off\"", got)
+	}
+}
+
 func TestSanitizeName(t *testing.T) {
 	cases := map[string]string{
 		"example.com":        "example.com",

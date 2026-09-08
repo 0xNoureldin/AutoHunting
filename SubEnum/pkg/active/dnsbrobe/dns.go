@@ -74,7 +74,10 @@ func ProbeSubdomains(subdomains []string, timeout int, concurrency int) []string
 	var mu sync.Mutex
 	aliveSubdomains := []string{}
 
-	logify.Infof("Probing %d mutation(s) with concurrency %d", len(subdomains), concurrency)
+	// ProbeSubdomains is shared by both the alterx permutation feature and
+	// wordlist DNS brute-force, so "candidate(s)" is used here rather than
+	// "mutation(s)" -- only the former caller actually mutates anything.
+	logify.Infof("Probing %d candidate(s) with concurrency %d", len(subdomains), concurrency)
 
 	// Process subdomains concurrently
 	for _, subdomain := range subdomains {
