@@ -152,6 +152,14 @@ Performs WHOIS lookups to gather:
 
 ---
 
+### ⚡ oneClick
+One command recon pipeline. Give it a domain (or a file of domains) and it chains together
+**SubEnum → URLEnum → jsAnalyzer**: subdomain enumeration, then URL enumeration on the
+discovered hosts, then secret scanning on the discovered `.js` files. See
+[Module Usage Details](#-module-usage-details) below for usage.
+
+---
+
 ## ⚙️ Installation
 
 ```bash
@@ -246,6 +254,22 @@ Analyzes JavaScript files and extracts secrets:
 ```bash
 go run . -i js.txt -o output.json -timeout 600 -c 10 -only secrets
 ```
+### oneClick (one command recon pipeline)
+Runs subdomain enumeration, URL enumeration, and JS secret scanning back to back with a
+single command — no need to juggle each tool's flags or pipe files between them by hand.
+```bash
+cd oneClick
+./oneclick.sh -d example.com                # passive, fast (default)
+./oneclick.sh -f domains.txt                # same, for a list of domains
+./oneclick.sh -d example.com --active       # deeper: brute forcing, crawling, headless browsing
+./oneclick.sh -d example.com -o results/acme -c 20 -t 120
+./oneclick.sh -h                            # full option list
+```
+Results (subdomains, URLs, the filtered list of JS files, `secrets.json`, a `SUMMARY.txt`,
+and a combined log) are written to `oneClick/results/<target>_<timestamp>/` unless `-o` is
+given. Active mode is off by default since it can take from several minutes up to an hour
+(see the URLEnum notes above); pass `--active` when you want deeper coverage.
+
 ## 🤝 Contributing
 
 Contributions are welcome! If you'd like to add new enumeration modules, improve performance, or fix bugs, please open an issue or submit a pull request. Be sure to follow Go best practices (`go fmt`) and include tests where appropriate.
