@@ -221,8 +221,12 @@ Enumerates subdomains. In `SubEnum/cmd/subenum`:
 go run . -h
 go run . -active -c 10 -i domains.txt -o subs.txt                      # active enumeration
 go run . -active -c 20 -i domains.txt -o subs.txt -e -max-mutations-size 50 # limit mutation size
+go run . -w wordlist.txt -i domains.txt -o subs.txt                    # DNS brute-force fuzzing
 ```
-Active enumeration does not perform brute forcing.
+Active enumeration (`-active`, zone transfer + permutation mutation) does not perform
+wordlist-based brute forcing; use `-w <wordlist>` for that instead, independently of
+`-active` — each candidate is `word + "." + domain`, concurrently DNS-probed for a live
+record.
 
 ### vhost (virtual host enumeration)
 Determines which subdomains resolve to which IP addresses:
@@ -240,6 +244,7 @@ go run . -host-file subs.txt -host-threads 52 -threads 86 -output-file ports.txt
 Enumerates URLs from subdomains:
 ```bash
 go run . -i subs.txt -o urls1.txt -pc 20 -ac 50 -timeout 400 -subs -active
+go run . -i subs.txt -o urls1.txt -subs -w wordlist.txt   # path/content fuzzing
 ```
 Notes:
 1. The `commoncrawl` source does not work in Codespaces; to use outside Codespaces remove the API key requirement in `commoncrawl.go` (`RequireAPIKey` should return `false`).
@@ -248,6 +253,9 @@ Notes:
 4. Passive enumeration takes ~2–3 minutes; active enumeration may take up to an hour.
 5. Non‑script files (e.g., SVG, JPEG) are ignored automatically.
 6. The tool returns unique URLs by default.
+7. `-w <wordlist>` fuzzes each active seed with the wordlist as paths (one request per path,
+   concurrently), reporting the ones whose response differs from a captured baseline. It
+   runs independently of `-active` and can be combined with it.
 
 ### JSAnalyzer
 Analyzes JavaScript files and extracts secrets:
@@ -262,6 +270,7 @@ From `oneClick/cmd/oneclick`:
 go run . -d example.com                # passive, fast (default)
 go run . -f domains.txt                # same, for a list of domains
 go run . -d example.com -active        # deeper: brute forcing, crawling, headless browsing
+go run . -d example.com -fuzz          # wordlist-based subdomain + URL fuzzing
 go run . -d example.com -o results/acme -c 20 -t 120
 go run . -h                            # full option list
 ```
@@ -269,6 +278,14 @@ Results (subdomains, URLs, the filtered list of JS files, `secrets.json`, a `SUM
 and a combined log) are written to `oneClick/results/<target>_<timestamp>/` unless `-o` is
 given. Active mode is off by default since it can take from several minutes up to an hour
 (see the URLEnum notes above); pass `-active` when you want deeper coverage.
+
+`-fuzz` enables wordlist-based fuzzing, independently of `-active` (and combinable with it):
+DNS brute-force for subdomain enumeration, and path/content discovery (baseline-diffing) for
+URL enumeration. On first use it downloads and caches SecLists' standard wordlists —
+`subdomains-top1million-5000.txt` and `common.txt` — into `oneClick/wordlists/`; pass
+`-sw <path>`/`-uw <path>` to use your own instead. Like `-active`, it's thorough but slow
+(thousands of candidates per target), so it also bumps the default timeout to 300s unless
+`-t` is set explicitly.
 
 ## 🤝 Contributing
 

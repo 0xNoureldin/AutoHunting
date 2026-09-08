@@ -20,6 +20,7 @@ func main() {
 	flag.StringVar(&options.Output, "o", "results.txt", "Output file for results")
 	flag.BoolVar(&options.ActiveEnabled, "active", false, "Enable active scanning mode (crawl + headless)")
 	flag.BoolVar(&options.IncludeSubdomains, "subs", false, "Include subdomains in active scanning")
+	flag.StringVar(&options.Wordlist, "w", "", "Wordlist file for path/content fuzzing (one path per line, enabled independently of -active)")
 	flag.Parse()
 
 	if err := test.Run(options); err != nil {

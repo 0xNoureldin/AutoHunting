@@ -12,4 +12,8 @@ type Options struct {
 	Verbose          bool
 	ActiveEnabled    bool
 	Enrich           bool
+
+	// Wordlist enables DNS brute-force fuzzing (word + "." + domain, probed
+	// for a live DNS record) when set, independently of ActiveEnabled.
+	Wordlist string
 }

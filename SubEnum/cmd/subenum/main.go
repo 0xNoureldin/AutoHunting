@@ -24,6 +24,7 @@ func main() {
 	flag.BoolVar(&options.Silent, "silent", false, "silent mode (only output results)")
 	flag.IntVar(&options.MaxMutationsSize, "max-mutations-size", 0, "max mutations size for each subdomain")
 	flag.BoolVar(&options.Enrich, "e", false, "Enrich premutations and mutations process from passive list instead of builtin one")
+	flag.StringVar(&options.Wordlist, "w", "", "Wordlist file for DNS brute-force fuzzing (one word per line, enabled independently of -active)")
 	flag.Parse()
 	if options.Silent {
 		logify.MaxLevel = logify.Silent

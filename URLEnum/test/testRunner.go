@@ -2,14 +2,15 @@ package test
 
 import (
 	"context"
+	"net/url"
+	"path"
 	"strings"
 	"sync"
 	"time"
-	"net/url"
-	"path"
 
 	"github.com/cyinnove/logify"
 	"github.com/noureldinSAF/AutoHunting/URLEnum/pkg/active/crawl"
+	"github.com/noureldinSAF/AutoHunting/URLEnum/pkg/active/fuzz"
 	"github.com/noureldinSAF/AutoHunting/URLEnum/pkg/active/headless"
 	"github.com/noureldinSAF/AutoHunting/URLEnum/pkg/scraper"
 	"github.com/noureldinSAF/AutoHunting/URLEnum/pkg/scraper/sources"
@@ -53,32 +54,31 @@ func Run(opts *Options) error {
 	var resultsMu sync.Mutex
 
 	addResult := func(u string) {
-    u = strings.TrimSpace(u)
-    if u == "" {
-        return
-    }
-    if !utils.IsInformationalURL(u) {
-        return
-    }
+		u = strings.TrimSpace(u)
+		if u == "" {
+			return
+		}
+		if !utils.IsInformationalURL(u) {
+			return
+		}
 
-    key := dedupKey(u)
-    if key == "" {
-        return
-    }
+		key := dedupKey(u)
+		if key == "" {
+			return
+		}
 
-    rep := canonicalURL(u)
-    if rep == "" {
-        rep = u
-    }
+		rep := canonicalURL(u)
+		if rep == "" {
+			rep = u
+		}
 
-    resultsMu.Lock()
-    if _, exists := allResults[key]; !exists {
-        // first wins
-        allResults[key] = rep
-    }
-    resultsMu.Unlock()
-}
-
+		resultsMu.Lock()
+		if _, exists := allResults[key]; !exists {
+			// first wins
+			allResults[key] = rep
+		}
+		resultsMu.Unlock()
+	}
 
 	// =========================
 	// Concurrency split (ONLY LOGIC CHANGE)
@@ -213,114 +213,165 @@ func Run(opts *Options) error {
 	// Collect unique URLs after passive stage
 	uniqueURLs := make([]string, 0, len(allResults))
 	for _, u := range allResults {
-    uniqueURLs = append(uniqueURLs, u)
-     }
-
+		uniqueURLs = append(uniqueURLs, u)
+	}
 
 	// =========================
-	// Active Enumeration (same flow: crawl then headless)
-	// BUT: workers are distributed across crawl/headless
+	// Active Enumeration (crawl, then headless) -- gated on -active.
+	// Fuzzing (wordlist-based path/content discovery) -- gated on
+	// -w/-wordlist, independently of -active.
 	// =========================
-	if opts.ActiveEnabled {
+	var wordlist []string
+	if opts.Wordlist != "" {
+		wl, err := utils.ReadInputFromFile(opts.Wordlist)
+		if err != nil {
+			logify.Errorf("Error reading wordlist %s: %v", opts.Wordlist, err)
+		} else {
+			wordlist = wl
+			logify.Infof("Loaded %d wordlist entries for fuzzing from %s", len(wordlist), opts.Wordlist)
+		}
+	}
+
+	if opts.ActiveEnabled || len(wordlist) > 0 {
 		activeSeeds := buildActiveSeedsFromQueries(opts.queries)
-        logify.Infof("Started Active Enumeration for %d seed target(s) (from opts.queries)", len(activeSeeds))
-
+		logify.Infof("Started active-seed enumeration for %d seed target(s) (active=%v, fuzz=%v)", len(activeSeeds), opts.ActiveEnabled, len(wordlist) > 0)
 
 		perTargetTimeout := time.Duration(opts.Timeout) * time.Second
 		if perTargetTimeout <= 0 {
 			perTargetTimeout = 30 * time.Second
 		}
 
-		
+		if opts.ActiveEnabled {
 
-		// 1) Crawl tool (Colly)
-		crawlOpts := &crawl.Options{
-			MaxDepth:    2,
-			Parallelism: opts.ActiveConcurrency, // CHANGED
-			Timeout:     perTargetTimeout,
-			AllowQuery:  true,
-		}
+			// 1) Crawl tool (Colly)
+			crawlOpts := &crawl.Options{
+				MaxDepth:    2,
+				Parallelism: opts.ActiveConcurrency, // CHANGED
+				Timeout:     perTargetTimeout,
+				AllowQuery:  true,
+			}
 
-		// Run crawl concurrently over seeds (bounded)
-		{
+			// Run crawl concurrently over seeds (bounded)
+			{
+				seeds := append([]string(nil), activeSeeds...)
+				seedJobs := make(chan string, len(seeds))
+				var seedWG sync.WaitGroup
+
+				for i := 0; i < crawlWorkers; i++ { // CHANGED
+					seedWG.Add(1)
+					go func() {
+						defer seedWG.Done()
+						for seed := range seedJobs {
+							seedCtx, cancel := context.WithTimeout(context.Background(), perTargetTimeout)
+							found, err := crawl.Enumerate(seedCtx, seed, opts.IncludeSubdomains, crawlOpts)
+							cancel()
+
+							if err != nil {
+								logify.Errorf("crawl failed for %s: %v", seed, err)
+								continue
+							}
+							for _, u := range found {
+								addResult(u)
+							}
+						}
+
+					}()
+				}
+
+				for _, s := range seeds {
+					seedJobs <- s
+				}
+				close(seedJobs)
+				seedWG.Wait()
+			}
+
+			// Refresh seeds after crawl added more
+			resultsMu.Lock()
+			uniqueURLs = uniqueURLs[:0]
+			for _, u := range allResults {
+				uniqueURLs = append(uniqueURLs, u)
+			}
+
+			resultsMu.Unlock()
+
+			// 2) Headless tool (chromedp)
+			headlessOpts := headless.Options{
+				Concurrency: opts.ActiveConcurrency, // CHANGED
+				Timeout:     perTargetTimeout,
+				Wait:        8 * time.Second,
+				//ChromePath:    "/usr/bin/google-chrome",
+				Headless:      true,
+				NoSandbox:     true,
+				DisableGPU:    true,
+				DisableDevShm: true,
+			}
+
+			// Run headless concurrently over seeds (bounded)
+			{
+				seeds := append([]string(nil), activeSeeds...)
+				seedJobs := make(chan string, len(seeds))
+				var seedWG sync.WaitGroup
+
+				for i := 0; i < headlessWorkers; i++ { // CHANGED
+					seedWG.Add(1)
+					go func() {
+						defer seedWG.Done()
+						for seed := range seedJobs {
+							seedCtx, cancel := context.WithTimeout(context.Background(), perTargetTimeout)
+							found, err := headless.Enumerate(seedCtx, seed, opts.IncludeSubdomains, headlessOpts)
+							cancel()
+
+							if err != nil {
+								logify.Errorf("headless failed for %s: %v", seed, err)
+								continue
+							}
+
+							for _, u := range found {
+								addResult(u)
+							}
+						}
+
+					}()
+				}
+
+				for _, s := range seeds {
+					seedJobs <- s
+				}
+				close(seedJobs)
+				seedWG.Wait()
+			}
+
+		} // opts.ActiveEnabled (crawl + headless)
+
+		// 3) Wordlist fuzzing (path/content discovery), independent of -active
+		if len(wordlist) > 0 {
+			fuzzOpts := fuzz.Options{
+				Concurrency: opts.ActiveConcurrency,
+				Timeout:     15 * time.Second,
+			}
+			fuzzWorkers := max(1, opts.ActiveConcurrency/2)
+
 			seeds := append([]string(nil), activeSeeds...)
 			seedJobs := make(chan string, len(seeds))
 			var seedWG sync.WaitGroup
 
-			for i := 0; i < crawlWorkers; i++ { // CHANGED
+			for i := 0; i < fuzzWorkers; i++ {
 				seedWG.Add(1)
 				go func() {
 					defer seedWG.Done()
 					for seed := range seedJobs {
-                          seedCtx, cancel := context.WithTimeout(context.Background(), perTargetTimeout)
-                          found, err := crawl.Enumerate(seedCtx, seed, opts.IncludeSubdomains, crawlOpts)
-                          cancel()
-                      
-                          if err != nil {
-                              logify.Errorf("crawl failed for %s: %v", seed, err)
-                              continue
-                          }
-                          for _, u := range found {
-                              addResult(u)
-                          }
-                    }
+						seedCtx, cancel := context.WithTimeout(context.Background(), perTargetTimeout)
+						found, err := fuzz.Enumerate(seedCtx, seed, wordlist, fuzzOpts)
+						cancel()
 
-				}()
-			}
-
-			for _, s := range seeds {
-				seedJobs <- s
-			}
-			close(seedJobs)
-			seedWG.Wait()
-		}
-
-		// Refresh seeds after crawl added more
-		resultsMu.Lock()
-		uniqueURLs = uniqueURLs[:0]
-		for _, u := range allResults {
-          uniqueURLs = append(uniqueURLs, u)
-        }
-
-		resultsMu.Unlock()
-
-		// 2) Headless tool (chromedp)
-		headlessOpts := headless.Options{
-			Concurrency:   opts.ActiveConcurrency, // CHANGED
-			Timeout:       perTargetTimeout,
-			Wait:          8 * time.Second,
-			//ChromePath:    "/usr/bin/google-chrome",
-			Headless:      true,
-			NoSandbox:     true,
-			DisableGPU:    true,
-			DisableDevShm: true,
-		}
-
-		// Run headless concurrently over seeds (bounded)
-		{
-			seeds := append([]string(nil), activeSeeds...)
-			seedJobs := make(chan string, len(seeds))
-			var seedWG sync.WaitGroup
-
-			for i := 0; i < headlessWorkers; i++ { // CHANGED
-				seedWG.Add(1)
-				go func() {
-					defer seedWG.Done()
-					for seed := range seedJobs {
-                         seedCtx, cancel := context.WithTimeout(context.Background(), perTargetTimeout)
-                         found, err := headless.Enumerate(seedCtx, seed, opts.IncludeSubdomains, headlessOpts)
-                         cancel()
-                     
-                         if err != nil {
-                             logify.Errorf("headless failed for %s: %v", seed, err)
-                             continue
-                         }
-						 
-                         for _, u := range found {
-                             addResult(u)
-                         }
-                    }
-
+						if err != nil {
+							logify.Errorf("fuzz failed for %s: %v", seed, err)
+							continue
+						}
+						for _, u := range found {
+							addResult(u)
+						}
+					}
 				}()
 			}
 
@@ -335,7 +386,7 @@ func Run(opts *Options) error {
 		total := len(allResults)
 		resultsMu.Unlock()
 
-		logify.Infof("Active Enumeration finished. Total unique URLs: %d", total)
+		logify.Infof("Active-seed enumeration finished. Total unique URLs: %d", total)
 
 		// Final unique list from map
 		uniqueURLs = make([]string, 0, len(allResults))
@@ -354,67 +405,66 @@ func Run(opts *Options) error {
 	return nil
 }
 
-
 // dedupKey: generic dedupe key that ignores ALL query params and fragments.
 // This ensures URLs that only differ by parameters are treated as duplicates.
 func dedupKey(raw string) string {
-    raw = strings.TrimSpace(raw)
-    if raw == "" {
-        return ""
-    }
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return ""
+	}
 
-    u, err := url.Parse(raw)
-    if err != nil {
-        // fallback if parsing fails
-        return raw
-    }
+	u, err := url.Parse(raw)
+	if err != nil {
+		// fallback if parsing fails
+		return raw
+	}
 
-    u.Fragment = ""
-    u.Host = strings.ToLower(u.Host)
-    u.Scheme = strings.ToLower(u.Scheme)
+	u.Fragment = ""
+	u.Host = strings.ToLower(u.Host)
+	u.Scheme = strings.ToLower(u.Scheme)
 
-    p := u.EscapedPath()
-    if p == "" {
-        p = "/"
-    }
-    p = path.Clean(p)
-    if !strings.HasPrefix(p, "/") {
-        p = "/" + p
-    }
+	p := u.EscapedPath()
+	if p == "" {
+		p = "/"
+	}
+	p = path.Clean(p)
+	if !strings.HasPrefix(p, "/") {
+		p = "/" + p
+	}
 
-    // KEY POINT: ignore query entirely
-    // If you want http/https to be treated the same, remove u.Scheme from the key.
-    return u.Scheme + "://" + u.Host + p
+	// KEY POINT: ignore query entirely
+	// If you want http/https to be treated the same, remove u.Scheme from the key.
+	return u.Scheme + "://" + u.Host + p
 }
 
 // canonicalURL: returns the URL without query and fragment (safe for crawling/headless).
 func canonicalURL(raw string) string {
-    raw = strings.TrimSpace(raw)
-    if raw == "" {
-        return ""
-    }
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return ""
+	}
 
-    u, err := url.Parse(raw)
-    if err != nil {
-        return raw
-    }
+	u, err := url.Parse(raw)
+	if err != nil {
+		return raw
+	}
 
-    u.Fragment = ""
-    u.RawQuery = "" // drop all params
-    u.Host = strings.ToLower(u.Host)
-    u.Scheme = strings.ToLower(u.Scheme)
+	u.Fragment = ""
+	u.RawQuery = "" // drop all params
+	u.Host = strings.ToLower(u.Host)
+	u.Scheme = strings.ToLower(u.Scheme)
 
-    p := u.EscapedPath()
-    if p == "" {
-        p = "/"
-    }
-    p = path.Clean(p)
-    if !strings.HasPrefix(p, "/") {
-        p = "/" + p
-    }
-    u.Path = p
+	p := u.EscapedPath()
+	if p == "" {
+		p = "/"
+	}
+	p = path.Clean(p)
+	if !strings.HasPrefix(p, "/") {
+		p = "/" + p
+	}
+	u.Path = p
 
-    return u.String()
+	return u.String()
 }
 
 func buildActiveSeedsFromQueries(queries []string) []string {

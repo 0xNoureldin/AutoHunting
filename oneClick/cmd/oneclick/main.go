@@ -9,7 +9,8 @@
 //
 //	go run . -d example.com
 //	go run . -f domains.txt
-//	go run . -d example.com --active -o /tmp/out
+//	go run . -d example.com -active -o /tmp/out
+//	go run . -d example.com -fuzz  // wordlist-based subdomain + URL fuzzing
 package main
 
 import (
@@ -68,14 +69,26 @@ Options:
   -o, -output <dir>         Output directory (default: oneClick/results/<target>_<timestamp>)
   -a, -active                Enable active enumeration (slower, deeper: brute forcing, crawling,
                               headless browsing). Off by default for a fast passive-only run.
+  -fz, -fuzz                 Enable wordlist-based fuzzing for subdomain enumeration (DNS
+                              brute-force) and URL enumeration (path/content discovery).
+                              Downloads and caches a well-known SecLists wordlist for each on
+                              first use (oneClick/wordlists/), unless overridden below. Works
+                              independently of -active and can be combined with it. Thorough but
+                              slow (thousands of candidates per target) -- like -active, it bumps
+                              the default timeout to 300s unless -t is set explicitly.
+  -sw, -subs-wordlist <path> Use this wordlist for subdomain fuzzing instead of downloading one
+  -uw, -urls-wordlist <path> Use this wordlist for URL fuzzing instead of downloading one
   -c, -concurrency <n>       Concurrency used across stages (default: 10)
-  -t, -timeout <seconds>     Per-request timeout used across stages (default: 60, 300 with -active)
+  -t, -timeout <seconds>     Per-request timeout used across stages (default: 60, 300 with -active
+                              or -fuzz)
   -h, -help                  Show this help
 
 Examples:
   go run . -d example.com
   go run . -f domains.txt -o results/acme
   go run . -d example.com -active -c 20
+  go run . -d example.com -fuzz
+  go run . -d example.com -fuzz -sw my-subs.txt -uw my-paths.txt
 `, bold, reset)
 }
 
@@ -89,6 +102,8 @@ func run() int {
 	var concurrency int
 	var timeout int
 	var help bool
+	var fuzz bool
+	var subsWordlistOverride, urlsWordlistOverride string
 	timeoutSet := false
 
 	fs := flag.NewFlagSet("oneclick", flag.ContinueOnError)
@@ -105,6 +120,12 @@ func run() int {
 	fs.IntVar(&concurrency, "concurrency", 10, "")
 	fs.IntVar(&timeout, "t", 60, "")
 	fs.IntVar(&timeout, "timeout", 60, "")
+	fs.BoolVar(&fuzz, "fz", false, "")
+	fs.BoolVar(&fuzz, "fuzz", false, "")
+	fs.StringVar(&subsWordlistOverride, "sw", "", "")
+	fs.StringVar(&subsWordlistOverride, "subs-wordlist", "", "")
+	fs.StringVar(&urlsWordlistOverride, "uw", "", "")
+	fs.StringVar(&urlsWordlistOverride, "urls-wordlist", "", "")
 	fs.BoolVar(&help, "h", false, "")
 	fs.BoolVar(&help, "help", false, "")
 
@@ -141,7 +162,11 @@ func run() int {
 		fail("Go is required but was not found in PATH")
 		return 1
 	}
-	if active && !timeoutSet {
+	if (active || fuzz) && !timeoutSet {
+		// Both are deep/slow techniques: -active budgets a full crawl or
+		// headless page load per seed, and -fuzz budgets working through a
+		// wordlist of thousands of paths per seed (subdomain DNS brute-force
+		// has its own short, fixed per-query timeout regardless of this).
 		timeout = 300
 	}
 
@@ -149,6 +174,32 @@ func run() int {
 	if err != nil {
 		fail("%v", err)
 		return 1
+	}
+
+	var subsWordlist, urlsWordlist string
+	if fuzz {
+		step("Preparing fuzzing wordlists")
+		cacheDir := filepath.Join(repoRoot, "oneClick", "wordlists")
+
+		if subsWordlistOverride != "" {
+			subsWordlist = subsWordlistOverride
+			ok("Using subdomain wordlist -> %s", subsWordlist)
+		} else if p, err := ensureWordlist(cacheDir, "subdomains.txt", defaultSubdomainWordlistURL); err != nil {
+			warn("Could not prepare subdomain wordlist, subdomain fuzzing disabled: %v", err)
+		} else {
+			subsWordlist = p
+			ok("Subdomain wordlist ready -> %s", p)
+		}
+
+		if urlsWordlistOverride != "" {
+			urlsWordlist = urlsWordlistOverride
+			ok("Using URL wordlist -> %s", urlsWordlist)
+		} else if p, err := ensureWordlist(cacheDir, "paths.txt", defaultPathWordlistURL); err != nil {
+			warn("Could not prepare URL wordlist, URL fuzzing disabled: %v", err)
+		} else {
+			urlsWordlist = p
+			ok("URL wordlist ready -> %s", p)
+		}
 	}
 
 	targetName := sanitizeName(domain)
@@ -214,6 +265,7 @@ func run() int {
 	fmt.Printf("%soneClick recon pipeline%s\n", bold, reset)
 	fmt.Printf("  targets:     %d domain(s)\n", len(rawDomains))
 	fmt.Printf("  mode:        %s\n", mode)
+	fmt.Printf("  fuzzing:     %s\n", fuzzStatus(fuzz, subsWordlist, urlsWordlist))
 	fmt.Printf("  concurrency: %d\n", concurrency)
 	fmt.Printf("  timeout:     %ds\n", timeout)
 	fmt.Printf("  output:      %s\n", outputDir)
@@ -232,12 +284,23 @@ func run() int {
 	// Stage 1: Subdomain enumeration (SubEnum)
 	// -------------------------------------------------------------------
 	step("Stage 1/3: Subdomain enumeration")
+	// DNS brute-force queries are cheap and parallelize far better than
+	// HTTP work (a dead candidate can mean up to 8 sequential resolver
+	// round trips), so a wordlist of thousands of candidates needs more
+	// concurrency than the default to finish in reasonable time.
+	subEnumConcurrency := concurrency
+	if subsWordlist != "" && subEnumConcurrency < 50 {
+		subEnumConcurrency = 50
+	}
 	subEnumArgs := append([]string{
 		"-i", inputDomainsPath,
 		"-o", subsPath,
-		"-c", strconv.Itoa(concurrency),
+		"-c", strconv.Itoa(subEnumConcurrency),
 		"-timeout", strconv.Itoa(timeout),
 	}, activeFlag...)
+	if subsWordlist != "" {
+		subEnumArgs = append(subEnumArgs, "-w", subsWordlist)
+	}
 	subEnumRC := runGoTool(filepath.Join(repoRoot, "SubEnum", "cmd", "subenum"), subEnumArgs, logFile)
 
 	// Always seed the discovered subdomains with the original target(s) so
@@ -265,6 +328,9 @@ func run() int {
 		"-ac", strconv.Itoa(concurrency * 2),
 		"-timeout", strconv.Itoa(timeout),
 	}, activeFlag...)
+	if urlsWordlist != "" {
+		urlEnumArgs = append(urlEnumArgs, "-w", urlsWordlist)
+	}
 	urlEnumRC := runGoTool(filepath.Join(repoRoot, "URLEnum", "cmd", "URLEnum"), urlEnumArgs, logFile)
 
 	touchFile(urlsPath)
@@ -316,6 +382,7 @@ func run() int {
 		"oneClick recon summary\n"+
 			"target(s):        %s\n"+
 			"mode:              %s\n"+
+			"fuzzing:           %s\n"+
 			"generated:         %s\n"+
 			"subdomains found:  %d   (%s)\n"+
 			"urls found:        %d   (%s)\n"+
@@ -324,6 +391,7 @@ func run() int {
 			"full log:          %s\n",
 		strings.Join(rawDomains, ","),
 		modeShort,
+		fuzzStatus(fuzz, subsWordlist, urlsWordlist),
 		time.Now().UTC().Format(time.RFC3339),
 		subsCount, subsPath,
 		urlsCount, urlsPath,
@@ -477,6 +545,22 @@ func filterJSURLs(urlsPath, jsPath string) error {
 	}
 	sort.Strings(jsURLs)
 	return writeLines(jsPath, jsURLs)
+}
+
+func fuzzStatus(fuzz bool, subsWordlist, urlsWordlist string) string {
+	if !fuzz {
+		return "off"
+	}
+	switch {
+	case subsWordlist != "" && urlsWordlist != "":
+		return "on (subdomains + URLs)"
+	case subsWordlist != "":
+		return "on (subdomains only, URL wordlist unavailable)"
+	case urlsWordlist != "":
+		return "on (URLs only, subdomain wordlist unavailable)"
+	default:
+		return "requested, but unavailable (see warnings above)"
+	}
 }
 
 func sanitizeName(s string) string {

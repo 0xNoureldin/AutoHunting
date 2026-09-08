@@ -12,5 +12,9 @@ type Options struct {
 	PassiveConcurrency int
 	ActiveConcurrency  int
 
+	// Wordlist enables path/content fuzzing against each active seed when
+	// set, independently of ActiveEnabled (crawl/headless).
+	Wordlist string
+
 	queries []string
 }

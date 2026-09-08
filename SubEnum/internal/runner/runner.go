@@ -25,6 +25,11 @@ func Run(opts *Options) error {
 		return err
 	}
 
+	wordlist, err := loadWordlist(opts)
+	if err != nil {
+		return err
+	}
+
 	set := newDomainSet(opts.Verbose)
 
 	for _, q := range queries {
@@ -34,6 +39,10 @@ func Run(opts *Options) error {
 
 		if opts.ActiveEnabled {
 			queryCount += runZoneTransfer(q, opts, set)
+		}
+
+		if len(wordlist) > 0 {
+			queryCount += runWordlistBruteForce(q, wordlist, opts, set)
 		}
 
 		logify.Infof("Query %s: Found %d unique subdomain(s) (Total: %d)", q, queryCount, set.Len())
@@ -84,6 +93,28 @@ func loadQueries(opts *Options) ([]string, error) {
 	}
 
 	return opts.queries, nil
+}
+
+func loadWordlist(opts *Options) ([]string, error) {
+	if opts.Wordlist == "" {
+		return nil, nil
+	}
+
+	words, err := utils.ReadInputFromFile(opts.Wordlist)
+	if err != nil {
+		return nil, err
+	}
+
+	cleaned := make([]string, 0, len(words))
+	for _, w := range words {
+		w = strings.TrimSpace(w)
+		if w != "" && !strings.HasPrefix(w, "#") {
+			cleaned = append(cleaned, w)
+		}
+	}
+
+	logify.Infof("Loaded %d wordlist entries for DNS brute-force from %s", len(cleaned), opts.Wordlist)
+	return cleaned, nil
 }
 
 func loadSources(opts *Options) ([]scraper.Source, *http.Client, error) {
@@ -145,6 +176,46 @@ func runZoneTransfer(q string, opts *Options, set *domainSet) int {
 	}
 
 	logify.Infof("Zone transfer discovered %d subdomain(s) for %s", len(zoneSubs), q)
+	return added
+}
+
+// dnsProbeTimeoutSeconds caps the per-resolver timeout used for wordlist
+// brute-force DNS probes. It is intentionally decoupled from opts.Timeout,
+// which is calibrated for HTTP passive-source fetches (tens of seconds to
+// minutes): dnsprobe.ProbeSubdomains tries up to len(client.DefaultResolvers)
+// resolvers per candidate, so reusing a long HTTP timeout there means a
+// handful of unreachable/slow resolvers can multiply into a per-candidate
+// worst case of minutes, and that compounds badly across a wordlist of
+// thousands of candidates. DNS answers fast when it answers at all, so a
+// short cap keeps a large brute-force run tractable without materially
+// harming accuracy.
+const dnsProbeTimeoutSeconds = 5
+
+// runWordlistBruteForce builds a candidate subdomain for every wordlist
+// entry ("word" + "." + q), concurrently DNS-probes them, and adds the
+// ones with a live record to set.
+func runWordlistBruteForce(q string, wordlist []string, opts *Options, set *domainSet) int {
+	candidates := make([]string, 0, len(wordlist))
+	for _, w := range wordlist {
+		candidates = append(candidates, w+"."+q)
+	}
+
+	dnsTimeout := dnsProbeTimeoutSeconds
+	if opts.Timeout > 0 && opts.Timeout < dnsTimeout {
+		dnsTimeout = opts.Timeout
+	}
+
+	logify.Infof("Starting DNS brute-force for %s: %d candidate(s)", q, len(candidates))
+	alive := dnsprobe.ProbeSubdomains(candidates, dnsTimeout, opts.Concurrency)
+
+	added := 0
+	for _, s := range alive {
+		if set.Add(s) {
+			added++
+		}
+	}
+
+	logify.Infof("DNS brute-force discovered %d subdomain(s) for %s", added, q)
 	return added
 }
 
