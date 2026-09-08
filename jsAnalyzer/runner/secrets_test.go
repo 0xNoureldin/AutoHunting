@@ -65,3 +65,78 @@ func TestFindSecretsSkipsPublicValues(t *testing.T) {
 		t.Errorf("public/non-secret value flagged as a secret: %+v", m)
 	}
 }
+
+// TestGroupSecretsByValue covers the shape secrets.json is expected to
+// have: the same (pattern, value) found in several files collapses into
+// one entry listing every URL, distinct secrets stay separate, and URLs
+// with no secret contribute nothing (not even an empty entry).
+func TestGroupSecretsByValue(t *testing.T) {
+	shared := &SecretMatch{PatternName: "AWS Access Key ID", Value: "AKIASHARED000000TEST"}
+	onlyInB := &SecretMatch{PatternName: "GitHub Personal Access Token", Value: "ghp_onlyinbTEST0000000000000000"}
+
+	results := []ScanResult{
+		{URL: "https://a.example.com/app.js", SecretMatches: []*SecretMatch{shared}},
+		{URL: "https://b.example.com/vendor.js", SecretMatches: []*SecretMatch{shared, onlyInB}},
+		{URL: "https://c.example.com/no-secrets.js"}, // no matches: must not appear in output
+	}
+
+	groups := GroupSecretsByValue(results)
+	if len(groups) != 2 {
+		t.Fatalf("expected 2 distinct secret groups, got %d: %+v", len(groups), groups)
+	}
+
+	byValue := make(map[string]SecretGroup, len(groups))
+	for _, g := range groups {
+		byValue[g.Value] = g
+	}
+
+	sharedGroup, ok := byValue[shared.Value]
+	if !ok {
+		t.Fatalf("missing group for shared secret %q: %+v", shared.Value, groups)
+	}
+	wantURLs := []string{"https://a.example.com/app.js", "https://b.example.com/vendor.js"}
+	if len(sharedGroup.URLs) != len(wantURLs) {
+		t.Fatalf("shared secret: got URLs %v, want %v", sharedGroup.URLs, wantURLs)
+	}
+	for i, want := range wantURLs {
+		if sharedGroup.URLs[i] != want {
+			t.Errorf("shared secret: URLs[%d] = %q, want %q (full: %v)", i, sharedGroup.URLs[i], want, sharedGroup.URLs)
+		}
+	}
+
+	onlyInBGroup, ok := byValue[onlyInB.Value]
+	if !ok {
+		t.Fatalf("missing group for %q: %+v", onlyInB.Value, groups)
+	}
+	if len(onlyInBGroup.URLs) != 1 || onlyInBGroup.URLs[0] != "https://b.example.com/vendor.js" {
+		t.Errorf("got URLs %v, want exactly [https://b.example.com/vendor.js]", onlyInBGroup.URLs)
+	}
+
+	for _, g := range groups {
+		for _, u := range g.URLs {
+			if u == "https://c.example.com/no-secrets.js" {
+				t.Errorf("URL with no secrets leaked into group %+v", g)
+			}
+		}
+	}
+}
+
+// TestGroupSecretsByValueEmpty ensures an all-clean scan produces a valid
+// empty JSON array ("[]"), not "null", so consumers can always range over it.
+func TestGroupSecretsByValueEmpty(t *testing.T) {
+	groups := GroupSecretsByValue([]ScanResult{{URL: "https://example.com/clean.js"}})
+	if groups == nil {
+		t.Fatal("GroupSecretsByValue returned nil, want a non-nil empty slice")
+	}
+	if len(groups) != 0 {
+		t.Errorf("expected no groups, got %+v", groups)
+	}
+
+	data, err := EncodeSecretGroups(groups)
+	if err != nil {
+		t.Fatalf("EncodeSecretGroups: %v", err)
+	}
+	if got := string(data); got != "[]" {
+		t.Errorf("EncodeSecretGroups(empty) = %q, want \"[]\"", got)
+	}
+}

@@ -1,29 +1,26 @@
-package runner 
+package runner
 
 import (
-	"github.com/ditashi/jsbeautifier-go/jsbeautifier"
-	"github.com/cyinnove/logify"
-	"time"
-	"crypto/tls"
-	"net/http"
-	"context"
-	"fmt"
-	"io"
-	"github.com/corpix/uarand"
-	"regexp" 
-	"encoding/json"
-	"sync"
-	"strings"
-	"os"
 	"bufio"
-	
+	"context"
+	"crypto/tls"
+	"encoding/json"
+	"fmt"
+	"github.com/corpix/uarand"
+	"github.com/cyinnove/logify"
+	"github.com/ditashi/jsbeautifier-go/jsbeautifier"
+	"io"
+	"net/http"
+	"os"
+	"regexp"
+	"strings"
+	"sync"
+	"time"
 )
-
-
 
 func getClient(opts AnalyzeOptions) *http.Client {
 	return &http.Client{
-		Timeout: opts.Timeout ,
+		Timeout: opts.Timeout,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
@@ -45,13 +42,13 @@ func GetContent(url string, opts AnalyzeOptions) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout )
+	ctx, cancel := context.WithTimeout(context.Background(), opts.Timeout)
 	defer cancel()
 
 	bodyChan := make(chan []byte)
 	errChan := make(chan error)
-	
-	go func() { 
+
+	go func() {
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			errChan <- err
@@ -61,14 +58,14 @@ func GetContent(url string, opts AnalyzeOptions) (string, error) {
 	}()
 
 	select {
-		case <-ctx.Done():
-			return "", fmt.Errorf("timeout while reading response from %s", url)
-		case err := <-errChan:
-			logify.Errorf("Error reading response body from %s: %v", url, err)
-			return "", err
-		case body := <-bodyChan:
-			return string(body), nil
-    }
+	case <-ctx.Done():
+		return "", fmt.Errorf("timeout while reading response from %s", url)
+	case err := <-errChan:
+		logify.Errorf("Error reading response body from %s: %v", url, err)
+		return "", err
+	case body := <-bodyChan:
+		return string(body), nil
+	}
 }
 
 func BeatifyJS(source string, opts AnalyzeOptions) string {
@@ -92,7 +89,7 @@ func BeatifyJS(source string, opts AnalyzeOptions) string {
 	timeout := time.NewTimer(opts.Timeout)
 
 	defer timeout.Stop()
-	
+
 	select {
 	case pretty := <-prettryChan:
 		return pretty
@@ -105,7 +102,6 @@ func BeatifyJS(source string, opts AnalyzeOptions) string {
 
 }
 
-
 func setToSlice(set map[string]struct{}) []string {
 	slice := make([]string, 0, len(set))
 	for key := range set {
@@ -113,7 +109,6 @@ func setToSlice(set map[string]struct{}) []string {
 	}
 	return slice
 }
-
 
 // secretPatterns is compiled exactly once at package init, mirroring the other
 // regexes in vars.go. LoadSecretPatterns used to call regexp.MustCompile for
@@ -164,6 +159,7 @@ func LoadSecretPatterns() ([]SecretPattern, error) {
 }
 
 type MultiError struct{ Errs []error }
+
 func (m MultiError) Error() string { return m.Errs[0].Error() } // simple
 
 func ScanJSURLs(urls []string, concurrency int, opts AnalyzeOptions) ([]ScanResult, error) {
@@ -231,7 +227,6 @@ func ScanJSURLs(urls []string, concurrency int, opts AnalyzeOptions) ([]ScanResu
 	return final, nil
 }
 
-
 func ScanJSURL(url string, opts AnalyzeOptions) (ScanResult, error) {
 	// Placeholder for actual scanning logic
 	body, err := GetContent(url, opts)
@@ -253,6 +248,37 @@ func ScanJSURL(url string, opts AnalyzeOptions) (ScanResult, error) {
 func EncodeResults(results []ScanResult) ([]byte, error) {
 	// Placeholder for actual encoding logic
 	return json.MarshalIndent(results, "", "  ")
+}
+
+// GroupSecretsByValue collapses per-URL secret matches into one entry per
+// distinct (pattern, value) pair, listing every URL it was found in. URLs
+// with no secret matches contribute nothing and are dropped entirely,
+// rather than appearing as an empty/URL-only entry.
+func GroupSecretsByValue(results []ScanResult) []SecretGroup {
+	type key struct{ pattern, value string }
+	index := make(map[key]int)
+	groups := []SecretGroup{}
+
+	for _, r := range results {
+		for _, m := range r.SecretMatches {
+			k := key{m.PatternName, m.Value}
+			if i, ok := index[k]; ok {
+				groups[i].URLs = append(groups[i].URLs, r.URL)
+				continue
+			}
+			index[k] = len(groups)
+			groups = append(groups, SecretGroup{
+				Pattern: m.PatternName,
+				Value:   m.Value,
+				URLs:    []string{r.URL},
+			})
+		}
+	}
+	return groups
+}
+
+func EncodeSecretGroups(groups []SecretGroup) ([]byte, error) {
+	return json.MarshalIndent(groups, "", "  ")
 }
 
 func ReadInputFromFile(file string) ([]string, error) {

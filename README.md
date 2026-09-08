@@ -262,6 +262,12 @@ Analyzes JavaScript files and extracts secrets:
 ```bash
 go run . -i js.txt -o output.json -timeout 600 -c 10 -only secrets
 ```
+With `-only secrets` (secrets and nothing else), the output is grouped by secret instead of
+by URL: each distinct `(pattern, value)` appears once, with a `urls` array listing every file
+it was found in, and files with no secret are left out entirely — so a key repeated across
+many bundled/minified files shows up as one entry, not one per file. Any other combination of
+`-subdomains`/`-cloud`/`-endpoints`/`-params`/`-npm`/`-secrets` keeps the original one-entry-
+per-URL shape (`secret_matches` included per URL, alongside whatever else was found there).
 ### oneClick (one command recon pipeline)
 Runs subdomain enumeration, URL enumeration, and JS secret scanning back to back with a
 single command — no need to juggle each tool's flags or pipe files between them by hand.
