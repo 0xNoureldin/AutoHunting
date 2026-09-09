@@ -151,6 +151,7 @@ Examples:
   go run . -d example.com -port-scan -all-ports
   go run . -d example.com -port-scan -ports 1-1000,8080,8443
   go run . -d example.com -fuzz-subs -vhost -live -quiet-stages  // live progress, no per-item spam
+  go run . -d example.com -o results/example -active -fs -fu -vh -ps -lv -c 50
   go run . -resume oneClick/results/example.com_20260909_030405  // pick up an interrupted run
 `, bold, reset)
 }
