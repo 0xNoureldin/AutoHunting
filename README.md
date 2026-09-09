@@ -248,10 +248,13 @@ go run . -hosts candidates.txt -ips targets.txt -output vhostResults -concurrenc
 `-hosts` is requested against that same connection target with only the `Host` header
 changed. `candidates.txt` needs full hostnames (e.g. `admin.example.com`), not bare words;
 oneClick's `-vhost` (below) builds this file for you from a subdomain wordlist. In fuzzing
-mode, every candidate that comes back 403 Forbidden is recorded separately -- regardless of
-whether it's confirmed as a distinct vhost -- alongside `-output`'s normal results, as
-`<output>_403.json` (e.g. `vhostResults_403.json`), since a 403 usually means the host exists
-and is just being gated rather than that it doesn't exist at all.
+mode, a candidate that comes back 403 Forbidden is recorded separately -- alongside
+`-output`'s normal results, as `<output>_403.json` (e.g. `vhostResults_403.json`) -- when its
+403 is genuinely distinct from what an unrecognized host gets right now (confirmed the same
+way a hit is: against a live control probe), since a 403 usually means the host exists and is
+just being gated rather than that it doesn't exist at all. A target whose default response is
+itself a generic 403 for every unrecognized `Host` (or one hit by a WAF/rate limit mid-scan)
+would otherwise turn the entire wordlist into "403s", which carries no signal.
 
 ### portScanner
 Performs TCP (or UDP) port scanning:
@@ -343,14 +346,17 @@ ones whose response genuinely differs from a baseline. This is the `vhosts` tool
 (see above) wired in automatically; discovered vhosts are merged into the subdomain list before
 URL enumeration runs, so they get the same downstream treatment as anything DNS found -- and
 are also written on their own to `vhost_subdomains.txt`, so you can tell which entries in
-`subdomains.txt` came from DNS versus from vhost fuzzing alone. Separately, every candidate
-that comes back 403 Forbidden -- whether or not it's confirmed as a distinct vhost -- is
-written to `403.txt`. A 403 usually means the host exists and is just access-gated (an
+`subdomains.txt` came from DNS versus from vhost fuzzing alone. Separately, a candidate whose
+403 Forbidden is genuinely distinct from what an unrecognized host gets right now -- confirmed
+against a live control probe the same way a hit is, not just "status code happens to be 403"
+-- is written to `403.txt`. A 403 usually means the host exists and is just access-gated (an
 internal admin panel, an IP-allowlisted endpoint), which is worth a look even when it isn't
-different enough from the baseline to count as a hit on its own (many WAFs/default vhosts
-return the exact same generic 403 page for every unrecognized `Host` too); `403.txt` entries
-are NOT merged into `subdomains.txt` since a 403 alone isn't strong enough evidence of a
-genuinely distinct host to feed into later stages. Off by default, independent of
+different enough from the baseline to count as a hit on its own; the live-control check is
+what keeps this from turning into noise when a WAF/default vhost returns the exact same
+generic 403 page for every unrecognized `Host` (or starts doing so mid-scan) -- without it,
+the entire wordlist would "test positive" for 403. `403.txt` entries are NOT merged into
+`subdomains.txt` since a 403 alone isn't strong enough evidence of a genuinely distinct host
+to feed into later stages. Off by default, independent of
 `-active`/`-mutations`/`-fuzz-subs`/`-fuzz-urls`, and combinable with any of them; also bumps
 the default timeout to 300s unless `-t` is set explicitly.
 

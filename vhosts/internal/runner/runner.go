@@ -39,13 +39,16 @@ func Run(opts *Options) error {
 	// map[IP][]Hosts - protected by mutex for concurrent access
 	resultMap := map[string][]string{}
 	// forbiddenMap collects every candidate whose response came back 403
-	// Forbidden, regardless of whether it was also confirmed as a distinct
-	// vhost. A 403 usually means the host exists and is being actively
-	// gated (an internal admin panel, an IP-allowlisted endpoint, etc.) --
-	// worth a human's attention even when it isn't different enough from
-	// the baseline to register as a hit on its own (a WAF/default vhost
-	// can just as easily return the same generic 403 page for every
-	// unrecognized Host).
+	// Forbidden AND is confirmed, against a live control probe taken at
+	// that same moment, to be a *distinct* 403 -- not simply what any
+	// other unrecognized host gets right now too. A 403 usually means the
+	// host exists and is being actively gated (an internal admin panel,
+	// an IP-allowlisted endpoint, etc.), worth a human's attention even
+	// when it isn't a confirmed vhost in its own right -- but a target
+	// whose default response (or a WAF triggered mid-scan) is itself a
+	// generic 403 for every unrecognized Host would otherwise turn the
+	// entire wordlist into "403s to test", which carries no signal at
+	// all. See the distinct/sameEnvelope check below.
 	forbiddenMap := map[string][]string{}
 	var mu sync.Mutex
 
@@ -131,48 +134,53 @@ func Run(opts *Options) error {
 							return
 						}
 
-						// Record every 403 unconditionally -- don't let it get
-						// silently swallowed just because it also happens to
-						// match the baseline (see forbiddenMap's comment).
-						if vhostResp.StatusCode == httpStatusForbidden {
-							logify.Infof("vhost: %s -> %s returned 403 Forbidden, recorded for manual follow-up", h, ipAddr)
-							mu.Lock()
-							forbiddenMap[ipAddr] = append(forbiddenMap[ipAddr], h)
-							mu.Unlock()
-						}
-
-						if baseline.inRange(vhostResp) {
+						isForbidden := vhostResp.StatusCode == httpStatusForbidden
+						isHitCandidate := !baseline.inRange(vhostResp)
+						if !isForbidden && !isHitCandidate {
+							// Matches the baseline and isn't a 403 -- nothing
+							// to confirm or report.
 							return
 						}
 
-						// vhostResp differs from the baseline captured once at the
-						// start of the scan. Before reporting a hit, confirm it
-						// against a *fresh* control probe -- a brand new random,
-						// guaranteed-absent host -- taken right now. Sending
-						// thousands of rapid Host-header requests at one server
-						// can itself trip a WAF/anti-bot challenge or rate limit
-						// partway through a scan; once that happens, EVERY
-						// remaining response (real or fake host alike) starts
-						// looking different from the now-stale starting baseline,
+						// vhostResp is either a 403 or differs from the
+						// baseline captured once at the start of the scan --
+						// or both. Either way, confirm it against a *fresh*
+						// control probe -- a brand new random, guaranteed-
+						// absent host -- taken right now, before reporting
+						// anything. Sending thousands of rapid Host-header
+						// requests at one server can itself trip a WAF/
+						// anti-bot challenge or rate limit partway through a
+						// scan; once that happens, EVERY remaining response
+						// (real or fake host alike) starts looking different
+						// from the now-stale starting baseline AND can just
+						// as easily start coming back 403 for everyone --
 						// which is exactly what turns an entire wordlist into
-						// "hits". If an unknown host looks just as different
-						// right now as our candidate does, the difference is
-						// environmental drift, not a real vhost -- and if the
-						// control probe itself fails, we can't rule that out, so
-						// we don't report a hit either.
+						// both "hits" and "403s to test". If an unknown host
+						// looks just as different (or just as 403) right now
+						// as our candidate does, that's environmental drift,
+						// not a real vhost or a real access-controlled one --
+						// and if the control probe itself fails, we can't
+						// rule that out, so we don't report anything either.
 						control, err := probeControl(opts.Timeout, validURL)
 						if err != nil {
 							logify.Errorf("vhost: control probe against %s failed, cannot confirm %s: %v", validURL, h, err)
 							return
 						}
-						if sameEnvelope(vhostResp, control) {
-							return
+						distinct := !sameEnvelope(vhostResp, control)
+
+						if isForbidden && distinct {
+							logify.Infof("vhost: %s -> %s returned a distinct 403 Forbidden, recorded for manual follow-up", h, ipAddr)
+							mu.Lock()
+							forbiddenMap[ipAddr] = append(forbiddenMap[ipAddr], h)
+							mu.Unlock()
 						}
 
-						logify.Infof("vhost: discovered %s -> %s (status %d, %d bytes)", h, ipAddr, vhostResp.StatusCode, vhostResp.ContentLength)
-						mu.Lock()
-						resultMap[ipAddr] = append(resultMap[ipAddr], h)
-						mu.Unlock()
+						if isHitCandidate && distinct {
+							logify.Infof("vhost: discovered %s -> %s (status %d, %d bytes)", h, ipAddr, vhostResp.StatusCode, vhostResp.ContentLength)
+							mu.Lock()
+							resultMap[ipAddr] = append(resultMap[ipAddr], h)
+							mu.Unlock()
+						}
 					}(host)
 				}
 

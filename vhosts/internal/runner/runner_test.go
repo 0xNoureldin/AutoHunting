@@ -196,13 +196,40 @@ func TestRunSurvivesMidScanDrift(t *testing.T) {
 	}
 }
 
-// TestForbiddenResponsesRecordedRegardlessOfHitStatus covers a host that's
-// real but access-gated (an internal admin panel, an IP-allowlisted
-// endpoint) and so returns the exact same 403 page as every unrecognized
-// Host too. Baseline-diffing correctly does NOT flag it as a distinct
-// vhost -- but a 403 is worth a human's attention regardless, so it must
-// still turn up in the separate 403 list Run produces (see forbiddenMap).
-func TestForbiddenResponsesRecordedRegardlessOfHitStatus(t *testing.T) {
+// forbiddenDecision replicates the exact isForbidden/isHitCandidate/
+// distinct decision Run's per-candidate goroutine makes, so it can be
+// exercised directly against a test server without going through
+// Run/ProbeHTTP (which only tries a fixed list of ports and won't find
+// an httptest server on an ephemeral one).
+func forbiddenDecision(t *testing.T, timeout int, validURL string, baseline baselineRange, host string) (isForbidden, isHit bool) {
+	t.Helper()
+	resp, err := vhttp.GetResponse(timeout, host, validURL)
+	if err != nil {
+		t.Fatalf("GetResponse(%q): %v", host, err)
+	}
+	isForbidden = resp.StatusCode == httpStatusForbidden
+	isHitCandidate := !baseline.inRange(resp)
+	if !isForbidden && !isHitCandidate {
+		return false, false
+	}
+	control, err := probeControl(timeout, validURL)
+	if err != nil {
+		t.Fatalf("probeControl: %v", err)
+	}
+	distinct := !sameEnvelope(resp, control)
+	return isForbidden && distinct, isHitCandidate && distinct
+}
+
+// TestGenericForbiddenIsNotFalselyReported is a regression test for the
+// reported false-positive bug: every candidate came back "403 Forbidden"
+// and got recorded, even though the target simply returns the exact same
+// generic 403 page for every unrecognized Host (a default-deny WAF, or
+// just the server's catch-all vhost) -- meaning literally the whole
+// wordlist "tested positive" for 403, which carries no signal at all.
+// Recording a 403 must require it to be genuinely distinct from what an
+// unknown host gets right now, not just that its status happens to be
+// 403.
+func TestGenericForbiddenIsNotFalselyReported(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
 		w.Write([]byte("<html><body>403 Forbidden</body></html>"))
@@ -215,23 +242,52 @@ func TestForbiddenResponsesRecordedRegardlessOfHitStatus(t *testing.T) {
 		t.Fatalf("captureBaselineRange: %v", err)
 	}
 
-	hosts := []string{"gated.example.test", "also-gated.example.test"}
-	var forbidden []string
-	for _, h := range hosts {
-		resp, err := vhttp.GetResponse(timeout, h, srv.URL)
-		if err != nil {
-			t.Fatalf("GetResponse(%q): %v", h, err)
+	for _, h := range []string{"fake1.example.test", "fake2.example.test", "fake3.example.test"} {
+		isForbidden, isHit := forbiddenDecision(t, timeout, srv.URL, baseline, h)
+		if isForbidden {
+			t.Errorf("%s: false positive -- flagged as a distinct 403 but it's just the generic page every unknown host gets", h)
 		}
-		if resp.StatusCode == httpStatusForbidden {
-			forbidden = append(forbidden, h)
-		}
-		if !baseline.inRange(resp) {
-			t.Errorf("%s: expected to match the baseline (same generic 403 page everywhere), so it must NOT also be reported as a distinct vhost hit", h)
+		if isHit {
+			t.Errorf("%s: false positive -- flagged as a distinct vhost but it isn't one", h)
 		}
 	}
+}
 
-	if len(forbidden) != len(hosts) {
-		t.Fatalf("expected both hosts to be recorded as 403s regardless of hit status, got %v", forbidden)
+// TestDistinctForbiddenIsStillReported covers a host that's real but
+// access-gated (an internal admin panel, an IP-allowlisted endpoint) and
+// so returns 403 like every unrecognized Host does -- but with its own,
+// different page (e.g. an app-level "insufficient permissions" message
+// rather than the generic block page). That's still worth a human's
+// attention, so it must be recorded even though its status code alone
+// matches the baseline.
+func TestDistinctForbiddenIsStillReported(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Host == "gated.example.test" {
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte("<html><body>Access Denied: you lack sufficient permissions to view this internal resource. Contact your administrator to request access to this restricted panel.</body></html>"))
+			return
+		}
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("<html><body>403 Forbidden</body></html>"))
+	}))
+	defer srv.Close()
+
+	const timeout = 5
+	baseline, err := captureBaselineRange(timeout, srv.URL)
+	if err != nil {
+		t.Fatalf("captureBaselineRange: %v", err)
+	}
+
+	isForbidden, _ := forbiddenDecision(t, timeout, srv.URL, baseline, "gated.example.test")
+	if !isForbidden {
+		t.Error("gated.example.test: expected a genuinely distinct 403 to be reported, but it wasn't")
+	}
+
+	for _, h := range []string{"fake1.example.test", "fake2.example.test"} {
+		isForbidden, _ := forbiddenDecision(t, timeout, srv.URL, baseline, h)
+		if isForbidden {
+			t.Errorf("%s: false positive -- flagged as a distinct 403 but it's just the generic page every unknown host gets", h)
+		}
 	}
 }
 
