@@ -108,10 +108,12 @@ Options:
                               (implies -fuzz-urls)
   -ps, -port-scan             Enable TCP-connect port scanning across every discovered
                               subdomain. Scans the top 100 most common ports by default;
-                              see -all-ports and -ports to scan differently. Any open port
-                              other than 80/443 is also written to portScanning.txt. Off by
-                              default; independent of every other stage, and can be
-                              combined with any of them.
+                              see -all-ports and -ports to scan differently. Only "notable"
+                              open ports -- not 80/443/8080/8443, the common web ports
+                              already covered elsewhere -- are written to ports.txt and
+                              merged into subdomains.txt (as host:port, so URL enumeration
+                              also targets that exact port). Off by default; independent of
+                              every other stage, and can be combined with any of them.
   -ap, -all-ports             Scan all 65535 ports instead of the default top 100 (implies
                               -port-scan; ignored if -ports is also set).
   -ports <spec>               Scan this specific comma-separated list of ports and/or port
@@ -501,7 +503,6 @@ func run() int {
 	jsPath := filepath.Join(outputDir, "js_urls.txt")
 	secretsPath := filepath.Join(outputDir, "secrets.json")
 	portsPath := filepath.Join(outputDir, "ports.txt")
-	portScanningPath := filepath.Join(outputDir, "portScanning.txt")
 
 	var activeFlag []string
 	if active {
@@ -655,34 +656,38 @@ func run() int {
 	// every discovered subdomain (including any found via vhost
 	// discovery). Catches non-web services and non-standard ports that
 	// URL enumeration, which only ever looks at http(s) endpoints, would
-	// never see.
-	portsCount, notablePortsCount := 0, 0
+	// never see. Only "notable" ports (not 80/443/8080/8443, the common
+	// web ports already covered elsewhere) are kept, and merged into
+	// subdomains.txt as host:port so URL enumeration also targets that
+	// specific port.
+	portsCount := 0
 	portScanRC := 0
 	if portScan {
 		step("Port scanning")
 		if st.Completed.PortScan {
 			portsCount = countNonEmptyLines(portsPath)
-			notablePortsCount = countNonEmptyLines(portScanningPath)
-			ok("Already completed (resumed), skipping: %d open port(s)", portsCount)
+			subsCount = countNonEmptyLines(subsPath)
+			ok("Already completed (resumed), skipping: %d notable open port(s)", portsCount)
 		} else {
-			portScanRC, portsCount, notablePortsCount = runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec, allPorts, concurrency, timeout, logFile, stageLive)
+			var totalPorts int
+			portScanRC, totalPorts, portsCount = runPortScan(repoRoot, subsPath, portsPath, portsSpec, allPorts, concurrency, timeout, logFile, stageLive)
+			subsCount = countNonEmptyLines(subsPath)
 			if portScanRC != 0 {
 				warn("portScanner exited with an error (see %s)", logPath)
 			} else if portsCount == 0 {
-				ok("No open ports found")
+				ok("No notable open ports found (%d total, all on 80/443/8080/8443)", totalPorts)
 			} else {
-				ok("Found %d open port(s) -> %s (%d not on 80/443 -> %s)", portsCount, portsPath, notablePortsCount, portScanningPath)
+				ok("Found %d notable open port(s) (%d total) -> %s (merged into %s, now %d total)", portsCount, totalPorts, portsPath, subsPath, subsCount)
 			}
 			if err := st.markDone(func(c *completedPhases) { c.PortScan = true }); err != nil {
 				warn("Could not save resume state: %v", err)
 			}
 		}
 	}
-	// Always leave ports.txt/portScanning.txt in place (empty if
-	// -port-scan wasn't used or nothing was found), so they're reliable
-	// paths to reference rather than sometimes missing.
+	// Always leave ports.txt in place (empty if -port-scan wasn't used or
+	// nothing notable was found), so it's a reliable path to reference
+	// rather than sometimes missing.
 	touchFile(portsPath)
-	touchFile(portScanningPath)
 
 	// -------------------------------------------------------------------
 	// Stage 2: URL enumeration (URLEnum)
@@ -779,8 +784,7 @@ func run() int {
 			"urls found:        %d   (%s)\n"+
 			"js files found:    %d   (%s)\n"+
 			"secrets output:    %s\n"+
-			"open ports found:  %d   (%s)\n"+
-			"  ...not 80/443:   %d   (%s)\n"+
+			"notable ports:     %d   (%s)\n"+
 			"full log:          %s\n",
 		strings.Join(rawDomains, ","),
 		modeShort,
@@ -798,7 +802,6 @@ func run() int {
 		jsCount, jsPath,
 		secretsPath,
 		portsCount, portsPath,
-		notablePortsCount, portScanningPath,
 		logPath,
 	)
 	if err := os.WriteFile(summaryPath, []byte(summary), 0o644); err != nil {
@@ -884,8 +887,13 @@ func isRepoRoot(dir string) bool {
 	return true
 }
 
+// hostnameRe accepts a bare hostname or, so notable-port discoveries can
+// be merged in as "host:port" and still reach URL enumeration targeting
+// that exact port (see runPortScan), one with a trailing :port (1-5
+// digits -- an approximation of the 1-65535 range, precise enough for
+// sanitizing against injected garbage without a separate numeric check).
 var hostnameRe = regexp.MustCompile(
-	`^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$`,
+	`^[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+(:[0-9]{1,5})?$`,
 )
 
 // sanitizeHostLines keeps only lines that look like a valid hostname

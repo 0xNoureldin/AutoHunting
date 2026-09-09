@@ -319,9 +319,9 @@ go run . -h                                # full option list
 Results (subdomains, vhost-discovered subdomains on their own when `-vhost` is used
 (`vhost_subdomains.txt`), every subdomain that returns 403 Forbidden from any source --
 passive, brute-force, or vhost discovery (`403.txt`, always checked, also merged back into
-`subdomains.txt`) -- URLs, the filtered list of JS files, `secrets.json`, open ports
-(`ports.txt` and, filtered down to non-80/443 ports, `portScanning.txt`) when `-port-scan` is
-used, a `SUMMARY.txt`, and a combined log) are written to
+`subdomains.txt`) -- URLs, the filtered list of JS files, `secrets.json`, every notable open
+port (`ports.txt`, also merged back into `subdomains.txt`) when `-port-scan` is used, a
+`SUMMARY.txt`, and a combined log) are written to
 `oneClick/results/<target>_<timestamp>/` unless `-o` is given. Active mode is off by default
 since it can take from several minutes up to an hour (see the URLEnum notes above); pass
 `-active` when you want deeper coverage.
@@ -379,10 +379,12 @@ directly (URL enumeration, `-port-scan`) won't be able to connect to it under it
 with `portScanner`, the top 100 most commonly open ports by default. Pass `-all-ports` to scan
 all 65535 instead, or `-ports <spec>` (e.g. `80,443,8000-8100`, same comma/range syntax as
 `portScanner`'s own `-ports`) for a specific list -- either flag implies `-port-scan`, and
-`-ports` wins if both are given. Every open port is written to `ports.txt`; any open port other
-than 80 or 443 -- the two expected open on any web target -- is written again, on its own, to
-`portScanning.txt`, so non-standard/non-web services stand out without having to grep them out
-of the full list. Off by default, independent of every other stage, and combinable with any of
+`-ports` wins if both are given. Only "notable" open ports -- not 80, 443, 8080, or 8443, the
+common web ports already covered by every other web-facing stage here -- are kept: written to
+`ports.txt`, and merged into `subdomains.txt` as `host:port` (URLEnum's seed-building
+understands a port in its input, so this makes URL enumeration target that exact port
+directly, not just the default web ones). Off by default, independent of every other stage,
+and combinable with any of
 them.
 
 By default, each stage's own output only goes into `oneclick.log`, keeping the terminal to

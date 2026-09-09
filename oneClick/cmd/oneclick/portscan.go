@@ -23,16 +23,27 @@ const portScanTimeoutSeconds = 5
 // 100-port list one at a time per host would be far slower than needed.
 const portScanThreadsFloor = 50
 
-// runPortScan TCP-connect scans every discovered subdomain (subsPath) with
-// the portScanner tool, writing every open host:port pair to portsPath
-// and, separately, only the "notable" ones -- open ports other than 80
-// and 443, the two expected open on any web target -- to
-// portScanningPath.
+// ignoredPorts are the common web ports excluded from ports.txt: 80/443
+// are already covered by every other web-facing stage here, and 8080/8443
+// are common enough alternates that seeing them open on every host is
+// noise rather than signal. Anything else found open is kept.
+var ignoredPorts = map[int]struct{}{
+	80:   {},
+	443:  {},
+	8080: {},
+	8443: {},
+}
+
+// runPortScan TCP-connect scans every discovered subdomain (subsPath)
+// with the portScanner tool. Only "notable" open ports (see ignoredPorts)
+// are kept: written to portsPath, and -- as "host:port" -- merged into
+// subsPath too, so URL enumeration also targets that specific port
+// directly instead of only the default web ports.
 //
 // Returns the portScanner subprocess exit code (0 on success and when
-// there's nothing to scan), the total number of open ports found, and the
-// number of those that are notable (not 80/443).
-func runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec string, allPorts bool, concurrency, timeout int, logFile io.Writer, live bool) (int, int, int) {
+// there's nothing to scan), the total number of open ports found (before
+// filtering), and the number of those that are notable and kept.
+func runPortScan(repoRoot, subsPath, portsPath, portsSpec string, allPorts bool, concurrency, timeout int, logFile io.Writer, live bool) (int, int, int) {
 	if countNonEmptyLines(subsPath) == 0 {
 		warn("No subdomains to port-scan, skipping")
 		return 0, 0, 0
@@ -47,9 +58,15 @@ func runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec stri
 		portThreads = portScanThreadsFloor
 	}
 
+	// portScanner has no notion of "notable" ports -- it just reports
+	// everything open -- so it writes to a scratch file that's cleaned up
+	// once filterNotablePorts has picked out what's worth keeping.
+	rawPortsPath := portsPath + ".raw"
+	defer os.Remove(rawPortsPath)
+
 	args := []string{
 		"-host-file", subsPath,
-		"-output-file", portsPath,
+		"-output-file", rawPortsPath,
 		"-timeout", strconv.Itoa(scanTimeout),
 		"-host-threads", strconv.Itoa(concurrency),
 		"-threads", strconv.Itoa(portThreads),
@@ -65,7 +82,7 @@ func runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec stri
 
 	rc := runGoTool(filepath.Join(repoRoot, "portScanner"), args, logFile, live)
 
-	lines, err := readLines(portsPath)
+	lines, err := readLines(rawPortsPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			warn("Could not read port scan results: %v", err)
@@ -74,18 +91,22 @@ func runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec stri
 	}
 
 	total, notable := filterNotablePorts(lines)
-	if err := writeLines(portScanningPath, notable); err != nil {
-		warn("Could not write %s: %v", portScanningPath, err)
+	if err := writeLines(portsPath, notable); err != nil {
+		warn("Could not write %s: %v", portsPath, err)
 		return rc, total, 0
+	}
+	if len(notable) > 0 {
+		if err := mergeSanitizedHosts(portsPath, subsPath); err != nil {
+			warn("Could not merge notable-port hosts into %s: %v", subsPath, err)
+		}
 	}
 	return rc, total, len(notable)
 }
 
 // filterNotablePorts counts the open host:port results in lines (as
 // written by portScanner's -output-file) and picks out the "notable"
-// ones -- open ports other than 80 and 443, the two expected open on any
-// web target. Blank lines and anything that doesn't parse as host:port
-// are skipped.
+// ones -- see ignoredPorts. Blank lines and anything that doesn't parse
+// as host:port are skipped.
 func filterNotablePorts(lines []string) (total int, notable []string) {
 	for _, l := range lines {
 		l = strings.TrimSpace(l)
@@ -101,7 +122,7 @@ func filterNotablePorts(lines []string) (total int, notable []string) {
 		if err != nil {
 			continue
 		}
-		if port != 80 && port != 443 {
+		if _, ignored := ignoredPorts[port]; !ignored {
 			notable = append(notable, l)
 		}
 	}
