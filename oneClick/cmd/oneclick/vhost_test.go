@@ -74,12 +74,16 @@ func TestRunVhostFuzzSkipsWithoutWordlist(t *testing.T) {
 	defer logFile.Close()
 
 	vhostSubsPath := filepath.Join(dir, "vhost_subdomains.txt")
-	rc, count := runVhostFuzz("/repo/root", []string{"example.com"}, "", subsPath, vhostSubsPath, 10, 60, logFile, false)
+	forbiddenPath := filepath.Join(dir, "403.txt")
+	rc, count, forbiddenCount := runVhostFuzz("/repo/root", []string{"example.com"}, "", subsPath, vhostSubsPath, forbiddenPath, 10, 60, logFile, false)
 	if rc != 0 {
 		t.Errorf("runVhostFuzz with no wordlist should return 0 (nothing to do), got %d", rc)
 	}
 	if count != 0 {
 		t.Errorf("runVhostFuzz with no wordlist should discover 0 vhosts, got %d", count)
+	}
+	if forbiddenCount != 0 {
+		t.Errorf("runVhostFuzz with no wordlist should record 0 403s, got %d", forbiddenCount)
 	}
 
 	got, err := readLines(subsPath)

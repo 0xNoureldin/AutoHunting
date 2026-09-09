@@ -1,9 +1,12 @@
 package runner
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"sync/atomic"
 	"testing"
 
@@ -190,5 +193,83 @@ func TestRunSurvivesMidScanDrift(t *testing.T) {
 
 	if len(hits) != 1 || hits[0] != "real-admin.example.test" {
 		t.Fatalf("expected only real-admin.example.test to be flagged once drift kicks in, got %v (out of %d candidates)", hits, len(hosts))
+	}
+}
+
+// TestForbiddenResponsesRecordedRegardlessOfHitStatus covers a host that's
+// real but access-gated (an internal admin panel, an IP-allowlisted
+// endpoint) and so returns the exact same 403 page as every unrecognized
+// Host too. Baseline-diffing correctly does NOT flag it as a distinct
+// vhost -- but a 403 is worth a human's attention regardless, so it must
+// still turn up in the separate 403 list Run produces (see forbiddenMap).
+func TestForbiddenResponsesRecordedRegardlessOfHitStatus(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("<html><body>403 Forbidden</body></html>"))
+	}))
+	defer srv.Close()
+
+	const timeout = 5
+	baseline, err := captureBaselineRange(timeout, srv.URL)
+	if err != nil {
+		t.Fatalf("captureBaselineRange: %v", err)
+	}
+
+	hosts := []string{"gated.example.test", "also-gated.example.test"}
+	var forbidden []string
+	for _, h := range hosts {
+		resp, err := vhttp.GetResponse(timeout, h, srv.URL)
+		if err != nil {
+			t.Fatalf("GetResponse(%q): %v", h, err)
+		}
+		if resp.StatusCode == httpStatusForbidden {
+			forbidden = append(forbidden, h)
+		}
+		if !baseline.inRange(resp) {
+			t.Errorf("%s: expected to match the baseline (same generic 403 page everywhere), so it must NOT also be reported as a distinct vhost hit", h)
+		}
+	}
+
+	if len(forbidden) != len(hosts) {
+		t.Fatalf("expected both hosts to be recorded as 403s regardless of hit status, got %v", forbidden)
+	}
+}
+
+func TestForbiddenOutputPath(t *testing.T) {
+	cases := map[string]string{
+		"results":      "results_403.json",
+		"results.json": "results_403.json",
+	}
+	for in, want := range cases {
+		if got := forbiddenOutputPath(in); got != want {
+			t.Errorf("forbiddenOutputPath(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
+func TestOutputResultsWritesForbiddenFileOnlyWhenNonEmpty(t *testing.T) {
+	dir := t.TempDir()
+	outputFile := filepath.Join(dir, "results")
+
+	if err := outputResults(map[string][]string{"1.2.3.4": {"real.example.test"}}, nil, &Options{OutputFile: outputFile, Silent: true}); err != nil {
+		t.Fatalf("outputResults: %v", err)
+	}
+	if _, err := os.Stat(outputFile + "_403.json"); !os.IsNotExist(err) {
+		t.Errorf("expected no 403 output file when there are no 403s")
+	}
+
+	if err := outputResults(map[string][]string{}, map[string][]string{"1.2.3.4": {"gated.example.test"}}, &Options{OutputFile: outputFile, Silent: true}); err != nil {
+		t.Fatalf("outputResults: %v", err)
+	}
+	data, err := os.ReadFile(outputFile + "_403.json")
+	if err != nil {
+		t.Fatalf("expected 403 output file to be written: %v", err)
+	}
+	var got map[string][]string
+	if err := json.Unmarshal(data, &got); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if len(got["1.2.3.4"]) != 1 || got["1.2.3.4"][0] != "gated.example.test" {
+		t.Errorf("unexpected 403 output contents: %v", got)
 	}
 }

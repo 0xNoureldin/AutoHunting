@@ -35,19 +35,31 @@ const vhostConcurrencyCap = 10
 // merges those same hosts into subsPath alongside the existing subdomain
 // list, so later stages see them too.
 //
+// Separately, every candidate whose response came back 403 Forbidden --
+// regardless of whether it was confirmed as a distinct vhost -- is
+// sanitized and written to forbiddenPath. A 403 usually means the host
+// exists and is being actively gated (an internal admin panel, an
+// IP-allowlisted endpoint), which is worth a human's attention even when
+// vhoster's own baseline-diffing doesn't consider it different enough to
+// count as a hit (many WAFs/default vhosts return the same generic 403
+// page for every unrecognized Host too). These are NOT merged into
+// subsPath: unlike a confirmed vhost, a 403 alone isn't strong enough
+// evidence of a genuinely distinct host to feed into later stages, so
+// they're left for manual follow-up instead.
+//
 // Returns the vhoster subprocess exit code (0 on success and when there's
-// nothing to do, e.g. no wordlist available) and the number of distinct
-// vhosts discovered.
-func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSubsPath string, concurrency, timeout int, logFile io.Writer, live bool) (int, int) {
+// nothing to do, e.g. no wordlist available), the number of distinct
+// vhosts discovered, and the number of 403 responses recorded.
+func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSubsPath, forbiddenPath string, concurrency, timeout int, logFile io.Writer, live bool) (int, int, int) {
 	if wordlist == "" {
 		warn("No subdomain wordlist available, skipping vhost discovery")
-		return 0, 0
+		return 0, 0, 0
 	}
 
 	words, err := readLines(wordlist)
 	if err != nil {
 		warn("Could not read wordlist for vhost discovery: %v", err)
-		return 0, 0
+		return 0, 0, 0
 	}
 
 	outDir := filepath.Dir(subsPath)
@@ -55,6 +67,7 @@ func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSu
 	ipsPath := filepath.Join(outDir, "vhost_targets.txt")
 	outBase := filepath.Join(outDir, "vhost_results")
 	outJSON := outBase + ".json"
+	forbiddenJSON := outBase + "_403.json"
 
 	var candidates []string
 	for _, d := range domains {
@@ -72,15 +85,15 @@ func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSu
 	}
 	if len(candidates) == 0 {
 		warn("No vhost candidates to try, skipping vhost discovery")
-		return 0, 0
+		return 0, 0, 0
 	}
 	if err := writeLines(hostsPath, candidates); err != nil {
 		warn("Could not write vhost candidate file: %v", err)
-		return 0, 0
+		return 0, 0, 0
 	}
 	if err := writeLines(ipsPath, domains); err != nil {
 		warn("Could not write vhost target file: %v", err)
-		return 0, 0
+		return 0, 0, 0
 	}
 
 	vhostConcurrency := concurrency
@@ -102,25 +115,37 @@ func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSu
 	}
 	rc := runGoTool(filepath.Join(repoRoot, "vhosts", "cmd", "vhoster"), vhosterArgs, logFile, live)
 
+	forbiddenCount := 0
+	if forbidden, err := readVhosterResults(forbiddenJSON); err != nil {
+		warn("Could not read 403 results: %v", err)
+	} else {
+		forbiddenSanitized := sanitizeHostLines(forbidden)
+		if err := writeLines(forbiddenPath, forbiddenSanitized); err != nil {
+			warn("Could not write 403 hosts to %s: %v", forbiddenPath, err)
+		} else {
+			forbiddenCount = len(forbiddenSanitized)
+		}
+	}
+
 	found, err := readVhosterResults(outJSON)
 	if err != nil {
 		warn("Could not read vhost discovery results: %v", err)
-		return rc, 0
+		return rc, 0, forbiddenCount
 	}
 
 	sanitized := sanitizeHostLines(found)
 	if err := writeLines(vhostSubsPath, sanitized); err != nil {
 		warn("Could not write discovered vhosts to %s: %v", vhostSubsPath, err)
-		return rc, 0
+		return rc, 0, forbiddenCount
 	}
 	if len(sanitized) == 0 {
-		return rc, 0
+		return rc, 0, forbiddenCount
 	}
 	if err := mergeSanitizedHosts(vhostSubsPath, subsPath); err != nil {
 		warn("Could not merge discovered vhosts into subdomains: %v", err)
-		return rc, 0
+		return rc, 0, forbiddenCount
 	}
-	return rc, len(sanitized)
+	return rc, len(sanitized), forbiddenCount
 }
 
 // readVhosterResults reads vhoster's {"target": ["vhost1", "vhost2", ...]}

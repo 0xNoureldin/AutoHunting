@@ -92,9 +92,12 @@ Options:
                               downloads, or -sw), reporting hosts whose response genuinely
                               differs. Finds vhosts that exist only in the server's own routing
                               config, with no DNS record at all -- invisible to every other
-                              technique here. Off by default; independent of -active,
-                              -mutations, -fuzz-subs, and -fuzz-urls, and can be combined with
-                              any of them.
+                              technique here. Every candidate that comes back 403 Forbidden is
+                              also recorded -- regardless of whether it's a confirmed hit -- in
+                              403.txt for manual follow-up, since a 403 usually means the host
+                              exists and is just being gated. Off by default; independent of
+                              -active, -mutations, -fuzz-subs, and -fuzz-urls, and can be
+                              combined with any of them.
   -sw, -subs-wordlist <path> Use this wordlist for subdomain fuzzing/vhost discovery instead of
                               downloading one (implies -fuzz-subs)
   -uw, -urls-wordlist <path> Use this wordlist for URL fuzzing instead of downloading one
@@ -355,6 +358,7 @@ func run() int {
 
 	subsPath := filepath.Join(outputDir, "subdomains.txt")
 	vhostSubsPath := filepath.Join(outputDir, "vhost_subdomains.txt")
+	forbiddenPath := filepath.Join(outputDir, "403.txt")
 	urlsPath := filepath.Join(outputDir, "urls.txt")
 	jsPath := filepath.Join(outputDir, "js_urls.txt")
 	secretsPath := filepath.Join(outputDir, "secrets.json")
@@ -418,10 +422,10 @@ func run() int {
 	// target throughout -- the same effect as pinning the domain to an IP
 	// in /etc/hosts and fuzzing the Host header, without touching system
 	// DNS config.
-	vhostCount := 0
+	vhostCount, forbiddenCount := 0, 0
 	if vhost {
 		var vhostRC int
-		vhostRC, vhostCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, concurrency, timeout, logFile, live)
+		vhostRC, vhostCount, forbiddenCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, forbiddenPath, concurrency, timeout, logFile, live)
 		subsCount = countNonEmptyLines(subsPath)
 		if vhostRC != 0 {
 			warn("vhost discovery exited with an error (see %s)", logPath)
@@ -430,11 +434,15 @@ func run() int {
 		} else {
 			ok("Discovered %d vhost(s) -> %s (merged into %s, now %d total)", vhostCount, vhostSubsPath, subsPath, subsCount)
 		}
+		if forbiddenCount > 0 {
+			ok("%d candidate(s) returned 403 Forbidden, worth a manual look -> %s", forbiddenCount, forbiddenPath)
+		}
 	}
-	// Always leave vhost_subdomains.txt in place (empty if -vhost wasn't
-	// used or nothing was found), so it's a reliable path to reference
-	// rather than sometimes missing.
+	// Always leave vhost_subdomains.txt and 403.txt in place (empty if
+	// -vhost wasn't used or nothing was found), so they're reliable paths
+	// to reference rather than sometimes missing.
 	touchFile(vhostSubsPath)
+	touchFile(forbiddenPath)
 
 	// Port scanning (optional, off by default): a TCP-connect scan across
 	// every discovered subdomain (including any found via vhost
@@ -533,6 +541,7 @@ func run() int {
 			"generated:         %s\n"+
 			"subdomains found:  %d   (%s)\n"+
 			"  ...via vhost:    %d   (%s)\n"+
+			"403 to test:       %d   (%s)\n"+
 			"urls found:        %d   (%s)\n"+
 			"js files found:    %d   (%s)\n"+
 			"secrets output:    %s\n"+
@@ -549,6 +558,7 @@ func run() int {
 		time.Now().UTC().Format(time.RFC3339),
 		subsCount, subsPath,
 		vhostCount, vhostSubsPath,
+		forbiddenCount, forbiddenPath,
 		urlsCount, urlsPath,
 		jsCount, jsPath,
 		secretsPath,

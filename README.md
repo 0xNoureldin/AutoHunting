@@ -247,7 +247,11 @@ go run . -hosts candidates.txt -ips targets.txt -output vhostResults -concurrenc
 `-ips` accepts a domain name as well as a literal IP -- either way, every candidate in
 `-hosts` is requested against that same connection target with only the `Host` header
 changed. `candidates.txt` needs full hostnames (e.g. `admin.example.com`), not bare words;
-oneClick's `-vhost` (below) builds this file for you from a subdomain wordlist.
+oneClick's `-vhost` (below) builds this file for you from a subdomain wordlist. In fuzzing
+mode, every candidate that comes back 403 Forbidden is recorded separately -- regardless of
+whether it's confirmed as a distinct vhost -- alongside `-output`'s normal results, as
+`<output>_403.json` (e.g. `vhostResults_403.json`), since a 403 usually means the host exists
+and is just being gated rather than that it doesn't exist at all.
 
 ### portScanner
 Performs TCP (or UDP) port scanning:
@@ -307,10 +311,11 @@ go run . -d example.com -live              # stream each stage's live output to 
 go run . -d example.com -o results/acme -c 20 -t 120
 go run . -h                                # full option list
 ```
-Results (subdomains, vhost-discovered subdomains on their own when `-vhost` is used, URLs,
-the filtered list of JS files, `secrets.json`, open ports (`ports.txt` and, filtered down to
-non-80/443 ports, `portScanning.txt`) when `-port-scan` is used, a `SUMMARY.txt`, and a combined
-log) are written to `oneClick/results/<target>_<timestamp>/` unless `-o` is given. Active mode is off by default
+Results (subdomains, vhost-discovered subdomains on their own when `-vhost` is used, every 403
+Forbidden response `-vhost` saw (`403.txt`), URLs, the filtered list of JS files, `secrets.json`,
+open ports (`ports.txt` and, filtered down to non-80/443 ports, `portScanning.txt`) when
+`-port-scan` is used, a `SUMMARY.txt`, and a combined log) are written to
+`oneClick/results/<target>_<timestamp>/` unless `-o` is given. Active mode is off by default
 since it can take from several minutes up to an hour (see the URLEnum notes above); pass
 `-active` when you want deeper coverage.
 
@@ -336,7 +341,14 @@ ones whose response genuinely differs from a baseline. This is the `vhosts` tool
 (see above) wired in automatically; discovered vhosts are merged into the subdomain list before
 URL enumeration runs, so they get the same downstream treatment as anything DNS found -- and
 are also written on their own to `vhost_subdomains.txt`, so you can tell which entries in
-`subdomains.txt` came from DNS versus from vhost fuzzing alone. Off by default, independent of
+`subdomains.txt` came from DNS versus from vhost fuzzing alone. Separately, every candidate
+that comes back 403 Forbidden -- whether or not it's confirmed as a distinct vhost -- is
+written to `403.txt`. A 403 usually means the host exists and is just access-gated (an
+internal admin panel, an IP-allowlisted endpoint), which is worth a look even when it isn't
+different enough from the baseline to count as a hit on its own (many WAFs/default vhosts
+return the exact same generic 403 page for every unrecognized `Host` too); `403.txt` entries
+are NOT merged into `subdomains.txt` since a 403 alone isn't strong enough evidence of a
+genuinely distinct host to feed into later stages. Off by default, independent of
 `-active`/`-mutations`/`-fuzz-subs`/`-fuzz-urls`, and combinable with any of them; also bumps
 the default timeout to 300s unless `-t` is set explicitly.
 

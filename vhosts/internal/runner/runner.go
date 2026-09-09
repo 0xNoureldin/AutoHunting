@@ -38,6 +38,15 @@ func Run(opts *Options) error {
 
 	// map[IP][]Hosts - protected by mutex for concurrent access
 	resultMap := map[string][]string{}
+	// forbiddenMap collects every candidate whose response came back 403
+	// Forbidden, regardless of whether it was also confirmed as a distinct
+	// vhost. A 403 usually means the host exists and is being actively
+	// gated (an internal admin panel, an IP-allowlisted endpoint, etc.) --
+	// worth a human's attention even when it isn't different enough from
+	// the baseline to register as a hit on its own (a WAF/default vhost
+	// can just as easily return the same generic 403 page for every
+	// unrecognized Host).
+	forbiddenMap := map[string][]string{}
 	var mu sync.Mutex
 
 	// Create semaphore for concurrency control
@@ -119,6 +128,15 @@ func Run(opts *Options) error {
 							return
 						}
 
+						// Record every 403 unconditionally -- don't let it get
+						// silently swallowed just because it also happens to
+						// match the baseline (see forbiddenMap's comment).
+						if vhostResp.StatusCode == httpStatusForbidden {
+							mu.Lock()
+							forbiddenMap[ipAddr] = append(forbiddenMap[ipAddr], h)
+							mu.Unlock()
+						}
+
 						if baseline.inRange(vhostResp) {
 							return
 						}
@@ -157,12 +175,16 @@ func Run(opts *Options) error {
 	}
 
 	// Output results
-	if err := outputResults(resultMap, opts); err != nil {
+	if err := outputResults(resultMap, forbiddenMap, opts); err != nil {
 		return err
 	}
 
 	return nil
 }
+
+// httpStatusForbidden avoids importing net/http purely for one status
+// constant, since this package already imports its own pkg/http as http.
+const httpStatusForbidden = 403
 
 // baselineRange is the envelope of "not actually a distinct vhost"
 // responses observed across several baseline samples. A single sample is
@@ -275,29 +297,51 @@ func randomToken() (string, error) {
 }
 
 // outputResults handles outputting results in JSON format to file and CLI format to console
-func outputResults(resultMap map[string][]string, opts *Options) error {
+func outputResults(resultMap, forbiddenMap map[string][]string, opts *Options) error {
 	// Write JSON output to file
 	if opts.OutputFile != "" {
-		jsonData, err := json.MarshalIndent(resultMap, "", "  ")
-		if err != nil {
-			return fmt.Errorf("failed to marshal JSON: %w", err)
-		}
-
-		outputFile := opts.OutputFile
-		if !strings.HasSuffix(outputFile, ".json") {
-			outputFile += ".json"
-		}
-
-		if err := os.WriteFile(outputFile, jsonData, os.ModePerm); err != nil {
+		if err := writeJSONMap(resultMap, jsonOutputPath(opts.OutputFile)); err != nil {
 			return fmt.Errorf("failed to write output file: %w", err)
+		}
+		if len(forbiddenMap) > 0 {
+			if err := writeJSONMap(forbiddenMap, forbiddenOutputPath(opts.OutputFile)); err != nil {
+				return fmt.Errorf("failed to write 403 output file: %w", err)
+			}
 		}
 	}
 
 	if !opts.Silent {
 		printCLIResults(resultMap)
+		if len(forbiddenMap) > 0 {
+			fmt.Println("\n403 Forbidden (not necessarily distinct vhosts, but worth a look):")
+			printCLIResults(forbiddenMap)
+		}
 	}
 
 	return nil
+}
+
+func writeJSONMap(m map[string][]string, path string) error {
+	jsonData, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal JSON: %w", err)
+	}
+	return os.WriteFile(path, jsonData, os.ModePerm)
+}
+
+func jsonOutputPath(outputFile string) string {
+	if !strings.HasSuffix(outputFile, ".json") {
+		return outputFile + ".json"
+	}
+	return outputFile
+}
+
+// forbiddenOutputPath derives the sibling file used for 403 Forbidden
+// results from the main -output path, e.g. "results" and "results.json"
+// both become "results_403.json".
+func forbiddenOutputPath(outputFile string) string {
+	base := strings.TrimSuffix(outputFile, ".json")
+	return base + "_403.json"
 }
 
 func printCLIResults(resultMap map[string][]string) {
