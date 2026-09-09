@@ -171,7 +171,7 @@ full pipeline walkthrough and every flag.
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com/noureldinSAF/AutoHunting.git
+git clone --branch claude/oneclick-recon-automation-3osora --single-branch https://github.com/0xNoureldin/AutoHunting.git
 cd AutoHunting
 ```
 
