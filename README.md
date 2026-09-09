@@ -156,11 +156,15 @@ Performs WHOIS lookups to gather:
 ---
 
 ### ⚡ oneClick
-One command recon pipeline. Give it a domain (or a file of domains) and it chains together
-**SubEnum → URLEnum → jsAnalyzer**: subdomain enumeration, then URL enumeration on the
-discovered hosts, then secret scanning on the discovered `.js` files. Optional add-on stages
-(off by default): virtual-host discovery (`-vhost`) and port scanning (`-port-scan`) across
-every discovered subdomain. See [Module Usage Details](#-module-usage-details) below for usage.
+The pipeline that ties every tool above together into one command. It isn't a recon engine of
+its own -- it's an orchestrator that runs the other standalone tools in this repo as
+subprocesses, one after another against the same target, feeding each stage's output into the
+next: **SubEnum → (vhosts) → (portScanner) → URLEnum → jsAnalyzer**. Give it a domain (or a
+file of domains) and it enumerates subdomains, optionally discovers virtual hosts and scans
+ports, enumerates URLs on whatever was found, and scans the discovered `.js` files for
+secrets -- checkpointing progress after every stage so an interrupted run can be resumed
+exactly where it left off. See [Module Usage Details](#-module-usage-details) below for the
+full pipeline walkthrough and every flag.
 
 ---
 
@@ -317,6 +321,64 @@ go run . -d example.com -active -fuzz-urls -t 30 -ut 600   # short timeout every
 go run . -resume oneClick/results/example.com_20260909_030405  # pick up an interrupted run
 go run . -h                                # full option list
 ```
+
+**What it is.** oneClick doesn't do any enumeration itself -- every stage's real work happens
+in that stage's own standalone tool (`SubEnum`, `vhosts`, `portScanner`, `URLEnum`,
+`jsAnalyzer`), invoked as a subprocess (`go run .` in that tool's own directory) with flags
+oneClick builds from its own. oneClick's own code is the plumbing: it decides what to run, in
+what order, with which files, and what to do with each stage's result before handing it to
+the next one. That's also why `-live`/`-quiet-stages` and a combined `oneclick.log` exist --
+each subprocess's output has to be explicitly captured and, optionally, mirrored to the
+terminal, rather than just appearing there the way a single in-process tool's would.
+
+**Pipeline steps -- what actually happens, in order:**
+
+1. **Setup.** Parse flags, create the output directory (`oneClick/results/<target>_<timestamp>/`
+   unless `-o` is given), and write the seed domain(s) from `-d`/`-f` to `input_domains.txt`.
+   A fresh `oneclick.state.json` checkpoint is saved immediately, before any stage has run, so
+   even a run interrupted right here can still be resumed with `-resume`.
+2. **Wordlist prep** -- only when `-fuzz-subs`, `-fuzz-urls`, or `-vhost` is set. Downloads and
+   caches the relevant SecLists wordlist into `oneClick/wordlists/` on first use (or uses
+   `-sw`/`-uw` if given, skipping the download).
+3. **Stage 1/3 -- Subdomain enumeration.** Runs `SubEnum` against `input_domains.txt`: passive
+   sources always, plus DNS zone transfer with `-active`, DNS brute-force with `-fuzz-subs`,
+   and alterx permutation guessing with `-mutations`, any combination of them. Results are
+   sanitized, deduped, and merged into `subdomains.txt` alongside the original seed domain(s).
+4. **Virtual-host discovery** -- only with `-vhost`. Runs `vhosts`' fuzzing mode: every
+   subdomain-wordlist candidate is sent as the `Host` header to each target, keeping the TCP
+   connection fixed, and a candidate is kept only once it's confirmed -- against a live control
+   probe in the same DNS zone, taken at that same moment -- to be genuinely different from what
+   an unrecognized name gets right now. Discovered vhosts go to `vhost_subdomains.txt` and are
+   merged into `subdomains.txt`; hosts that exist but come back with their own, genuinely
+   distinct 403 go to `vhost_403.txt`.
+5. **403 check** -- always runs, regardless of which flags above were used. Every subdomain
+   known so far (from every source above) is probed directly, on its own hostname, for a 403
+   Forbidden response. Only a 403 that's genuinely distinct from whatever the overwhelming
+   majority of other 403s on this run look like is kept -- a WAF/CDN 403-ing every request
+   indiscriminately, or upstream over-collection, would otherwise flood this with noise rather
+   than signal. Combined with vhost's own `vhost_403.txt` findings and deduped, the result
+   becomes `403.txt`, which is merged into `subdomains.txt`.
+6. **Port scan** -- only with `-port-scan`, `-all-ports`, or `-ports`. Runs `portScanner`
+   (TCP-connect) against every subdomain known so far. Only "notable" open ports (not
+   80/443/8080/8443, already covered by every web-facing stage here) are kept: written to
+   `ports.txt`, and merged into `subdomains.txt` as `host:port` so URL enumeration targets that
+   exact port too, not just the default web ports.
+7. **Stage 2/3 -- URL enumeration.** Runs `URLEnum` against the final `subdomains.txt`: passive
+   sources always, plus crawling and headless-browser rendering with `-active`, and
+   path/content wordlist fuzzing with `-fuzz-urls`. Every URL found is deduped and written to
+   `urls.txt`.
+8. **Stage 3/3 -- JS secret scanning.** Filters `urls.txt` down to `.js` files (`js_urls.txt`);
+   if any were found, runs `jsAnalyzer` against them to extract secrets, written grouped by
+   secret (not by URL) to `secrets.json`.
+9. **Summary.** Writes `SUMMARY.txt` -- counts and file paths for everything above -- and
+   prints it to the terminal.
+
+Every stage marks itself done in `oneclick.state.json` the moment it finishes, which is what
+makes `-resume <output-dir>` work after an interruption (Ctrl+C, a crash, a closed terminal):
+it restores the original target and every flag automatically, skips whatever the checkpoint
+says already completed, and picks up with whatever's left. See the resume/state paragraph
+further below for details.
+
 Results (subdomains, vhost-discovered subdomains on their own when `-vhost` is used
 (`vhost_subdomains.txt`), every subdomain that returns 403 Forbidden from any source --
 passive, brute-force, or vhost discovery (`403.txt`, always checked, also merged back into
