@@ -107,7 +107,7 @@ func Run(opts *Options) error {
 					return
 				}
 
-				baseline, err := captureBaselineRange(opts.Timeout, validURL)
+				baseline, err := captureBaselineRange(opts.Timeout, validURL, ipAddr)
 				if err != nil {
 					logify.Errorf("vhost: could not establish a baseline for %s: %v", validURL, err)
 					return
@@ -146,22 +146,24 @@ func Run(opts *Options) error {
 						// baseline captured once at the start of the scan --
 						// or both. Either way, confirm it against a *fresh*
 						// control probe -- a brand new random, guaranteed-
-						// absent host -- taken right now, before reporting
-						// anything. Sending thousands of rapid Host-header
-						// requests at one server can itself trip a WAF/
-						// anti-bot challenge or rate limit partway through a
-						// scan; once that happens, EVERY remaining response
-						// (real or fake host alike) starts looking different
-						// from the now-stale starting baseline AND can just
-						// as easily start coming back 403 for everyone --
-						// which is exactly what turns an entire wordlist into
-						// both "hits" and "403s to test". If an unknown host
-						// looks just as different (or just as 403) right now
-						// as our candidate does, that's environmental drift,
-						// not a real vhost or a real access-controlled one --
-						// and if the control probe itself fails, we can't
-						// rule that out, so we don't report anything either.
-						control, err := probeControl(opts.Timeout, validURL)
+						// absent host *in the same DNS zone as the target*
+						// (see probeControl) -- taken right now, before
+						// reporting anything. Sending thousands of rapid
+						// Host-header requests at one server can itself trip
+						// a WAF/anti-bot challenge or rate limit partway
+						// through a scan; once that happens, EVERY remaining
+						// response (real or fake host alike) starts looking
+						// different from the now-stale starting baseline AND
+						// can just as easily start coming back 403 for
+						// everyone -- which is exactly what turns an entire
+						// wordlist into both "hits" and "403s to test". If an
+						// unknown host looks just as different (or just as
+						// 403) right now as our candidate does, that's
+						// environmental drift, not a real vhost or a real
+						// access-controlled one -- and if the control probe
+						// itself fails, we can't rule that out, so we don't
+						// report anything either.
+						control, err := probeControl(opts.Timeout, validURL, ipAddr)
 						if err != nil {
 							logify.Errorf("vhost: control probe against %s failed, cannot confirm %s: %v", validURL, h, err)
 							return
@@ -255,13 +257,14 @@ func sameEnvelope(a, b *http.Response) bool {
 }
 
 // captureBaselineRange requests validURL 3 times with a random, practically
-// guaranteed-absent Host header and returns the range of responses seen.
-func captureBaselineRange(timeout int, validURL string) (baselineRange, error) {
+// guaranteed-absent Host header in domain's own zone (see probeControl) and
+// returns the range of responses seen.
+func captureBaselineRange(timeout int, validURL, domain string) (baselineRange, error) {
 	const samples = 3
 	var resps []*http.Response
 
 	for i := 0; i < samples; i++ {
-		resp, err := probeControl(timeout, validURL)
+		resp, err := probeControl(timeout, validURL, domain)
 		if err != nil {
 			return baselineRange{}, fmt.Errorf("baseline request failed: %w", err)
 		}
@@ -286,19 +289,36 @@ func captureBaselineRange(timeout int, validURL string) (baselineRange, error) {
 }
 
 // probeControl requests validURL with a fresh, random, practically
-// guaranteed-absent Host header and returns the response. It's used both to
-// build the initial baseline (captureBaselineRange) and, per candidate, as
-// a live "what does an unknown host look like right now" control -- see
-// sameEnvelope and its use in Run. Each invalid host is the same fixed
-// length (a 16-char hex token) so that a server echoing the Host header
-// into its response body doesn't itself introduce content-length variance
-// unrelated to real vhost differences.
-func probeControl(timeout int, validURL string) (*http.Response, error) {
+// guaranteed-absent Host header of the form "<token>.<domain>" and returns
+// the response. It's used both to build the initial baseline
+// (captureBaselineRange) and, per candidate, as a live "what does an
+// unknown host look like right now" control -- see sameEnvelope and its use
+// in Run.
+//
+// The control host is built as a subdomain of domain -- the same target
+// whose real candidates (also "<word>.<domain>") are being tested --
+// rather than an unrelated, foreign host. This is not cosmetic: a CDN/WAF
+// in front of domain routinely treats an unrecognized name that still
+// falls within its own zone (falling through to the origin's default/
+// catch-all vhost) differently from a Host header for a completely
+// unrelated domain (often blocked or redirected at the edge itself,
+// before it ever reaches the origin). A control built from an unrelated
+// domain (e.g. "<token>-invalid.invalid") measures the latter, which is
+// not the response real candidates actually compete against -- so it never
+// matches, and every real candidate is misread as "distinct" regardless of
+// whether it's a genuine vhost. Sharing domain's own zone is what makes
+// this a genuine apples-to-apples control.
+//
+// Each control host's token is the same fixed length (a 16-char hex
+// string) so that a server echoing the Host header into its response body
+// doesn't itself introduce content-length variance unrelated to real vhost
+// differences.
+func probeControl(timeout int, validURL, domain string) (*http.Response, error) {
 	token, err := randomToken()
 	if err != nil {
 		return nil, err
 	}
-	resp, err := http.GetResponse(timeout, token+"-invalid.invalid", validURL)
+	resp, err := http.GetResponse(timeout, token+"."+domain, validURL)
 	if err != nil || resp == nil {
 		return nil, fmt.Errorf("control request failed: %w", err)
 	}

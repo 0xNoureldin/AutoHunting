@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 	"testing"
 
@@ -39,7 +40,7 @@ func TestCaptureBaselineRangeThenInRange(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	baseline, err := captureBaselineRange(5, srv.URL)
+	baseline, err := captureBaselineRange(5, srv.URL, "example.test")
 	if err != nil {
 		t.Fatalf("captureBaselineRange: %v", err)
 	}
@@ -94,7 +95,7 @@ func TestInRangeToleratesHostEchoingErrorPage(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	baseline, err := captureBaselineRange(5, srv.URL)
+	baseline, err := captureBaselineRange(5, srv.URL, "example.test")
 	if err != nil {
 		t.Fatalf("captureBaselineRange: %v", err)
 	}
@@ -170,7 +171,7 @@ func TestRunSurvivesMidScanDrift(t *testing.T) {
 	// inRange + the probeControl/sameEnvelope confirmation) directly
 	// against srv.URL, rather than going through Run/ProbeHTTP.
 	const timeout = 5
-	baseline, err := captureBaselineRange(timeout, srv.URL)
+	baseline, err := captureBaselineRange(timeout, srv.URL, "example.test")
 	if err != nil {
 		t.Fatalf("captureBaselineRange: %v", err)
 	}
@@ -184,7 +185,7 @@ func TestRunSurvivesMidScanDrift(t *testing.T) {
 		if baseline.inRange(resp) {
 			continue
 		}
-		control, err := probeControl(timeout, srv.URL)
+		control, err := probeControl(timeout, srv.URL, "example.test")
 		if err != nil || sameEnvelope(resp, control) {
 			continue
 		}
@@ -201,7 +202,7 @@ func TestRunSurvivesMidScanDrift(t *testing.T) {
 // exercised directly against a test server without going through
 // Run/ProbeHTTP (which only tries a fixed list of ports and won't find
 // an httptest server on an ephemeral one).
-func forbiddenDecision(t *testing.T, timeout int, validURL string, baseline baselineRange, host string) (isForbidden, isHit bool) {
+func forbiddenDecision(t *testing.T, timeout int, validURL, domain string, baseline baselineRange, host string) (isForbidden, isHit bool) {
 	t.Helper()
 	resp, err := vhttp.GetResponse(timeout, host, validURL)
 	if err != nil {
@@ -212,7 +213,7 @@ func forbiddenDecision(t *testing.T, timeout int, validURL string, baseline base
 	if !isForbidden && !isHitCandidate {
 		return false, false
 	}
-	control, err := probeControl(timeout, validURL)
+	control, err := probeControl(timeout, validURL, domain)
 	if err != nil {
 		t.Fatalf("probeControl: %v", err)
 	}
@@ -237,13 +238,13 @@ func TestGenericForbiddenIsNotFalselyReported(t *testing.T) {
 	defer srv.Close()
 
 	const timeout = 5
-	baseline, err := captureBaselineRange(timeout, srv.URL)
+	baseline, err := captureBaselineRange(timeout, srv.URL, "example.test")
 	if err != nil {
 		t.Fatalf("captureBaselineRange: %v", err)
 	}
 
 	for _, h := range []string{"fake1.example.test", "fake2.example.test", "fake3.example.test"} {
-		isForbidden, isHit := forbiddenDecision(t, timeout, srv.URL, baseline, h)
+		isForbidden, isHit := forbiddenDecision(t, timeout, srv.URL, "example.test", baseline, h)
 		if isForbidden {
 			t.Errorf("%s: false positive -- flagged as a distinct 403 but it's just the generic page every unknown host gets", h)
 		}
@@ -273,20 +274,86 @@ func TestDistinctForbiddenIsStillReported(t *testing.T) {
 	defer srv.Close()
 
 	const timeout = 5
-	baseline, err := captureBaselineRange(timeout, srv.URL)
+	baseline, err := captureBaselineRange(timeout, srv.URL, "example.test")
 	if err != nil {
 		t.Fatalf("captureBaselineRange: %v", err)
 	}
 
-	isForbidden, _ := forbiddenDecision(t, timeout, srv.URL, baseline, "gated.example.test")
+	isForbidden, _ := forbiddenDecision(t, timeout, srv.URL, "example.test", baseline, "gated.example.test")
 	if !isForbidden {
 		t.Error("gated.example.test: expected a genuinely distinct 403 to be reported, but it wasn't")
 	}
 
 	for _, h := range []string{"fake1.example.test", "fake2.example.test"} {
-		isForbidden, _ := forbiddenDecision(t, timeout, srv.URL, baseline, h)
+		isForbidden, _ := forbiddenDecision(t, timeout, srv.URL, "example.test", baseline, h)
 		if isForbidden {
 			t.Errorf("%s: false positive -- flagged as a distinct 403 but it's just the generic page every unknown host gets", h)
+		}
+	}
+}
+
+// TestControlProbeUsesTargetsOwnZone is a regression test for the root
+// cause behind a second wave of false positives reported after
+// TestRunSurvivesMidScanDrift's live-control fix had already landed:
+// probeControl's guaranteed-absent Host header used to be built from a
+// completely foreign domain ("<token>-invalid.invalid"), while every real
+// candidate is always "<word>.<domain>" -- a subdomain of the target's own
+// zone. A CDN/WAF commonly treats those two cases differently: an
+// unrecognized name that's still within its own zone falls through to the
+// origin's generic catch-all vhost, while a Host header for a totally
+// unrelated domain gets handled or blocked at the edge itself, before ever
+// reaching the origin. That made the control probe measure the wrong
+// thing: it never matched the origin's catch-all response, so the live
+// control confirmation never actually filtered anything -- EVERY
+// unconfigured "<word>.<domain>" candidate that hit the origin's generic
+// 403 catch-all page got reported as a "distinct" 403, exactly as observed
+// live against a real target (identical status code and byte count across
+// a dozen+ unrelated wordlist candidates). The fix is for the control
+// probe to share the target's own zone, so it experiences the exact same
+// edge-routing decision real candidates do.
+func TestControlProbeUsesTargetsOwnZone(t *testing.T) {
+	const domain = "tuwaiq-test.example"
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.Host == "real."+domain:
+			// The one genuinely configured vhost.
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("real internal application - distinctly different from the catch-all"))
+		case strings.HasSuffix(r.Host, "."+domain):
+			// Simulates a CDN/WAF falling through to the origin's generic
+			// catch-all vhost for any *unconfigured* name that's still
+			// within the target's own zone -- what every real wordlist
+			// candidate other than "real" actually gets.
+			w.WriteHeader(http.StatusForbidden)
+			w.Write([]byte("<html><body>403 Forbidden</body></html>"))
+		default:
+			// Simulates a CDN/WAF handling, at the edge, a Host header for
+			// a completely unrelated domain -- never reaching the origin's
+			// catch-all at all. This is what the old "<token>-invalid.invalid"
+			// control host actually measured.
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("blocked by edge - unrecognized domain, please use a valid hostname to reach this service"))
+		}
+	}))
+	defer srv.Close()
+
+	const timeout = 5
+	baseline, err := captureBaselineRange(timeout, srv.URL, domain)
+	if err != nil {
+		t.Fatalf("captureBaselineRange: %v", err)
+	}
+
+	isForbidden, isHit := forbiddenDecision(t, timeout, srv.URL, domain, baseline, "real."+domain)
+	if !isForbidden && !isHit {
+		t.Errorf("real.%s: expected the genuinely configured vhost to be flagged (as a hit and/or a distinct 403), but it wasn't", domain)
+	}
+
+	for _, word := range []string{"willow", "ww3", "www-ava", "www-admission", "winner"} {
+		h := word + "." + domain
+		isForbidden, isHit := forbiddenDecision(t, timeout, srv.URL, domain, baseline, h)
+		if isForbidden || isHit {
+			t.Errorf("%s: false positive -- flagged (forbidden=%v hit=%v) but it's just the origin's generic catch-all 403 that every unconfigured name in this zone gets", h, isForbidden, isHit)
 		}
 	}
 }

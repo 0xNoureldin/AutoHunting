@@ -346,10 +346,17 @@ routing config — which every DNS-based technique above (passive sources, `-fuz
 `-fuzz-subs` downloads/uses, or `-sw`), keeping the connection target fixed, and reports a
 candidate only once it's confirmed, against a *live* control probe taken at that same moment
 (not just a baseline captured once at the start), to be genuinely different from what an
-unrecognized host gets right now. That live-recheck is what keeps a WAF or rate limit
-triggered mid-scan from turning the entire wordlist into "hits" -- once that happens every
-remaining response starts looking different from the stale starting baseline, which a
-one-time baseline comparison alone can't tell apart from a real discovery. This is the
+unrecognized host gets right now. The control probe itself is also built as `random.domain` --
+a subdomain of the same target zone, not an unrelated/foreign host -- since a CDN or WAF
+commonly treats an unrecognized name that's still inside its own zone (falling through to the
+origin's generic catch-all vhost) differently from a Host header for a totally unrelated
+domain (often blocked at the edge before ever reaching the origin); comparing against the
+latter would never match the former, making every real candidate look "distinct" regardless of
+whether it's an actual hit. That live-recheck is what keeps a WAF or rate limit triggered
+mid-scan (or a target that simply 403s every unconfigured name in its zone) from turning the
+entire wordlist into "hits" -- once that happens every remaining response starts looking
+different from the stale starting baseline, which a one-time baseline comparison alone can't
+tell apart from a real discovery. This is the
 `vhosts` tool's fuzzing mode (see above) wired in automatically; discovered vhosts are merged
 into the subdomain list before URL enumeration runs, so they get the same downstream
 treatment as anything DNS found -- and are also written on their own to

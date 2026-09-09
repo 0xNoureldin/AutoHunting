@@ -94,10 +94,12 @@ Options:
                               HTTP(S) with the Host header swapped to "word.domain" for every
                               entry in the subdomain wordlist (same one -fuzz-subs uses/
                               downloads, or -sw), reporting hosts whose response is confirmed,
-                              against a live control probe, to be genuinely different -- not
-                              just "status happens to be 403" or "looks different from a
-                              stale baseline", which is what a WAF/rate limit triggered
-                              mid-scan would otherwise turn every candidate into. Finds vhosts
+                              against a live control probe in the same target zone, to be
+                              genuinely different -- not just "status happens to be 403" or
+                              "looks different from a stale baseline", which is what a WAF/rate
+                              limit triggered mid-scan (or a target that 403s every unconfigured
+                              name in its own zone) would otherwise turn every candidate into.
+                              Finds vhosts
                               that exist only in the server's own routing config, with no DNS
                               record at all -- invisible to every other technique here. Off by
                               default; independent of -active, -mutations, -fuzz-subs, and
