@@ -119,12 +119,33 @@ func Run(opts *Options) error {
 							return
 						}
 
-						// Detect vhost: compare response to baseline
-						if !baseline.inRange(vhostResp) {
-							mu.Lock()
-							resultMap[ipAddr] = append(resultMap[ipAddr], h)
-							mu.Unlock()
+						if baseline.inRange(vhostResp) {
+							return
 						}
+
+						// vhostResp differs from the baseline captured once at the
+						// start of the scan. Before reporting a hit, confirm it
+						// against a *fresh* control probe -- a brand new random,
+						// guaranteed-absent host -- taken right now. Sending
+						// thousands of rapid Host-header requests at one server
+						// can itself trip a WAF/anti-bot challenge or rate limit
+						// partway through a scan; once that happens, EVERY
+						// remaining response (real or fake host alike) starts
+						// looking different from the now-stale starting baseline,
+						// which is exactly what turns an entire wordlist into
+						// "hits". If an unknown host looks just as different
+						// right now as our candidate does, the difference is
+						// environmental drift, not a real vhost -- and if the
+						// control probe itself fails, we can't rule that out, so
+						// we don't report a hit either.
+						control, err := probeControl(opts.Timeout, validURL)
+						if err != nil || sameEnvelope(vhostResp, control) {
+							return
+						}
+
+						mu.Lock()
+						resultMap[ipAddr] = append(resultMap[ipAddr], h)
+						mu.Unlock()
 					}(host)
 				}
 
@@ -143,13 +164,19 @@ func Run(opts *Options) error {
 	return nil
 }
 
-// baselineRange is the range of "not actually a distinct vhost" responses
-// observed across several baseline samples. A single sample is fragile: any
-// natural variance between requests (a server that echoes the Host header
-// into an error page, cache/CDN timing, etc.) would make every candidate
-// look like a hit. Ranging over several samples absorbs that noise.
+// baselineRange is the envelope of "not actually a distinct vhost"
+// responses observed across several baseline samples. A single sample is
+// fragile: any natural variance between requests (a server that echoes the
+// Host header into an error page, cache/CDN timing, etc.) would make every
+// candidate look like a hit. Ranging over several samples absorbs that
+// noise.
+//
+// Status codes are categorical, not ordinal, so they're tracked as the set
+// actually observed rather than a min-max range -- a baseline that saw 200
+// on one sample and 404 on another must not treat every code in between
+// (301, 302, ...) as "normal", which a numeric range would.
 type baselineRange struct {
-	statusMin, statusMax int
+	statuses             map[int]struct{}
 	lengthMin, lengthMax int64
 }
 
@@ -163,7 +190,7 @@ type baselineRange struct {
 const lengthTolerance = 64
 
 func (r baselineRange) inRange(resp *http.Response) bool {
-	if resp.StatusCode < r.statusMin || resp.StatusCode > r.statusMax {
+	if _, ok := r.statuses[resp.StatusCode]; !ok {
 		return false
 	}
 	if resp.ContentLength < r.lengthMin-lengthTolerance || resp.ContentLength > r.lengthMax+lengthTolerance {
@@ -172,38 +199,43 @@ func (r baselineRange) inRange(resp *http.Response) bool {
 	return true
 }
 
+// sameEnvelope reports whether two responses look like the same kind of
+// "unrecognized host" response: an identical status code, and content
+// lengths within lengthTolerance of each other. Unlike inRange, this
+// compares two live responses captured back-to-back rather than a response
+// against a baseline captured earlier -- see probeControl's use in Run.
+func sameEnvelope(a, b *http.Response) bool {
+	if a.StatusCode != b.StatusCode {
+		return false
+	}
+	diff := a.ContentLength - b.ContentLength
+	if diff < 0 {
+		diff = -diff
+	}
+	return diff <= lengthTolerance
+}
+
 // captureBaselineRange requests validURL 3 times with a random, practically
 // guaranteed-absent Host header and returns the range of responses seen.
-// Each invalid host is the same fixed length (a 16-char hex token) so that a
-// server echoing the Host header into its response body doesn't itself
-// introduce content-length variance unrelated to real vhost differences.
 func captureBaselineRange(timeout int, validURL string) (baselineRange, error) {
 	const samples = 3
 	var resps []*http.Response
 
 	for i := 0; i < samples; i++ {
-		token, err := randomToken()
+		resp, err := probeControl(timeout, validURL)
 		if err != nil {
-			return baselineRange{}, err
-		}
-		resp, err := http.GetResponse(timeout, token+"-invalid.invalid", validURL)
-		if err != nil || resp == nil {
 			return baselineRange{}, fmt.Errorf("baseline request failed: %w", err)
 		}
 		resps = append(resps, resp)
 	}
 
 	r := baselineRange{
-		statusMin: resps[0].StatusCode, statusMax: resps[0].StatusCode,
-		lengthMin: resps[0].ContentLength, lengthMax: resps[0].ContentLength,
+		statuses:  map[int]struct{}{},
+		lengthMin: resps[0].ContentLength,
+		lengthMax: resps[0].ContentLength,
 	}
-	for _, resp := range resps[1:] {
-		if resp.StatusCode < r.statusMin {
-			r.statusMin = resp.StatusCode
-		}
-		if resp.StatusCode > r.statusMax {
-			r.statusMax = resp.StatusCode
-		}
+	for _, resp := range resps {
+		r.statuses[resp.StatusCode] = struct{}{}
 		if resp.ContentLength < r.lengthMin {
 			r.lengthMin = resp.ContentLength
 		}
@@ -212,6 +244,26 @@ func captureBaselineRange(timeout int, validURL string) (baselineRange, error) {
 		}
 	}
 	return r, nil
+}
+
+// probeControl requests validURL with a fresh, random, practically
+// guaranteed-absent Host header and returns the response. It's used both to
+// build the initial baseline (captureBaselineRange) and, per candidate, as
+// a live "what does an unknown host look like right now" control -- see
+// sameEnvelope and its use in Run. Each invalid host is the same fixed
+// length (a 16-char hex token) so that a server echoing the Host header
+// into its response body doesn't itself introduce content-length variance
+// unrelated to real vhost differences.
+func probeControl(timeout int, validURL string) (*http.Response, error) {
+	token, err := randomToken()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.GetResponse(timeout, token+"-invalid.invalid", validURL)
+	if err != nil || resp == nil {
+		return nil, fmt.Errorf("control request failed: %w", err)
+	}
+	return resp, nil
 }
 
 func randomToken() (string, error) {

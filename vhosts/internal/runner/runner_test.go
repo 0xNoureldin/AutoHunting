@@ -1,8 +1,10 @@
 package runner
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 
 	vhttp "github.com/zomaxsec/vhoster/pkg/http"
@@ -110,5 +112,83 @@ func TestInRangeToleratesHostEchoingErrorPage(t *testing.T) {
 		if !baseline.inRange(get(host)) {
 			t.Errorf("%s: false positive against a host-echoing error page (ordinary-length candidate)", host)
 		}
+	}
+}
+
+// TestRunSurvivesMidScanDrift is a regression test for the false-positive
+// report where a 5000-word wordlist produced 5000 "discovered vhosts" --
+// literally every candidate flagged as a hit. That happens when something
+// about the target's responses changes partway through the scan (a WAF or
+// anti-bot defense kicking in after enough rapid requests, rate limiting,
+// etc.): the baseline was captured once at the very start, so once the
+// target's behavior drifts, EVERY remaining response -- real host or fake
+// -- looks different from that now-stale baseline. Run must confirm each
+// apparent hit against a live control probe taken at that same moment
+// rather than trusting the original baseline forever.
+func TestRunSurvivesMidScanDrift(t *testing.T) {
+	var requestCount int32
+	const driftAfter = 20
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		n := atomic.AddInt32(&requestCount, 1)
+
+		if r.Host == "real-admin.example.test" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("admin panel - a genuinely different vhost, present throughout the scan"))
+			return
+		}
+
+		if n <= driftAfter {
+			// Normal behavior at the start of the scan (covers the
+			// baseline capture and the first few candidates).
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("<html><body><h1>404 Not Found</h1></body></html>"))
+			return
+		}
+
+		// Simulated drift: from here on, EVERY unrecognized host (and,
+		// in a real WAF, arguably every host at all) gets a challenge
+		// page with a random per-request token, unrelated to vhost
+		// routing entirely.
+		token, _ := randomToken()
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("<html><body>Access denied - ray-id " + token + "</body></html>"))
+	}))
+	defer srv.Close()
+
+	hosts := []string{"real-admin.example.test"}
+	for i := 0; i < 200; i++ {
+		hosts = append(hosts, fmt.Sprintf("fake-word-%d.example.test", i))
+	}
+
+	// http.ProbeHTTP only tries a fixed list of ports and won't find this
+	// ephemeral-port test server, so this exercises the same detection
+	// logic Run's per-candidate loop uses (captureBaselineRange, then
+	// inRange + the probeControl/sameEnvelope confirmation) directly
+	// against srv.URL, rather than going through Run/ProbeHTTP.
+	const timeout = 5
+	baseline, err := captureBaselineRange(timeout, srv.URL)
+	if err != nil {
+		t.Fatalf("captureBaselineRange: %v", err)
+	}
+
+	var hits []string
+	for _, h := range hosts {
+		resp, err := vhttp.GetResponse(timeout, h, srv.URL)
+		if err != nil {
+			t.Fatalf("GetResponse(%q): %v", h, err)
+		}
+		if baseline.inRange(resp) {
+			continue
+		}
+		control, err := probeControl(timeout, srv.URL)
+		if err != nil || sameEnvelope(resp, control) {
+			continue
+		}
+		hits = append(hits, h)
+	}
+
+	if len(hits) != 1 || hits[0] != "real-admin.example.test" {
+		t.Fatalf("expected only real-admin.example.test to be flagged once drift kicks in, got %v (out of %d candidates)", hits, len(hosts))
 	}
 }
