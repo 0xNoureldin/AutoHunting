@@ -27,6 +27,27 @@ func TestWordlistStatus(t *testing.T) {
 	}
 }
 
+func TestLiveLogsStatus(t *testing.T) {
+	cases := []struct {
+		name              string
+		live, quietStages bool
+		want              string
+	}{
+		{"off, quiet-stages ignored", false, false, "off"},
+		{"off even with quiet-stages", false, true, "off"},
+		{"live, full raw stream", true, false, "on"},
+		{"live, quieted to banners/summaries only", true, true, "on (stage banners/summaries only, see quiet-stages)"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got := liveLogsStatus(c.live, c.quietStages)
+			if got != c.want {
+				t.Errorf("liveLogsStatus(%v, %v) = %q, want %q", c.live, c.quietStages, got, c.want)
+			}
+		})
+	}
+}
+
 func TestOnOff(t *testing.T) {
 	if got := onOff(true); got != "on" {
 		t.Errorf("onOff(true) = %q, want \"on\"", got)

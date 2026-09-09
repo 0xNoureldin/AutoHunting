@@ -308,6 +308,7 @@ go run . -d example.com -port-scan         # TCP port scan every discovered subd
 go run . -d example.com -port-scan -all-ports        # scan all 65535 ports instead
 go run . -d example.com -port-scan -ports 1-1000,8080,8443  # scan specific ports/ranges instead
 go run . -d example.com -live              # stream each stage's live output to the terminal
+go run . -d example.com -fuzz-subs -vhost -live -quiet-stages  # live, but banners/summaries only
 go run . -d example.com -o results/acme -c 20 -t 120
 go run . -h                                # full option list
 ```
@@ -363,7 +364,13 @@ of the full list. Off by default, independent of every other stage, and combinab
 them.
 
 By default, each stage's own output only goes into `oneclick.log`, keeping the terminal to
-oneClick's own progress lines. Pass `-live` to also stream it to the terminal as it happens.
+oneClick's own progress lines. Pass `-live` to also stream it to the terminal as it happens --
+each stage (subdomain/URL/vhost fuzzing especially) logs a line for every discovery and every
+network error as it runs, which is a lot of output on a large wordlist. Add `-quiet-stages`
+alongside `-live` to suppress that raw per-item stream from the terminal while still printing
+oneClick's own stage banners and the summary line after each stage finishes; the full raw
+output is unaffected in `oneclick.log` either way. `-quiet-stages` has no effect without
+`-live`, since nothing streams to the terminal in the first place.
 
 ## 🤝 Contributing
 

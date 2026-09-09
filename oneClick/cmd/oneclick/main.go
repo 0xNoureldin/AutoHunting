@@ -118,6 +118,13 @@ Options:
                               -active, -fuzz-subs, -fuzz-urls, or -vhost)
   -lv, -live                  Stream each stage's live output to the terminal as it runs, not
                               just to the log file. Off by default (quiet, log-file-only).
+  -qs, -quiet-stages          With -live, suppress each stage's raw internal output (every
+                              discovery/error line a sub-tool logs as it runs) from the
+                              terminal, while still printing oneClick's own stage banners and
+                              the summary line after each stage finishes. The full raw output
+                              is always written to the log file regardless -- this only
+                              affects what's mirrored to the terminal. No effect without
+                              -live (nothing streams to the terminal either way).
   -h, -help                  Show this help
 
 Examples:
@@ -132,6 +139,7 @@ Examples:
   go run . -d example.com -port-scan
   go run . -d example.com -port-scan -all-ports
   go run . -d example.com -port-scan -ports 1-1000,8080,8443
+  go run . -d example.com -fuzz-subs -vhost -live -quiet-stages  // live progress, no per-item spam
 `, bold, reset)
 }
 
@@ -147,6 +155,7 @@ func run() int {
 	var help bool
 	var fuzzSubs, fuzzUrls bool
 	var live bool
+	var quietStages bool
 	var mutations bool
 	var vhost bool
 	var portScan, allPorts bool
@@ -187,6 +196,8 @@ func run() int {
 	fs.StringVar(&portsSpec, "ports", "", "")
 	fs.BoolVar(&live, "live", false, "")
 	fs.BoolVar(&live, "lv", false, "")
+	fs.BoolVar(&quietStages, "quiet-stages", false, "")
+	fs.BoolVar(&quietStages, "qs", false, "")
 	fs.BoolVar(&help, "h", false, "")
 	fs.BoolVar(&help, "help", false, "")
 
@@ -339,6 +350,15 @@ func run() int {
 		return 1
 	}
 
+	// stageLive gates only the raw, unfiltered stdout/stderr of each
+	// sub-tool subprocess (discovery/error logs among it) being mirrored
+	// to the terminal. quiet-stages overrides -live for that mirror alone
+	// -- oneClick's own stage banners and per-stage summaries (step/ok/
+	// warn/logf) are printed directly by this process and always show
+	// regardless, and the full raw output always still goes to the log
+	// file either way (see runGoTool).
+	stageLive := live && !quietStages
+
 	mode, modeShort := "passive (fast)", "passive"
 	if active {
 		mode, modeShort = "active (deep, slower)", "active"
@@ -351,7 +371,7 @@ func run() int {
 	fmt.Printf("  fuzz urls:   %s\n", wordlistStatus(fuzzUrls, urlsWordlist))
 	fmt.Printf("  vhost:       %s\n", wordlistStatus(vhost, subsWordlist))
 	fmt.Printf("  port scan:   %s\n", portScanStatus(portScan, allPorts, portsSpec))
-	fmt.Printf("  live logs:   %s\n", onOff(live))
+	fmt.Printf("  live logs:   %s\n", liveLogsStatus(live, quietStages))
 	fmt.Printf("  concurrency: %d\n", concurrency)
 	fmt.Printf("  timeout:     %ds\n", timeout)
 	fmt.Printf("  output:      %s\n", outputDir)
@@ -397,7 +417,7 @@ func run() int {
 	if mutations {
 		subEnumArgs = append(subEnumArgs, "-mutations")
 	}
-	subEnumRC := runGoTool(filepath.Join(repoRoot, "SubEnum", "cmd", "subenum"), subEnumArgs, logFile, live)
+	subEnumRC := runGoTool(filepath.Join(repoRoot, "SubEnum", "cmd", "subenum"), subEnumArgs, logFile, stageLive)
 
 	// Always seed the discovered subdomains with the original target(s) so
 	// later stages still have something to work with even if enumeration
@@ -425,7 +445,7 @@ func run() int {
 	vhostCount, forbiddenCount := 0, 0
 	if vhost {
 		var vhostRC int
-		vhostRC, vhostCount, forbiddenCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, forbiddenPath, concurrency, timeout, logFile, live)
+		vhostRC, vhostCount, forbiddenCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, forbiddenPath, concurrency, timeout, logFile, stageLive)
 		subsCount = countNonEmptyLines(subsPath)
 		if vhostRC != 0 {
 			warn("vhost discovery exited with an error (see %s)", logPath)
@@ -453,7 +473,7 @@ func run() int {
 	portScanRC := 0
 	if portScan {
 		step("Port scanning")
-		portScanRC, portsCount, notablePortsCount = runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec, allPorts, concurrency, timeout, logFile, live)
+		portScanRC, portsCount, notablePortsCount = runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec, allPorts, concurrency, timeout, logFile, stageLive)
 		if portScanRC != 0 {
 			warn("portScanner exited with an error (see %s)", logPath)
 		} else if portsCount == 0 {
@@ -482,7 +502,7 @@ func run() int {
 	if urlsWordlist != "" {
 		urlEnumArgs = append(urlEnumArgs, "-w", urlsWordlist)
 	}
-	urlEnumRC := runGoTool(filepath.Join(repoRoot, "URLEnum", "cmd", "URLEnum"), urlEnumArgs, logFile, live)
+	urlEnumRC := runGoTool(filepath.Join(repoRoot, "URLEnum", "cmd", "URLEnum"), urlEnumArgs, logFile, stageLive)
 
 	touchFile(urlsPath)
 	urlsCount := countNonEmptyLines(urlsPath)
@@ -517,7 +537,7 @@ func run() int {
 			"-c", strconv.Itoa(concurrency),
 			"-timeout", strconv.Itoa(timeout),
 		}
-		jsAnalyzerRC = runGoTool(filepath.Join(repoRoot, "jsAnalyzer", "cmd"), jsAnalyzerArgs, logFile, live)
+		jsAnalyzerRC = runGoTool(filepath.Join(repoRoot, "jsAnalyzer", "cmd"), jsAnalyzerArgs, logFile, stageLive)
 		if jsAnalyzerRC != 0 {
 			warn("jsAnalyzer exited with an error (see %s)", logPath)
 		} else {
@@ -746,6 +766,22 @@ func onOff(b bool) string {
 		return "on"
 	}
 	return "off"
+}
+
+// liveLogsStatus describes the -live/-quiet-stages combination: off (the
+// default, nothing streams), on (full raw stage output streams), or on
+// but quieted (stage banners/summaries only, raw per-item stage output
+// suppressed from the terminal -- though always still written in full to
+// the log file).
+func liveLogsStatus(live, quietStages bool) string {
+	switch {
+	case !live:
+		return "off"
+	case quietStages:
+		return "on (stage banners/summaries only, see quiet-stages)"
+	default:
+		return "on"
+	}
 }
 
 func sanitizeName(s string) string {
