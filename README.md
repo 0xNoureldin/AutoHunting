@@ -310,6 +310,7 @@ go run . -d example.com -port-scan -ports 1-1000,8080,8443  # scan specific port
 go run . -d example.com -live              # stream each stage's live output to the terminal
 go run . -d example.com -fuzz-subs -vhost -live -quiet-stages  # live, but banners/summaries only
 go run . -d example.com -o results/acme -c 20 -t 120
+go run . -resume oneClick/results/example.com_20260909_030405  # pick up an interrupted run
 go run . -h                                # full option list
 ```
 Results (subdomains, vhost-discovered subdomains on their own when `-vhost` is used, every 403
@@ -371,6 +372,18 @@ alongside `-live` to suppress that raw per-item stream from the terminal while s
 oneClick's own stage banners and the summary line after each stage finishes; the full raw
 output is unaffected in `oneclick.log` either way. `-quiet-stages` has no effect without
 `-live`, since nothing streams to the terminal in the first place.
+
+Every run checkpoints its progress to `oneclick.state.json` in the output directory,
+updated as soon as each phase (subdomain enumeration, vhost discovery, port scanning, URL
+enumeration, secret scanning) finishes -- so if the run is interrupted (Ctrl+C, a crash, a
+closed terminal), nothing already completed is lost. Resume it with
+`-resume <output-dir>` (the directory printed as `output:` at the start of the run, and
+again in the message a Ctrl+C prints): it restores the original target and every flag
+automatically -- don't pass anything else alongside `-resume` -- skips whatever phases the
+state file marks done, and picks up with whatever's left. Resuming an already-fully-completed
+run is a harmless no-op that just regenerates `SUMMARY.txt`. `oneclick.log` is appended to
+across resumes rather than overwritten, so the full history of a multi-attempt run stays in
+one file.
 
 ## 🤝 Contributing
 

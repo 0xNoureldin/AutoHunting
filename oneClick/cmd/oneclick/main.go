@@ -15,6 +15,7 @@
 //	go run . -d example.com -fuzz-subs -fuzz-urls  // both
 //	go run . -d example.com -vhost                 // Host-header vhost discovery
 //	go run . -d example.com -port-scan             // TCP-connect port scan of discovered subdomains
+//	go run . -resume oneClick/results/example.com_20260909_030405 // resume an interrupted run
 package main
 
 import (
@@ -24,11 +25,13 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -66,6 +69,7 @@ func usage() {
 Usage:
   go run . -d <domain>       Run the pipeline against a single domain
   go run . -f <file>         Run the pipeline against a file of domains (one per line)
+  go run . -resume <dir>     Resume a previous (e.g. interrupted) run from its output directory
 
 Options:
   -d, -domain <domain>      Target domain, or comma separated domains
@@ -125,6 +129,13 @@ Options:
                               is always written to the log file regardless -- this only
                               affects what's mirrored to the terminal. No effect without
                               -live (nothing streams to the terminal either way).
+  -r, -resume <dir>          Resume an interrupted run from its output directory (the one
+                              printed as "output:" and in the interrupt message). Skips
+                              every pipeline phase (subdomain enumeration, vhost discovery,
+                              port scanning, URL enumeration, secret scanning) that already
+                              finished, and continues with whatever's left. Restores the
+                              original run's target and flags automatically -- don't combine
+                              -resume with any other flag.
   -h, -help                  Show this help
 
 Examples:
@@ -140,6 +151,7 @@ Examples:
   go run . -d example.com -port-scan -all-ports
   go run . -d example.com -port-scan -ports 1-1000,8080,8443
   go run . -d example.com -fuzz-subs -vhost -live -quiet-stages  // live progress, no per-item spam
+  go run . -resume oneClick/results/example.com_20260909_030405  // pick up an interrupted run
 `, bold, reset)
 }
 
@@ -161,6 +173,7 @@ func run() int {
 	var portScan, allPorts bool
 	var portsSpec string
 	var subsWordlistOverride, urlsWordlistOverride string
+	var resumeDir string
 	timeoutSet := false
 
 	fs := flag.NewFlagSet("oneclick", flag.ContinueOnError)
@@ -198,6 +211,8 @@ func run() int {
 	fs.BoolVar(&live, "lv", false, "")
 	fs.BoolVar(&quietStages, "quiet-stages", false, "")
 	fs.BoolVar(&quietStages, "qs", false, "")
+	fs.StringVar(&resumeDir, "resume", "", "")
+	fs.StringVar(&resumeDir, "r", "", "")
 	fs.BoolVar(&help, "h", false, "")
 	fs.BoolVar(&help, "help", false, "")
 
@@ -208,11 +223,48 @@ func run() int {
 		usage()
 		return 0
 	}
+	var explicitFlags []string
 	fs.Visit(func(f *flag.Flag) {
+		explicitFlags = append(explicitFlags, f.Name)
 		if f.Name == "t" || f.Name == "timeout" {
 			timeoutSet = true
 		}
 	})
+
+	if resumeDir != "" {
+		for _, name := range explicitFlags {
+			if name == "resume" || name == "r" {
+				continue
+			}
+			fail("-resume restores the original run's settings automatically; don't combine it with other flags (got -%s)", name)
+			return 1
+		}
+
+		st, err := loadRunState(resumeDir)
+		if err != nil {
+			fail("Could not load resume state from %s: %v", resumeDir, err)
+			return 1
+		}
+		cfg := st.Config
+		domain = cfg.Domain
+		domainFile = cfg.DomainFile
+		active = cfg.Active
+		concurrency = cfg.Concurrency
+		timeout = cfg.Timeout
+		timeoutSet = cfg.TimeoutSet
+		fuzzSubs = cfg.FuzzSubs
+		fuzzUrls = cfg.FuzzUrls
+		mutations = cfg.Mutations
+		vhost = cfg.Vhost
+		portScan = cfg.PortScan
+		allPorts = cfg.AllPorts
+		portsSpec = cfg.PortsSpec
+		live = cfg.Live
+		quietStages = cfg.QuietStages
+		subsWordlistOverride = cfg.SubsWordlistOverride
+		urlsWordlistOverride = cfg.UrlsWordlistOverride
+		outputDir = resumeDir
+	}
 
 	if domain == "" && domainFile == "" {
 		fail("You must provide either -d <domain> or -f <file>")
@@ -311,13 +363,70 @@ func run() int {
 		outputDir = abs
 	}
 
+	// st is the resume checkpoint for this output directory: loaded back
+	// from a previous run when -resume was given (its Completed phases
+	// tell the pipeline below what to skip), or freshly created and
+	// immediately saved otherwise, so that even an interruption before
+	// any phase finishes can still be resumed with the right config.
+	var st *runState
+	if resumeDir != "" {
+		st, err = loadRunState(outputDir)
+		if err != nil {
+			fail("Could not load resume state from %s: %v", outputDir, err)
+			return 1
+		}
+		ok("Resuming previous run in %s", outputDir)
+	} else {
+		st = newRunState(outputDir, runConfig{
+			Domain:               domain,
+			DomainFile:           domainFile,
+			Active:               active,
+			Concurrency:          concurrency,
+			Timeout:              timeout,
+			TimeoutSet:           timeoutSet,
+			FuzzSubs:             fuzzSubs,
+			FuzzUrls:             fuzzUrls,
+			Mutations:            mutations,
+			Vhost:                vhost,
+			PortScan:             portScan,
+			AllPorts:             allPorts,
+			PortsSpec:            portsSpec,
+			Live:                 live,
+			QuietStages:          quietStages,
+			SubsWordlistOverride: subsWordlistOverride,
+			UrlsWordlistOverride: urlsWordlistOverride,
+		})
+		if err := st.save(); err != nil {
+			fail("Could not write resume state: %v", err)
+			return 1
+		}
+	}
+
+	// A signal doesn't stop any sub-tool subprocess already running --
+	// Ctrl+C delivers SIGINT to this whole foreground process group, so
+	// the subprocess dies on its own too -- this just makes sure the user
+	// sees how to pick the run back up instead of losing that information
+	// when the terminal returns to a bare prompt.
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-sigCh
+		fmt.Println()
+		warn("Interrupted -- progress so far is saved. Resume with:")
+		fmt.Printf("  go run . -resume %s\n", outputDir)
+		os.Exit(130)
+	}()
+
 	logPath := filepath.Join(outputDir, "oneclick.log")
-	logFile, err := os.Create(logPath)
+	logFile, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
-		fail("Could not create log file: %v", err)
+		fail("Could not open log file: %v", err)
 		return 1
 	}
 	defer logFile.Close()
+	if resumeDir != "" {
+		fmt.Fprintf(logFile, "\n=== Resumed at %s ===\n", time.Now().UTC().Format(time.RFC3339))
+	}
 
 	inputDomainsPath := filepath.Join(outputDir, "input_domains.txt")
 	var rawDomains []string
@@ -394,37 +503,47 @@ func run() int {
 	// Stage 1: Subdomain enumeration (SubEnum)
 	// -------------------------------------------------------------------
 	step("Stage 1/3: Subdomain enumeration")
-	// DNS brute-force queries are cheap and parallelize far better than
-	// HTTP work (a dead candidate can mean up to 8 sequential resolver
-	// round trips), so a wordlist of thousands of candidates needs more
-	// concurrency than the default to finish in reasonable time.
-	subEnumConcurrency := concurrency
-	if fuzzSubs && subsWordlist != "" && subEnumConcurrency < 50 {
-		subEnumConcurrency = 50
-	}
-	subEnumArgs := append([]string{
-		"-i", inputDomainsPath,
-		"-o", subsPath,
-		"-c", strconv.Itoa(subEnumConcurrency),
-		"-timeout", strconv.Itoa(timeout),
-	}, activeFlag...)
-	// subsWordlist is also prepared for -vhost alone, which must NOT imply
-	// SubEnum's own DNS brute-force -- only pass -w through when the user
-	// actually asked for -fuzz-subs (or -sw, which implies it above).
-	if fuzzSubs && subsWordlist != "" {
-		subEnumArgs = append(subEnumArgs, "-w", subsWordlist)
-	}
-	if mutations {
-		subEnumArgs = append(subEnumArgs, "-mutations")
-	}
-	subEnumRC := runGoTool(filepath.Join(repoRoot, "SubEnum", "cmd", "subenum"), subEnumArgs, logFile, stageLive)
+	subEnumRC := 0
+	if st.Completed.Subdomains {
+		ok("Already completed (resumed), skipping")
+	} else {
+		// DNS brute-force queries are cheap and parallelize far better than
+		// HTTP work (a dead candidate can mean up to 8 sequential resolver
+		// round trips), so a wordlist of thousands of candidates needs more
+		// concurrency than the default to finish in reasonable time.
+		subEnumConcurrency := concurrency
+		if fuzzSubs && subsWordlist != "" && subEnumConcurrency < 50 {
+			subEnumConcurrency = 50
+		}
+		subEnumArgs := append([]string{
+			"-i", inputDomainsPath,
+			"-o", subsPath,
+			"-c", strconv.Itoa(subEnumConcurrency),
+			"-timeout", strconv.Itoa(timeout),
+		}, activeFlag...)
+		// subsWordlist is also prepared for -vhost alone, which must NOT
+		// imply SubEnum's own DNS brute-force -- only pass -w through when
+		// the user actually asked for -fuzz-subs (or -sw, which implies
+		// it above).
+		if fuzzSubs && subsWordlist != "" {
+			subEnumArgs = append(subEnumArgs, "-w", subsWordlist)
+		}
+		if mutations {
+			subEnumArgs = append(subEnumArgs, "-mutations")
+		}
+		subEnumRC = runGoTool(filepath.Join(repoRoot, "SubEnum", "cmd", "subenum"), subEnumArgs, logFile, stageLive)
 
-	// Always seed the discovered subdomains with the original target(s) so
-	// later stages still have something to work with even if enumeration
-	// finds nothing, and drop any garbage lines a flaky source may inject.
-	if err := mergeSanitizedHosts(inputDomainsPath, subsPath); err != nil {
-		fail("Could not merge subdomain results: %v", err)
-		return 1
+		// Always seed the discovered subdomains with the original
+		// target(s) so later stages still have something to work with
+		// even if enumeration finds nothing, and drop any garbage lines a
+		// flaky source may inject.
+		if err := mergeSanitizedHosts(inputDomainsPath, subsPath); err != nil {
+			fail("Could not merge subdomain results: %v", err)
+			return 1
+		}
+		if err := st.markDone(func(c *completedPhases) { c.Subdomains = true }); err != nil {
+			warn("Could not save resume state: %v", err)
+		}
 	}
 	subsCount := countNonEmptyLines(subsPath)
 	if subEnumRC != 0 {
@@ -444,18 +563,28 @@ func run() int {
 	// DNS config.
 	vhostCount, forbiddenCount := 0, 0
 	if vhost {
-		var vhostRC int
-		vhostRC, vhostCount, forbiddenCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, forbiddenPath, concurrency, timeout, logFile, stageLive)
-		subsCount = countNonEmptyLines(subsPath)
-		if vhostRC != 0 {
-			warn("vhost discovery exited with an error (see %s)", logPath)
-		} else if vhostCount == 0 {
-			ok("No vhosts discovered")
+		if st.Completed.Vhost {
+			vhostCount = countNonEmptyLines(vhostSubsPath)
+			forbiddenCount = countNonEmptyLines(forbiddenPath)
+			subsCount = countNonEmptyLines(subsPath)
+			ok("Already completed (resumed), skipping: %d vhost(s), %d 403(s)", vhostCount, forbiddenCount)
 		} else {
-			ok("Discovered %d vhost(s) -> %s (merged into %s, now %d total)", vhostCount, vhostSubsPath, subsPath, subsCount)
-		}
-		if forbiddenCount > 0 {
-			ok("%d candidate(s) returned 403 Forbidden, worth a manual look -> %s", forbiddenCount, forbiddenPath)
+			var vhostRC int
+			vhostRC, vhostCount, forbiddenCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, forbiddenPath, concurrency, timeout, logFile, stageLive)
+			subsCount = countNonEmptyLines(subsPath)
+			if vhostRC != 0 {
+				warn("vhost discovery exited with an error (see %s)", logPath)
+			} else if vhostCount == 0 {
+				ok("No vhosts discovered")
+			} else {
+				ok("Discovered %d vhost(s) -> %s (merged into %s, now %d total)", vhostCount, vhostSubsPath, subsPath, subsCount)
+			}
+			if forbiddenCount > 0 {
+				ok("%d candidate(s) returned 403 Forbidden, worth a manual look -> %s", forbiddenCount, forbiddenPath)
+			}
+			if err := st.markDone(func(c *completedPhases) { c.Vhost = true }); err != nil {
+				warn("Could not save resume state: %v", err)
+			}
 		}
 	}
 	// Always leave vhost_subdomains.txt and 403.txt in place (empty if
@@ -473,13 +602,22 @@ func run() int {
 	portScanRC := 0
 	if portScan {
 		step("Port scanning")
-		portScanRC, portsCount, notablePortsCount = runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec, allPorts, concurrency, timeout, logFile, stageLive)
-		if portScanRC != 0 {
-			warn("portScanner exited with an error (see %s)", logPath)
-		} else if portsCount == 0 {
-			ok("No open ports found")
+		if st.Completed.PortScan {
+			portsCount = countNonEmptyLines(portsPath)
+			notablePortsCount = countNonEmptyLines(portScanningPath)
+			ok("Already completed (resumed), skipping: %d open port(s)", portsCount)
 		} else {
-			ok("Found %d open port(s) -> %s (%d not on 80/443 -> %s)", portsCount, portsPath, notablePortsCount, portScanningPath)
+			portScanRC, portsCount, notablePortsCount = runPortScan(repoRoot, subsPath, portsPath, portScanningPath, portsSpec, allPorts, concurrency, timeout, logFile, stageLive)
+			if portScanRC != 0 {
+				warn("portScanner exited with an error (see %s)", logPath)
+			} else if portsCount == 0 {
+				ok("No open ports found")
+			} else {
+				ok("Found %d open port(s) -> %s (%d not on 80/443 -> %s)", portsCount, portsPath, notablePortsCount, portScanningPath)
+			}
+			if err := st.markDone(func(c *completedPhases) { c.PortScan = true }); err != nil {
+				warn("Could not save resume state: %v", err)
+			}
 		}
 	}
 	// Always leave ports.txt/portScanning.txt in place (empty if
@@ -492,17 +630,25 @@ func run() int {
 	// Stage 2: URL enumeration (URLEnum)
 	// -------------------------------------------------------------------
 	step("Stage 2/3: URL enumeration")
-	urlEnumArgs := append([]string{
-		"-i", subsPath, "-subs",
-		"-o", urlsPath,
-		"-pc", strconv.Itoa(concurrency),
-		"-ac", strconv.Itoa(concurrency * 2),
-		"-timeout", strconv.Itoa(timeout),
-	}, activeFlag...)
-	if urlsWordlist != "" {
-		urlEnumArgs = append(urlEnumArgs, "-w", urlsWordlist)
+	urlEnumRC := 0
+	if st.Completed.URLEnum {
+		ok("Already completed (resumed), skipping")
+	} else {
+		urlEnumArgs := append([]string{
+			"-i", subsPath, "-subs",
+			"-o", urlsPath,
+			"-pc", strconv.Itoa(concurrency),
+			"-ac", strconv.Itoa(concurrency * 2),
+			"-timeout", strconv.Itoa(timeout),
+		}, activeFlag...)
+		if urlsWordlist != "" {
+			urlEnumArgs = append(urlEnumArgs, "-w", urlsWordlist)
+		}
+		urlEnumRC = runGoTool(filepath.Join(repoRoot, "URLEnum", "cmd", "URLEnum"), urlEnumArgs, logFile, stageLive)
+		if err := st.markDone(func(c *completedPhases) { c.URLEnum = true }); err != nil {
+			warn("Could not save resume state: %v", err)
+		}
 	}
-	urlEnumRC := runGoTool(filepath.Join(repoRoot, "URLEnum", "cmd", "URLEnum"), urlEnumArgs, logFile, stageLive)
 
 	touchFile(urlsPath)
 	urlsCount := countNonEmptyLines(urlsPath)
@@ -516,32 +662,41 @@ func run() int {
 	// Stage 3: JS secret scanning (jsAnalyzer)
 	// -------------------------------------------------------------------
 	step("Stage 3/3: JS secret scanning")
-	if err := filterJSURLs(urlsPath, jsPath); err != nil {
-		fail("Could not filter JS URLs: %v", err)
-		return 1
-	}
-	jsCount := countNonEmptyLines(jsPath)
 	jsAnalyzerRC := 0
-	if jsCount == 0 {
-		warn("No JS files found in URLEnum output, skipping secret scan")
-		if err := os.WriteFile(secretsPath, []byte("[]\n"), 0o644); err != nil {
-			fail("Could not write empty secrets file: %v", err)
+	var jsCount int
+	if st.Completed.Secrets {
+		jsCount = countNonEmptyLines(jsPath)
+		ok("Already completed (resumed), skipping -> %s", secretsPath)
+	} else {
+		if err := filterJSURLs(urlsPath, jsPath); err != nil {
+			fail("Could not filter JS URLs: %v", err)
 			return 1
 		}
-	} else {
-		logf("Scanning %d JS file(s) for secrets", jsCount)
-		jsAnalyzerArgs := []string{
-			"-i", jsPath,
-			"-o", secretsPath,
-			"-only", "secrets",
-			"-c", strconv.Itoa(concurrency),
-			"-timeout", strconv.Itoa(timeout),
-		}
-		jsAnalyzerRC = runGoTool(filepath.Join(repoRoot, "jsAnalyzer", "cmd"), jsAnalyzerArgs, logFile, stageLive)
-		if jsAnalyzerRC != 0 {
-			warn("jsAnalyzer exited with an error (see %s)", logPath)
+		jsCount = countNonEmptyLines(jsPath)
+		if jsCount == 0 {
+			warn("No JS files found in URLEnum output, skipping secret scan")
+			if err := os.WriteFile(secretsPath, []byte("[]\n"), 0o644); err != nil {
+				fail("Could not write empty secrets file: %v", err)
+				return 1
+			}
 		} else {
-			ok("Secret scan results -> %s", secretsPath)
+			logf("Scanning %d JS file(s) for secrets", jsCount)
+			jsAnalyzerArgs := []string{
+				"-i", jsPath,
+				"-o", secretsPath,
+				"-only", "secrets",
+				"-c", strconv.Itoa(concurrency),
+				"-timeout", strconv.Itoa(timeout),
+			}
+			jsAnalyzerRC = runGoTool(filepath.Join(repoRoot, "jsAnalyzer", "cmd"), jsAnalyzerArgs, logFile, stageLive)
+			if jsAnalyzerRC != 0 {
+				warn("jsAnalyzer exited with an error (see %s)", logPath)
+			} else {
+				ok("Secret scan results -> %s", secretsPath)
+			}
+		}
+		if err := st.markDone(func(c *completedPhases) { c.Secrets = true }); err != nil {
+			warn("Could not save resume state: %v", err)
 		}
 	}
 
