@@ -122,8 +122,20 @@ Options:
                               ranges instead of the default top 100 (e.g. 80,443,8000-8100).
                               Implies -port-scan and overrides -all-ports.
   -c, -concurrency <n>       Concurrency used across stages (default: 10)
-  -t, -timeout <seconds>     Per-request timeout used across stages (default: 60, 300 with
-                              -active, -fuzz-subs, -fuzz-urls, or -vhost)
+  -t, -timeout <seconds>     Per-request timeout for every "normal" request across stages --
+                              subdomain enumeration, vhost discovery, the 403 check, port
+                              scanning, and JS secret scanning (default: 60, 300 with -active,
+                              -fuzz-subs, -fuzz-urls, or -vhost). Does not affect URL
+                              enumeration; see -url-timeout for that.
+  -ut, -url-timeout <seconds> Per-request timeout for URL enumeration specifically, both its
+                              passive and active phases (default: 60, 300 with -active or
+                              -fuzz-urls). Kept separate from -timeout because URL
+                              enumeration's own requests (a full page crawl/headless load per
+                              seed with -active, or a wordlist fuzz of thousands of paths per
+                              seed with -fuzz-urls) can legitimately need much more time per
+                              request than a plain subdomain/vhost/port probe does -- sharing
+                              one timeout meant bumping it for URL enumeration also made every
+                              other stage wait just as long on a single slow request.
   -lv, -live                  Stream each stage's live output to the terminal as it runs, not
                               just to the log file. Off by default (quiet, log-file-only).
   -qs, -quiet-stages          With -live, suppress each stage's raw internal output (every
@@ -157,6 +169,7 @@ Examples:
   go run . -d example.com
   go run . -f domains.txt -o results/acme
   go run . -d example.com -active -c 20
+  go run . -d example.com -active -fuzz-urls -t 30 -ut 600  // short timeout everywhere except URL enumeration
   go run . -d example.com -fuzz-subs
   go run . -d example.com -fuzz-urls
   go run . -d example.com -fuzz-subs -sw my-subs.txt -fuzz-urls -uw my-paths.txt
@@ -180,6 +193,7 @@ func run() int {
 	var active bool
 	var concurrency int
 	var timeout int
+	var urlTimeout int
 	var help bool
 	var fuzzSubs, fuzzUrls bool
 	var live bool
@@ -191,6 +205,7 @@ func run() int {
 	var subsWordlistOverride, urlsWordlistOverride string
 	var resumeDir string
 	timeoutSet := false
+	urlTimeoutSet := false
 
 	fs := flag.NewFlagSet("oneclick", flag.ContinueOnError)
 	fs.Usage = usage
@@ -206,6 +221,8 @@ func run() int {
 	fs.IntVar(&concurrency, "concurrency", 10, "")
 	fs.IntVar(&timeout, "t", 60, "")
 	fs.IntVar(&timeout, "timeout", 60, "")
+	fs.IntVar(&urlTimeout, "ut", 60, "")
+	fs.IntVar(&urlTimeout, "url-timeout", 60, "")
 	fs.BoolVar(&fuzzSubs, "fs", false, "")
 	fs.BoolVar(&fuzzSubs, "fuzz-subs", false, "")
 	fs.BoolVar(&fuzzUrls, "fu", false, "")
@@ -245,6 +262,9 @@ func run() int {
 		if f.Name == "t" || f.Name == "timeout" {
 			timeoutSet = true
 		}
+		if f.Name == "ut" || f.Name == "url-timeout" {
+			urlTimeoutSet = true
+		}
 	})
 
 	if resumeDir != "" {
@@ -268,6 +288,8 @@ func run() int {
 		concurrency = cfg.Concurrency
 		timeout = cfg.Timeout
 		timeoutSet = cfg.TimeoutSet
+		urlTimeout = cfg.URLTimeout
+		urlTimeoutSet = cfg.URLTimeoutSet
 		fuzzSubs = cfg.FuzzSubs
 		fuzzUrls = cfg.FuzzUrls
 		mutations = cfg.Mutations
@@ -317,14 +339,7 @@ func run() int {
 		portScan = true
 	}
 
-	if (active || fuzzSubs || fuzzUrls || vhost) && !timeoutSet {
-		// All are deep/slow techniques: -active budgets a full crawl or
-		// headless page load per seed, and each fuzz/vhost stage budgets
-		// working through a wordlist of thousands of candidates per seed
-		// (subdomain DNS brute-force has its own short, fixed per-query
-		// timeout regardless of this).
-		timeout = 300
-	}
+	timeout, urlTimeout = resolveTimeouts(timeout, timeoutSet, urlTimeout, urlTimeoutSet, active, fuzzSubs, fuzzUrls, vhost)
 
 	repoRoot, err := findRepoRoot()
 	if err != nil {
@@ -400,6 +415,8 @@ func run() int {
 			Concurrency:          concurrency,
 			Timeout:              timeout,
 			TimeoutSet:           timeoutSet,
+			URLTimeout:           urlTimeout,
+			URLTimeoutSet:        urlTimeoutSet,
 			FuzzSubs:             fuzzSubs,
 			FuzzUrls:             fuzzUrls,
 			Mutations:            mutations,
@@ -498,7 +515,8 @@ func run() int {
 	fmt.Printf("  port scan:   %s\n", portScanStatus(portScan, allPorts, portsSpec))
 	fmt.Printf("  live logs:   %s\n", liveLogsStatus(live, quietStages))
 	fmt.Printf("  concurrency: %d\n", concurrency)
-	fmt.Printf("  timeout:     %ds\n", timeout)
+	fmt.Printf("  timeout:     %ds (normal requests)\n", timeout)
+	fmt.Printf("  url timeout: %ds (URL enumeration)\n", urlTimeout)
 	fmt.Printf("  output:      %s\n", outputDir)
 
 	subsPath := filepath.Join(outputDir, "subdomains.txt")
@@ -714,7 +732,7 @@ func run() int {
 			"-o", urlsPath,
 			"-pc", strconv.Itoa(concurrency),
 			"-ac", strconv.Itoa(concurrency * 2),
-			"-timeout", strconv.Itoa(timeout),
+			"-timeout", strconv.Itoa(urlTimeout),
 		}, activeFlag...)
 		if urlsWordlist != "" {
 			urlEnumArgs = append(urlEnumArgs, "-w", urlsWordlist)
@@ -994,6 +1012,25 @@ func wordlistStatus(enabled bool, wordlist string) string {
 	default:
 		return "requested, but unavailable (see warnings above)"
 	}
+}
+
+// resolveTimeouts applies the "default to 300s under a deep/slow flag,
+// unless the user set it explicitly" rule to both timeouts. timeout covers
+// every stage except URL enumeration (subdomain enumeration, vhost
+// discovery, the 403 check, port scanning, JS secret scanning) and is
+// bumped by any of the deep/slow flags. urlTimeout covers URL enumeration
+// alone (both its passive and active phases) and is bumped only by the
+// flags that actually slow *that* stage down (-active, -fuzz-urls) --
+// -fuzz-subs and -vhost don't touch URL enumeration's own workload, so
+// they leave urlTimeout at its default.
+func resolveTimeouts(timeout int, timeoutSet bool, urlTimeout int, urlTimeoutSet bool, active, fuzzSubs, fuzzUrls, vhost bool) (int, int) {
+	if (active || fuzzSubs || fuzzUrls || vhost) && !timeoutSet {
+		timeout = 300
+	}
+	if (active || fuzzUrls) && !urlTimeoutSet {
+		urlTimeout = 300
+	}
+	return timeout, urlTimeout
 }
 
 func onOff(b bool) string {

@@ -23,6 +23,8 @@ type runConfig struct {
 	Concurrency          int    `json:"concurrency"`
 	Timeout              int    `json:"timeout"`
 	TimeoutSet           bool   `json:"timeoutSet"`
+	URLTimeout           int    `json:"urlTimeout"`
+	URLTimeoutSet        bool   `json:"urlTimeoutSet"`
 	FuzzSubs             bool   `json:"fuzzSubs"`
 	FuzzUrls             bool   `json:"fuzzUrls"`
 	Mutations            bool   `json:"mutations"`

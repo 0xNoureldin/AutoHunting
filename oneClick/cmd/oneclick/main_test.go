@@ -27,6 +27,68 @@ func TestWordlistStatus(t *testing.T) {
 	}
 }
 
+func TestResolveTimeouts(t *testing.T) {
+	cases := []struct {
+		name                              string
+		timeout, urlTimeout               int
+		timeoutSet, urlTimeoutSet         bool
+		active, fuzzSubs, fuzzUrls, vhost bool
+		wantTimeout, wantURLTimeout       int
+	}{
+		{
+			name:    "nothing set, no deep flags -- both stay at their defaults",
+			timeout: 60, urlTimeout: 60,
+			wantTimeout: 60, wantURLTimeout: 60,
+		},
+		{
+			name:    "-active bumps both",
+			timeout: 60, urlTimeout: 60,
+			active:      true,
+			wantTimeout: 300, wantURLTimeout: 300,
+		},
+		{
+			name:    "-fuzz-urls bumps both (URL enumeration's own wordlist fuzz)",
+			timeout: 60, urlTimeout: 60,
+			fuzzUrls:    true,
+			wantTimeout: 300, wantURLTimeout: 300,
+		},
+		{
+			name:    "-fuzz-subs bumps only the normal-request timeout, not URL enumeration's",
+			timeout: 60, urlTimeout: 60,
+			fuzzSubs:    true,
+			wantTimeout: 300, wantURLTimeout: 60,
+		},
+		{
+			name:    "-vhost bumps only the normal-request timeout, not URL enumeration's",
+			timeout: 60, urlTimeout: 60,
+			vhost:       true,
+			wantTimeout: 300, wantURLTimeout: 60,
+		},
+		{
+			name:    "explicit -t survives -active, explicit -ut survives too",
+			timeout: 45, urlTimeout: 90,
+			timeoutSet: true, urlTimeoutSet: true,
+			active:      true,
+			wantTimeout: 45, wantURLTimeout: 90,
+		},
+		{
+			name:    "explicit -t alone leaves url timeout to be bumped independently",
+			timeout: 45, urlTimeout: 60,
+			timeoutSet:  true,
+			active:      true,
+			wantTimeout: 45, wantURLTimeout: 300,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			gotTimeout, gotURLTimeout := resolveTimeouts(c.timeout, c.timeoutSet, c.urlTimeout, c.urlTimeoutSet, c.active, c.fuzzSubs, c.fuzzUrls, c.vhost)
+			if gotTimeout != c.wantTimeout || gotURLTimeout != c.wantURLTimeout {
+				t.Errorf("resolveTimeouts(...) = (%d, %d), want (%d, %d)", gotTimeout, gotURLTimeout, c.wantTimeout, c.wantURLTimeout)
+			}
+		})
+	}
+}
+
 func TestLiveLogsStatus(t *testing.T) {
 	cases := []struct {
 		name              string

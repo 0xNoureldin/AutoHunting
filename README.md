@@ -313,6 +313,7 @@ go run . -d example.com -port-scan -ports 1-1000,8080,8443  # scan specific port
 go run . -d example.com -live              # stream each stage's live output to the terminal
 go run . -d example.com -fuzz-subs -vhost -live -quiet-stages  # live, but banners/summaries only
 go run . -d example.com -o results/acme -c 20 -t 120
+go run . -d example.com -active -fuzz-urls -t 30 -ut 600   # short timeout everywhere except URL enumeration
 go run . -resume oneClick/results/example.com_20260909_030405  # pick up an interrupted run
 go run . -h                                # full option list
 ```
@@ -332,8 +333,21 @@ enumeration — and independently of `-active`/`-mutations`, so any combination 
 use each downloads and caches its own SecLists wordlist (`subdomains-top1million-5000.txt`,
 `common.txt`) into `oneClick/wordlists/`; pass `-sw <path>`/`-uw <path>` to use your own
 instead (which also implies the matching `-fuzz-subs`/`-fuzz-urls`, so you don't need both).
-Like `-active`, they're thorough but slow (thousands of candidates per target), so either one
-also bumps the default timeout to 300s unless `-t` is set explicitly.
+Like `-active`, they're thorough but slow (thousands of candidates per target). `-fuzz-subs`
+bumps the default normal-request timeout (`-t`) to 300s unless set explicitly; `-fuzz-urls`
+bumps both `-t` and URL enumeration's own timeout (`-ut`/`-url-timeout`, see below) to 300s,
+since it directly affects URL enumeration's own workload.
+
+oneClick tracks two separate per-request timeouts: `-t`/`-timeout` for every "normal" stage
+(subdomain enumeration, vhost discovery, the 403 check, port scanning, JS secret scanning),
+and `-ut`/`-url-timeout` for URL enumeration alone (its passive and active phases alike).
+They're kept apart because URL enumeration's own requests -- a full page crawl/headless load
+per seed with `-active`, or a wordlist fuzz of thousands of paths per seed with `-fuzz-urls`
+-- can legitimately need much more time per request than a plain subdomain/vhost/port probe
+does; sharing one timeout used to mean bumping it for URL enumeration's sake made every other
+stage wait just as long on a single slow request too. Both default to 60s, and each is bumped
+to 300s independently by the flags that actually slow down what it covers (`-active` bumps
+both; `-fuzz-subs` and `-vhost` bump only `-t`; `-fuzz-urls` bumps both) unless set explicitly.
 
 `-mutations` enables alterx permutation-based subdomain guessing (e.g. trying `dev-api` and
 `api-dev` once `api` is known). It's off by default and independent of `-active`, `-fuzz-subs`,
@@ -365,7 +379,8 @@ from vhost fuzzing alone. A candidate whose 403 Forbidden is, by that same live-
 genuinely distinct from what an unrecognized host gets right now is written to
 `vhost_403.txt`. Off by default, independent of
 `-active`/`-mutations`/`-fuzz-subs`/`-fuzz-urls`, and combinable with any of them; also bumps
-the default timeout to 300s unless `-t` is set explicitly.
+the default normal-request timeout (`-t`) to 300s unless set explicitly -- it doesn't touch
+`-url-timeout`, since vhost discovery doesn't run URL enumeration.
 
 Once every subdomain is known -- from passive sources, `-fuzz-subs`, and `-vhost` alike --
 every one of them is probed directly, on its own hostname, for a 403 Forbidden response.

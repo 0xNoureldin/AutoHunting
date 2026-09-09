@@ -9,13 +9,15 @@ func TestRunStateSaveAndLoadRoundTrip(t *testing.T) {
 	dir := t.TempDir()
 
 	cfg := runConfig{
-		Domain:      "example.com",
-		Concurrency: 20,
-		Timeout:     120,
-		TimeoutSet:  true,
-		FuzzSubs:    true,
-		Vhost:       true,
-		PortsSpec:   "80,443,8080",
+		Domain:        "example.com",
+		Concurrency:   20,
+		Timeout:       120,
+		TimeoutSet:    true,
+		URLTimeout:    600,
+		URLTimeoutSet: true,
+		FuzzSubs:      true,
+		Vhost:         true,
+		PortsSpec:     "80,443,8080",
 	}
 	st := newRunState(dir, cfg)
 	if err := st.save(); err != nil {
