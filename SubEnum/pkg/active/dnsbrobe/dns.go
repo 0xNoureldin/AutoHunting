@@ -32,11 +32,26 @@ func runDnsProbe(timeout int, host string) *ProbeResult {
 		wildcardHash = getHashForResults(wildCardType)
 	}
 
+	// client.Query only errors on a genuine network/transport failure
+	// (timeout, connection refused, ...) -- a clean "doesn't exist" comes
+	// back as err == nil with an NXDOMAIN/empty-answer status, so this
+	// never fires for the ordinary case of most brute-force candidates
+	// simply not existing. Track it per-host rather than per-resolver
+	// attempt: one flaky resolver among several shouldn't be reported as
+	// if the whole probe failed.
+	var queryErr error
+	resolved := false
+
 resolversLabel:
 	for _, r := range client.DefaultResolvers {
 		foundAny := false
 		result, err := client.Query(host, timeout, dns.TypeA, r)
-		if err != nil || result == nil {
+		if err != nil {
+			queryErr = err
+			continue
+		}
+		resolved = true
+		if result == nil {
 			continue
 		}
 
@@ -54,6 +69,10 @@ resolversLabel:
 		if foundAny {
 			break resolversLabel
 		}
+	}
+
+	if !resolved && queryErr != nil {
+		logify.Errorf("DNS probe for %s: every resolver failed, last error: %v", host, queryErr)
 	}
 
 	return &ProbeResult{
@@ -94,6 +113,7 @@ func ProbeSubdomains(subdomains []string, timeout int, concurrency int) []string
 
 			// If subdomain has valid DNS records, it's alive
 			if len(result.Results) > 0 {
+				logify.Infof("Discovered alive subdomain: %s", host)
 				mu.Lock()
 				aliveSubdomains = append(aliveSubdomains, host)
 				mu.Unlock()

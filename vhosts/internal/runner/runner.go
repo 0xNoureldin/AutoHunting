@@ -100,11 +100,13 @@ func Run(opts *Options) error {
 				// Generate valid HTTP URL for this IP
 				validURL := http.ProbeHTTP(ipAddr, opts.Timeout)
 				if validURL == "" {
+					logify.Errorf("vhost: %s has no reachable HTTP(S) port, skipping", ipAddr)
 					return
 				}
 
 				baseline, err := captureBaselineRange(opts.Timeout, validURL)
 				if err != nil {
+					logify.Errorf("vhost: could not establish a baseline for %s: %v", validURL, err)
 					return
 				}
 
@@ -125,6 +127,7 @@ func Run(opts *Options) error {
 						// Send request with Host header set to the domain
 						vhostResp, err := http.GetResponse(opts.Timeout, h, validURL)
 						if err != nil {
+							logify.Errorf("vhost: request to %s (Host: %s) failed: %v", validURL, h, err)
 							return
 						}
 
@@ -132,6 +135,7 @@ func Run(opts *Options) error {
 						// silently swallowed just because it also happens to
 						// match the baseline (see forbiddenMap's comment).
 						if vhostResp.StatusCode == httpStatusForbidden {
+							logify.Infof("vhost: %s -> %s returned 403 Forbidden, recorded for manual follow-up", h, ipAddr)
 							mu.Lock()
 							forbiddenMap[ipAddr] = append(forbiddenMap[ipAddr], h)
 							mu.Unlock()
@@ -157,10 +161,15 @@ func Run(opts *Options) error {
 						// control probe itself fails, we can't rule that out, so
 						// we don't report a hit either.
 						control, err := probeControl(opts.Timeout, validURL)
-						if err != nil || sameEnvelope(vhostResp, control) {
+						if err != nil {
+							logify.Errorf("vhost: control probe against %s failed, cannot confirm %s: %v", validURL, h, err)
+							return
+						}
+						if sameEnvelope(vhostResp, control) {
 							return
 						}
 
+						logify.Infof("vhost: discovered %s -> %s (status %d, %d bytes)", h, ipAddr, vhostResp.StatusCode, vhostResp.ContentLength)
 						mu.Lock()
 						resultMap[ipAddr] = append(resultMap[ipAddr], h)
 						mu.Unlock()

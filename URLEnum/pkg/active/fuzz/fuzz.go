@@ -125,17 +125,25 @@ func Enumerate(ctx context.Context, seed string, wordlist []string, opts Options
 				}
 
 				fp, err := probe(ctx, client, target, opts.Method)
-				mu.Lock()
-				tried++
 				if err != nil {
+					mu.Lock()
+					tried++
 					failed++
 					mu.Unlock()
+					logify.Errorf("fuzz: request to %s failed: %v", target, err)
 					continue
 				}
-				if !baseline.inRange(fp) {
+
+				isHit := !baseline.inRange(fp)
+				mu.Lock()
+				tried++
+				if isHit {
 					found = append(found, target)
 				}
 				mu.Unlock()
+				if isHit {
+					logify.Infof("fuzz: found %s (status %d, %d bytes)", target, fp.StatusCode, fp.ContentLength)
+				}
 			}
 		}()
 	}
