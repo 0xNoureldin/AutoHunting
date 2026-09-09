@@ -7,13 +7,29 @@ import (
 	"strings"
 )
 
+// ReadInputFromFile reads one entry per line, trimming whitespace and
+// dropping blank lines and "#"-prefixed comments. A trailing newline --
+// the normal case for any file written by a text editor or by this
+// codebase's own writeLines-style helpers -- would otherwise produce a
+// spurious empty final entry (strings.Split on "a\n" returns ["a", ""]),
+// which callers that don't do their own filtering (like the domain list
+// in loadQueries) would silently enumerate as a real query.
 func ReadInputFromFile(file string) ([]string, error) {
-
 	fileData, err := os.ReadFile(file)
 	if err != nil {
 		return []string{}, err
 	}
-	return strings.Split(string(fileData), "\n"), nil
+
+	lines := strings.Split(string(fileData), "\n")
+	cleaned := make([]string, 0, len(lines))
+	for _, l := range lines {
+		l = strings.TrimSpace(l)
+		if l == "" || strings.HasPrefix(l, "#") {
+			continue
+		}
+		cleaned = append(cleaned, l)
+	}
+	return cleaned, nil
 }
 
 func WriteOutputToFile(file string, data []string) error {
@@ -48,7 +64,7 @@ func NewSubdomainExtractor(domain string) (*RegexSubdomainExtractor, error) {
 	escapedDomain := regexp.QuoteMeta(domain)
 	// Pattern: [alphanumeric, asterisk, underscore, dot, hyphen]+.domain
 	// This matches subdomains like: api.example.com, sub.example.com, etc.
-	pattern := `(?i)[a-zA-Z0-9\*_.-]+\.` + escapedDomain 
+	pattern := `(?i)[a-zA-Z0-9\*_.-]+\.` + escapedDomain
 	extractor, err := regexp.Compile(pattern)
 	if err != nil {
 		return nil, err
@@ -65,21 +81,21 @@ func (r *RegexSubdomainExtractor) Extract(text string) []string {
 	for _, match := range matches {
 		if len(match) > 1 {
 			subdomain := strings.ToLower(strings.TrimSpace(match[1]))
-			
+
 			// Clean up common HTML entities
 			subdomain = strings.ReplaceAll(subdomain, "&#39;", "'")
 			subdomain = strings.ReplaceAll(subdomain, "&quot;", "\"")
 			subdomain = strings.ReplaceAll(subdomain, "&amp;", "&")
-			
+
 			// Remove HTML tags
 			subdomain = regexp.MustCompile(`<[^>]+>`).ReplaceAllString(subdomain, "")
-			
+
 			// Trim punctuation and whitespace
 			subdomain = strings.Trim(subdomain, ".,;:!?\"'()[]{}<> \t\n\r")
-			
+
 			// Remove trailing dots
 			subdomain = strings.TrimSuffix(subdomain, ".")
-			
+
 			// Validate and deduplicate
 			if isValidSubdomain(subdomain) && !seen[subdomain] {
 				seen[subdomain] = true

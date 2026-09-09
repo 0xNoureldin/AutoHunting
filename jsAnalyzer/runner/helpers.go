@@ -281,13 +281,28 @@ func EncodeSecretGroups(groups []SecretGroup) ([]byte, error) {
 	return json.MarshalIndent(groups, "", "  ")
 }
 
+// ReadInputFromFile reads one entry per line, trimming whitespace and
+// dropping blank lines and "#"-prefixed comments. A trailing newline --
+// the normal case for any file written by a text editor or by this
+// codebase's own writeLines-style helpers -- would otherwise produce a
+// spurious empty final entry (strings.Split on "a\n" returns ["a", ""]),
+// which the caller would otherwise scan as an extra, invalid URL.
 func ReadInputFromFile(file string) ([]string, error) {
-
 	fileData, err := os.ReadFile(file)
 	if err != nil {
 		return []string{}, err
 	}
-	return strings.Split(string(fileData), "\n"), nil
+
+	lines := strings.Split(string(fileData), "\n")
+	cleaned := make([]string, 0, len(lines))
+	for _, l := range lines {
+		l = strings.TrimSpace(l)
+		if l == "" || strings.HasPrefix(l, "#") {
+			continue
+		}
+		cleaned = append(cleaned, l)
+	}
+	return cleaned, nil
 }
 
 func WriteOutputToFile(file string, data []string) error {
