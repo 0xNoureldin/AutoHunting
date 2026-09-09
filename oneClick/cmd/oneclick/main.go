@@ -93,15 +93,15 @@ Options:
   -vh, -vhost                 Enable virtual host discovery: probes each target directly over
                               HTTP(S) with the Host header swapped to "word.domain" for every
                               entry in the subdomain wordlist (same one -fuzz-subs uses/
-                              downloads, or -sw), reporting hosts whose response genuinely
-                              differs. Finds vhosts that exist only in the server's own routing
-                              config, with no DNS record at all -- invisible to every other
-                              technique here. Every candidate that comes back 403 Forbidden is
-                              also recorded -- regardless of whether it's a confirmed hit -- in
-                              403.txt for manual follow-up, since a 403 usually means the host
-                              exists and is just being gated. Off by default; independent of
-                              -active, -mutations, -fuzz-subs, and -fuzz-urls, and can be
-                              combined with any of them.
+                              downloads, or -sw), reporting hosts whose response is confirmed,
+                              against a live control probe, to be genuinely different -- not
+                              just "status happens to be 403" or "looks different from a
+                              stale baseline", which is what a WAF/rate limit triggered
+                              mid-scan would otherwise turn every candidate into. Finds vhosts
+                              that exist only in the server's own routing config, with no DNS
+                              record at all -- invisible to every other technique here. Off by
+                              default; independent of -active, -mutations, -fuzz-subs, and
+                              -fuzz-urls, and can be combined with any of them.
   -sw, -subs-wordlist <path> Use this wordlist for subdomain fuzzing/vhost discovery instead of
                               downloading one (implies -fuzz-subs)
   -uw, -urls-wordlist <path> Use this wordlist for URL fuzzing instead of downloading one
@@ -132,11 +132,18 @@ Options:
   -r, -resume <dir>          Resume an interrupted run from its output directory (the one
                               printed as "output:" and in the interrupt message). Skips
                               every pipeline phase (subdomain enumeration, vhost discovery,
-                              port scanning, URL enumeration, secret scanning) that already
-                              finished, and continues with whatever's left. Restores the
-                              original run's target and flags automatically -- don't combine
-                              -resume with any other flag.
+                              403 detection, port scanning, URL enumeration, secret scanning)
+                              that already finished, and continues with whatever's left.
+                              Restores the original run's target and flags automatically --
+                              don't combine -resume with any other flag.
   -h, -help                  Show this help
+
+After every subdomain is known (from passive sources, DNS brute-force, and vhost discovery
+alike), every one of them is probed directly for a 403 Forbidden response -- always, not
+gated behind any flag above. Combined with -vhost's own findings and deduped, this becomes
+403.txt, which is then merged into subdomains.txt: a 403 usually means the host exists and
+is worth a closer look, not that it doesn't exist, so it gets the same downstream treatment
+(URL enumeration, port scanning) as anything else discovered.
 
 Examples:
   go run . -d example.com
@@ -488,6 +495,7 @@ func run() int {
 
 	subsPath := filepath.Join(outputDir, "subdomains.txt")
 	vhostSubsPath := filepath.Join(outputDir, "vhost_subdomains.txt")
+	vhostForbiddenPath := filepath.Join(outputDir, "vhost_403.txt")
 	forbiddenPath := filepath.Join(outputDir, "403.txt")
 	urlsPath := filepath.Join(outputDir, "urls.txt")
 	jsPath := filepath.Join(outputDir, "js_urls.txt")
@@ -562,16 +570,16 @@ func run() int {
 	// target throughout -- the same effect as pinning the domain to an IP
 	// in /etc/hosts and fuzzing the Host header, without touching system
 	// DNS config.
-	vhostCount, forbiddenCount := 0, 0
+	vhostCount, vhostForbiddenCount := 0, 0
 	if vhost {
 		if st.Completed.Vhost {
 			vhostCount = countNonEmptyLines(vhostSubsPath)
-			forbiddenCount = countNonEmptyLines(forbiddenPath)
+			vhostForbiddenCount = countNonEmptyLines(vhostForbiddenPath)
 			subsCount = countNonEmptyLines(subsPath)
-			ok("Already completed (resumed), skipping: %d vhost(s), %d 403(s)", vhostCount, forbiddenCount)
+			ok("Already completed (resumed), skipping: %d vhost(s), %d 403(s)", vhostCount, vhostForbiddenCount)
 		} else {
 			var vhostRC int
-			vhostRC, vhostCount, forbiddenCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, forbiddenPath, concurrency, timeout, logFile, stageLive)
+			vhostRC, vhostCount, vhostForbiddenCount = runVhostFuzz(repoRoot, rawDomains, subsWordlist, subsPath, vhostSubsPath, vhostForbiddenPath, concurrency, timeout, logFile, stageLive)
 			subsCount = countNonEmptyLines(subsPath)
 			if vhostRC != 0 {
 				warn("vhost discovery exited with an error (see %s)", logPath)
@@ -580,18 +588,67 @@ func run() int {
 			} else {
 				ok("Discovered %d vhost(s) -> %s (merged into %s, now %d total)", vhostCount, vhostSubsPath, subsPath, subsCount)
 			}
-			if forbiddenCount > 0 {
-				ok("%d candidate(s) returned 403 Forbidden, worth a manual look -> %s", forbiddenCount, forbiddenPath)
+			if vhostForbiddenCount > 0 {
+				ok("%d candidate(s) returned a distinct 403 Forbidden -> %s", vhostForbiddenCount, vhostForbiddenPath)
 			}
 			if err := st.markDone(func(c *completedPhases) { c.Vhost = true }); err != nil {
 				warn("Could not save resume state: %v", err)
 			}
 		}
 	}
-	// Always leave vhost_subdomains.txt and 403.txt in place (empty if
-	// -vhost wasn't used or nothing was found), so they're reliable paths
-	// to reference rather than sometimes missing.
+	// Always leave vhost_subdomains.txt and vhost_403.txt in place (empty
+	// if -vhost wasn't used or nothing was found), so they're reliable
+	// paths to reference rather than sometimes missing.
 	touchFile(vhostSubsPath)
+	touchFile(vhostForbiddenPath)
+
+	// 403 detection across every discovered subdomain so far (always
+	// runs, regardless of which discovery techniques were used): a direct
+	// probe of the confirmed subdomain list, on each host's own name --
+	// no baseline needed, since (unlike a vhost wordlist guess) every
+	// entry here is already a confirmed, real subdomain from passive
+	// sources, DNS brute-force, or vhost discovery merged in above.
+	// Combined with vhost's own (DNS-less) 403 findings and deduped, then
+	// merged into subdomains.txt so a 403-gated host gets the same
+	// downstream treatment as anything else discovered -- a 403 usually
+	// means the host exists and is worth a closer look, not that it
+	// doesn't exist.
+	step("Checking for 403 Forbidden across all subdomains")
+	forbiddenCount := 0
+	if st.Completed.Forbidden {
+		forbiddenCount = countNonEmptyLines(forbiddenPath)
+		subsCount = countNonEmptyLines(subsPath)
+		ok("Already completed (resumed), skipping: %d 403(s)", forbiddenCount)
+	} else {
+		vhostForbidden, err := readLines(vhostForbiddenPath)
+		if err != nil && !os.IsNotExist(err) {
+			warn("Could not read %s: %v", vhostForbiddenPath, err)
+		}
+		allSubs, err := readLines(subsPath)
+		if err != nil {
+			warn("Could not read %s for 403 probing: %v", subsPath, err)
+		}
+		directForbidden := probeSubdomainsForForbidden(allSubs, concurrency, timeout)
+		combined := sanitizeHostLines(append(vhostForbidden, directForbidden...))
+		if err := writeLines(forbiddenPath, combined); err != nil {
+			warn("Could not write %s: %v", forbiddenPath, err)
+		} else {
+			forbiddenCount = len(combined)
+		}
+		if forbiddenCount > 0 {
+			if err := mergeSanitizedHosts(forbiddenPath, subsPath); err != nil {
+				warn("Could not merge 403 hosts into %s: %v", subsPath, err)
+			} else {
+				subsCount = countNonEmptyLines(subsPath)
+			}
+			ok("%d subdomain(s) returned 403 Forbidden -> %s (merged into %s, now %d total)", forbiddenCount, forbiddenPath, subsPath, subsCount)
+		} else {
+			ok("No 403 Forbidden responses found")
+		}
+		if err := st.markDone(func(c *completedPhases) { c.Forbidden = true }); err != nil {
+			warn("Could not save resume state: %v", err)
+		}
+	}
 	touchFile(forbiddenPath)
 
 	// Port scanning (optional, off by default): a TCP-connect scan across
@@ -717,7 +774,8 @@ func run() int {
 			"generated:         %s\n"+
 			"subdomains found:  %d   (%s)\n"+
 			"  ...via vhost:    %d   (%s)\n"+
-			"403 to test:       %d   (%s)\n"+
+			"403 found:         %d   (%s)\n"+
+			"  ...via vhost:    %d   (%s)\n"+
 			"urls found:        %d   (%s)\n"+
 			"js files found:    %d   (%s)\n"+
 			"secrets output:    %s\n"+
@@ -735,6 +793,7 @@ func run() int {
 		subsCount, subsPath,
 		vhostCount, vhostSubsPath,
 		forbiddenCount, forbiddenPath,
+		vhostForbiddenCount, vhostForbiddenPath,
 		urlsCount, urlsPath,
 		jsCount, jsPath,
 		secretsPath,

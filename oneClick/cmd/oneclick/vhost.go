@@ -29,28 +29,26 @@ const vhostConcurrencyCap = 10
 // record: it builds "word.domain" candidates from wordlist for every
 // domain in domains, runs the vhosts/cmd/vhoster tool (Host-header fuzzing
 // against each domain's own resolved connection target, baseline-diffed
-// so only genuinely distinct responses are reported), writes whatever it
-// finds to vhostSubsPath (sanitized, deduped, sorted -- a standalone
-// deliverable in its own right, not just an intermediate file), and also
-// merges those same hosts into subsPath alongside the existing subdomain
-// list, so later stages see them too.
+// and live-control-confirmed so only genuinely distinct responses are
+// reported), writes whatever it finds to vhostSubsPath (sanitized,
+// deduped, sorted -- a standalone deliverable in its own right, not just
+// an intermediate file), and also merges those same hosts into subsPath
+// alongside the existing subdomain list, so later stages see them too.
 //
-// Separately, every candidate whose response came back 403 Forbidden --
-// regardless of whether it was confirmed as a distinct vhost -- is
-// sanitized and written to forbiddenPath. A 403 usually means the host
-// exists and is being actively gated (an internal admin panel, an
-// IP-allowlisted endpoint), which is worth a human's attention even when
-// vhoster's own baseline-diffing doesn't consider it different enough to
-// count as a hit (many WAFs/default vhosts return the same generic 403
-// page for every unrecognized Host too). These are NOT merged into
-// subsPath: unlike a confirmed vhost, a 403 alone isn't strong enough
-// evidence of a genuinely distinct host to feed into later stages, so
-// they're left for manual follow-up instead.
+// Separately, every candidate confirmed (against a live control, not
+// just "status happens to be 403") to be a genuinely distinct 403 is
+// sanitized and written to vhostForbiddenPath -- vhost's own contribution
+// to the pipeline's combined 403.txt, which the caller assembles
+// alongside a direct probe of every other confirmed subdomain (see
+// forbidden.go and main.go). This file only covers candidates that have
+// NO DNS record of their own (that's the whole point of vhost fuzzing);
+// a real, DNS-resolvable subdomain's own 403 is caught by that separate
+// direct probe instead, which needs no baseline at all.
 //
 // Returns the vhoster subprocess exit code (0 on success and when there's
 // nothing to do, e.g. no wordlist available), the number of distinct
 // vhosts discovered, and the number of 403 responses recorded.
-func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSubsPath, forbiddenPath string, concurrency, timeout int, logFile io.Writer, live bool) (int, int, int) {
+func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSubsPath, vhostForbiddenPath string, concurrency, timeout int, logFile io.Writer, live bool) (int, int, int) {
 	if wordlist == "" {
 		warn("No subdomain wordlist available, skipping vhost discovery")
 		return 0, 0, 0
@@ -120,8 +118,8 @@ func runVhostFuzz(repoRoot string, domains []string, wordlist, subsPath, vhostSu
 		warn("Could not read 403 results: %v", err)
 	} else {
 		forbiddenSanitized := sanitizeHostLines(forbidden)
-		if err := writeLines(forbiddenPath, forbiddenSanitized); err != nil {
-			warn("Could not write 403 hosts to %s: %v", forbiddenPath, err)
+		if err := writeLines(vhostForbiddenPath, forbiddenSanitized); err != nil {
+			warn("Could not write 403 hosts to %s: %v", vhostForbiddenPath, err)
 		} else {
 			forbiddenCount = len(forbiddenSanitized)
 		}

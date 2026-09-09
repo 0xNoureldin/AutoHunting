@@ -42,6 +42,7 @@ type runConfig struct {
 type completedPhases struct {
 	Subdomains bool `json:"subdomains"`
 	Vhost      bool `json:"vhost"`
+	Forbidden  bool `json:"forbidden"`
 	PortScan   bool `json:"portScan"`
 	URLEnum    bool `json:"urlEnum"`
 	Secrets    bool `json:"secrets"`
