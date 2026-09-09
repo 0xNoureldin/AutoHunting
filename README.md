@@ -369,15 +369,20 @@ the default timeout to 300s unless `-t` is set explicitly.
 
 Once every subdomain is known -- from passive sources, `-fuzz-subs`, and `-vhost` alike --
 every one of them is probed directly, on its own hostname, for a 403 Forbidden response.
-Unlike `-vhost`'s own check (which tests wordlist *guesses* against an unknown routing target
-and needs the live-control comparison to rule out "none of these hosts are real"), this runs
-on subdomains already confirmed real, so a 403 on any of them is meaningful on its own -- no
-baseline needed. This step always runs, regardless of which flags above were used (even a
-bare `go run . -d example.com` with no flags at all). Combined with `-vhost`'s own
-`vhost_403.txt` findings and deduped, the result becomes `403.txt`, which is then merged into
-`subdomains.txt`: a 403 usually means the host exists and is worth a closer look, not that it
-doesn't exist, so it gets the same downstream treatment (URL enumeration, port scanning) as
-anything else discovered. One caveat: a `-vhost`-only host has no DNS record of its own (that
+Unlike `-vhost`'s own check (which tests wordlist *guesses* against an unknown routing
+target), every host here is already a confirmed, real subdomain -- but that alone doesn't
+guarantee its 403 is host-specific signal: a WAF/CDN can 403 every request indiscriminately
+regardless of hostname, and upstream over-collection (e.g. a DNS brute-force run into a
+wildcarded zone, which used to hand this stage thousands of hosts that were never really
+distinct) can flood it the same way an unconfirmed vhost guess would. So only a 403 that's
+genuinely distinct from whatever the overwhelming majority of other 403s on this run look
+like is kept; a shared response shape across most of the confirmed hosts is treated as a
+generic block rather than real signal. This step always runs, regardless of which flags
+above were used (even a bare `go run . -d example.com` with no flags at all). Combined with
+`-vhost`'s own `vhost_403.txt` findings and deduped, the result becomes `403.txt`, which is
+then merged into `subdomains.txt`: a 403 usually means the host exists and is worth a closer
+look, not that it doesn't exist, so it gets the same downstream treatment (URL enumeration,
+port scanning) as anything else discovered. One caveat: a `-vhost`-only host has no DNS record of its own (that
 was the whole point of finding it that way), so once merged into `subdomains.txt` it can still
 only actually be reached the same way `-vhost` reached it -- later stages that resolve DNS
 directly (URL enumeration, `-port-scan`) won't be able to connect to it under its bare name.

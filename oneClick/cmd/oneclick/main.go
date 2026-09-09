@@ -144,10 +144,14 @@ Options:
 
 After every subdomain is known (from passive sources, DNS brute-force, and vhost discovery
 alike), every one of them is probed directly for a 403 Forbidden response -- always, not
-gated behind any flag above. Combined with -vhost's own findings and deduped, this becomes
-403.txt, which is then merged into subdomains.txt: a 403 usually means the host exists and
-is worth a closer look, not that it doesn't exist, so it gets the same downstream treatment
-(URL enumeration, port scanning) as anything else discovered.
+gated behind any flag above. Only 403s genuinely distinct from whatever the majority of
+other 403s on the run look like are kept, so a WAF/CDN 403-ing every request indiscriminately
+(or upstream over-collection handing this stage lots of hosts that were never really
+distinct) doesn't flood the results the same way an unconfirmed vhost guess could. Combined
+with -vhost's own findings and deduped, this becomes 403.txt, which is then merged into
+subdomains.txt: a 403 usually means the host exists and is worth a closer look, not that it
+doesn't exist, so it gets the same downstream treatment (URL enumeration, port scanning) as
+anything else discovered.
 
 Examples:
   go run . -d example.com
@@ -607,15 +611,21 @@ func run() int {
 
 	// 403 detection across every discovered subdomain so far (always
 	// runs, regardless of which discovery techniques were used): a direct
-	// probe of the confirmed subdomain list, on each host's own name --
-	// no baseline needed, since (unlike a vhost wordlist guess) every
-	// entry here is already a confirmed, real subdomain from passive
-	// sources, DNS brute-force, or vhost discovery merged in above.
-	// Combined with vhost's own (DNS-less) 403 findings and deduped, then
-	// merged into subdomains.txt so a 403-gated host gets the same
-	// downstream treatment as anything else discovered -- a 403 usually
-	// means the host exists and is worth a closer look, not that it
-	// doesn't exist.
+	// probe of the confirmed subdomain list, on each host's own name.
+	// Being a confirmed, real subdomain doesn't guarantee its 403 is
+	// host-specific signal, though -- a WAF/CDN can 403 every request
+	// indiscriminately, and upstream over-collection (e.g. wildcard DNS
+	// making unrelated brute-force words all resolve) can hand this stage
+	// thousands of "confirmed" hosts that were never really distinct in
+	// the first place. So probeSubdomainsForForbidden only reports a 403
+	// that's genuinely distinct from whatever the overwhelming majority of
+	// other 403s on this run look like (see filterGenericForbidden),
+	// mirroring the same reasoning vhost fuzzing's live-control check
+	// applies to its own wordlist guesses. Combined with vhost's own
+	// (DNS-less) 403 findings and deduped, then merged into
+	// subdomains.txt so a 403-gated host gets the same downstream
+	// treatment as anything else discovered -- a 403 usually means the
+	// host exists and is worth a closer look, not that it doesn't exist.
 	step("Checking for 403 Forbidden across all subdomains")
 	forbiddenCount := 0
 	if st.Completed.Forbidden {

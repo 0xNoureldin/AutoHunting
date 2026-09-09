@@ -1,13 +1,13 @@
 package dnsprobe
 
 import (
+	cryptorand "crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"math/rand"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/cyinnove/logify"
 	"github.com/cyinnove/tldify"
@@ -129,8 +129,26 @@ func ProbeSubdomains(subdomains []string, timeout int, concurrency int) []string
 	return aliveSubdomains
 }
 
+// detectWildcard probes a random, practically guaranteed-absent subdomain
+// of host's own zone and, if it resolves, returns that result as the
+// "wildcard" answer every genuinely nonexistent name in this zone gets --
+// so runDnsProbe can tell a real hit apart from the zone's own wildcard
+// DNS record (very common behind a CDN) instead of reporting every single
+// brute-force candidate as "alive" once one is in play.
+//
+// The probe label MUST be a single, syntactically valid DNS label: a
+// wildcard record ("*.domain.tld") only matches a query name with exactly
+// one extra label in front of it, so a malformed probe -- one containing
+// literal "." characters of its own, like a timestamp string -- turns
+// into several extra labels and will never match the wildcard regardless
+// of whether one is actually configured. That previously made wildcard
+// detection always report "no wildcard" here, however "wildcarded" the
+// real target was.
 func detectWildcard(host string) (*client.Result, bool) {
-	randomSub := time.Now().String()
+	randomSub, err := randomLabel()
+	if err != nil {
+		return nil, false
+	}
 
 	parsedDomain, err := tldify.Parse(host)
 	if err != nil {
@@ -153,6 +171,17 @@ func detectWildcard(host string) (*client.Result, bool) {
 
 func randomResolver() string {
 	return client.DefaultResolvers[rand.Intn(len(client.DefaultResolvers))]
+}
+
+// randomLabel returns a random, fixed-length hex string safe to use as a
+// single DNS label (letters and digits only -- no dots, spaces, or other
+// characters that would split into extra labels or get rejected outright).
+func randomLabel() (string, error) {
+	b := make([]byte, 8)
+	if _, err := cryptorand.Read(b); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(b), nil
 }
 
 func getHashForResults(result *client.Result) string {
