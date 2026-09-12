@@ -171,7 +171,7 @@ full pipeline walkthrough and every flag.
 ## ⚙️ Installation
 
 ```bash
-git clone --branch ReconeEngine --single-branch https://github.com/0xNoureldin/AutoHunting.git
+git clone --branch ReconEngine --single-branch https://github.com/0xNoureldin/AutoHunting.git
 cd AutoHunting
 ```
 
